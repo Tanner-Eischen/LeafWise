@@ -1,124 +1,308 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:plant_social/core/models/user.dart';
 
-part 'auth_models.freezed.dart';
 part 'auth_models.g.dart';
 
-@freezed
-class LoginRequest with _$LoginRequest {
-  const factory LoginRequest({
-    required String email,
-    required String password,
-  }) = _LoginRequest;
+@JsonSerializable()
+class LoginRequest {
+  final String email;
+  final String password;
 
-  factory LoginRequest.fromJson(Map<String, dynamic> json) => _$LoginRequestFromJson(json);
+  const LoginRequest({
+    required this.email,
+    required this.password,
+  });
+
+  factory LoginRequest.fromJson(Map<String, dynamic> json) {
+    return LoginRequest(
+      email: json['email'] as String,
+      password: json['password'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'email': email,
+      'password': password,
+    };
+  }
 }
 
-@freezed
-class RegisterRequest with _$RegisterRequest {
-  const factory RegisterRequest({
-    required String email,
-    required String username,
-    required String password,
-    required String confirmPassword,
-    String? fullName,
-    String? inviteCode,
-  }) = _RegisterRequest;
+@JsonSerializable()
+class RegisterRequest {
+  final String email;
+  final String username;
+  final String password;
+  final String confirmPassword;
+  final String? fullName;
+  final String? inviteCode;
 
-  factory RegisterRequest.fromJson(Map<String, dynamic> json) => _$RegisterRequestFromJson(json);
+  const RegisterRequest({
+    required this.email,
+    required this.username,
+    required this.password,
+    required this.confirmPassword,
+    this.fullName,
+    this.inviteCode,
+  });
+
+  factory RegisterRequest.fromJson(Map<String, dynamic> json) {
+    return RegisterRequest(
+      email: json['email'] as String,
+      username: json['username'] as String,
+      password: json['password'] as String,
+      confirmPassword: json['confirmPassword'] as String,
+      fullName: json['fullName'] as String?,
+      inviteCode: json['inviteCode'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'email': email,
+      'username': username,
+      'password': password,
+      'confirmPassword': confirmPassword,
+      'fullName': fullName,
+      'inviteCode': inviteCode,
+    };
+  }
 }
 
-@freezed
-class AuthResponse with _$AuthResponse {
-  const factory AuthResponse({
-    required String accessToken,
-    required String refreshToken,
-    required User user,
-    String? tokenType,
-    int? expiresIn,
-  }) = _AuthResponse;
+@JsonSerializable()
+class AuthResponse {
+  final String accessToken;
+  final String refreshToken;
+  final User user;
+  final String? tokenType;
+  final int? expiresIn;
 
-  factory AuthResponse.fromJson(Map<String, dynamic> json) => _$AuthResponseFromJson(json);
+  const AuthResponse({
+    required this.accessToken,
+    required this.refreshToken,
+    required this.user,
+    this.tokenType,
+    this.expiresIn,
+  });
+
+  factory AuthResponse.fromJson(Map<String, dynamic> json) {
+    return AuthResponse(
+      accessToken: json['accessToken'] as String,
+      refreshToken: json['refreshToken'] as String,
+      user: User.fromJson(json['user'] as Map<String, dynamic>),
+      tokenType: json['tokenType'] as String?,
+      expiresIn: json['expiresIn'] as int?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'accessToken': accessToken,
+      'refreshToken': refreshToken,
+      'user': user.toJson(),
+      'tokenType': tokenType,
+      'expiresIn': expiresIn,
+    };
+  }
 }
 
-@freezed
-class RefreshTokenRequest with _$RefreshTokenRequest {
-  const factory RefreshTokenRequest({
-    required String refreshToken,
-  }) = _RefreshTokenRequest;
+@JsonSerializable()
+class RefreshTokenRequest {
+  final String refreshToken;
 
-  factory RefreshTokenRequest.fromJson(Map<String, dynamic> json) => _$RefreshTokenRequestFromJson(json);
+  const RefreshTokenRequest({
+    required this.refreshToken,
+  });
+
+  factory RefreshTokenRequest.fromJson(Map<String, dynamic> json) {
+    return RefreshTokenRequest(
+      refreshToken: json['refreshToken'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'refreshToken': refreshToken,
+    };
+  }
 }
 
-@freezed
-class ForgotPasswordRequest with _$ForgotPasswordRequest {
-  const factory ForgotPasswordRequest({
-    required String email,
-  }) = _ForgotPasswordRequest;
+@JsonSerializable()
+class ForgotPasswordRequest {
+  final String email;
 
-  factory ForgotPasswordRequest.fromJson(Map<String, dynamic> json) => _$ForgotPasswordRequestFromJson(json);
+  const ForgotPasswordRequest({
+    required this.email,
+  });
+
+  factory ForgotPasswordRequest.fromJson(Map<String, dynamic> json) {
+    return ForgotPasswordRequest(
+      email: json['email'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'email': email,
+    };
+  }
 }
 
-@freezed
-class ResetPasswordRequest with _$ResetPasswordRequest {
-  const factory ResetPasswordRequest({
-    required String token,
-    required String newPassword,
-    required String confirmPassword,
-  }) = _ResetPasswordRequest;
+@JsonSerializable()
+class ResetPasswordRequest {
+  final String token;
+  final String newPassword;
+  final String confirmPassword;
 
-  factory ResetPasswordRequest.fromJson(Map<String, dynamic> json) => _$ResetPasswordRequestFromJson(json);
+  const ResetPasswordRequest({
+    required this.token,
+    required this.newPassword,
+    required this.confirmPassword,
+  });
+
+  factory ResetPasswordRequest.fromJson(Map<String, dynamic> json) {
+    return ResetPasswordRequest(
+      token: json['token'] as String,
+      newPassword: json['newPassword'] as String,
+      confirmPassword: json['confirmPassword'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'token': token,
+      'newPassword': newPassword,
+      'confirmPassword': confirmPassword,
+    };
+  }
 }
 
-@freezed
-class ChangePasswordRequest with _$ChangePasswordRequest {
-  const factory ChangePasswordRequest({
-    required String currentPassword,
-    required String newPassword,
-    required String confirmPassword,
-  }) = _ChangePasswordRequest;
+@JsonSerializable()
+class ChangePasswordRequest {
+  final String currentPassword;
+  final String newPassword;
+  final String confirmPassword;
 
-  factory ChangePasswordRequest.fromJson(Map<String, dynamic> json) => _$ChangePasswordRequestFromJson(json);
+  const ChangePasswordRequest({
+    required this.currentPassword,
+    required this.newPassword,
+    required this.confirmPassword,
+  });
+
+  factory ChangePasswordRequest.fromJson(Map<String, dynamic> json) {
+    return ChangePasswordRequest(
+      currentPassword: json['currentPassword'] as String,
+      newPassword: json['newPassword'] as String,
+      confirmPassword: json['confirmPassword'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'currentPassword': currentPassword,
+      'newPassword': newPassword,
+      'confirmPassword': confirmPassword,
+    };
+  }
 }
 
-@freezed
-class VerifyEmailRequest with _$VerifyEmailRequest {
-  const factory VerifyEmailRequest({
-    required String token,
-  }) = _VerifyEmailRequest;
+@JsonSerializable()
+class VerifyEmailRequest {
+  final String token;
 
-  factory VerifyEmailRequest.fromJson(Map<String, dynamic> json) => _$VerifyEmailRequestFromJson(json);
+  const VerifyEmailRequest({
+    required this.token,
+  });
+
+  factory VerifyEmailRequest.fromJson(Map<String, dynamic> json) {
+    return VerifyEmailRequest(
+      token: json['token'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'token': token,
+    };
+  }
 }
 
-@freezed
-class ResendVerificationRequest with _$ResendVerificationRequest {
-  const factory ResendVerificationRequest({
-    required String email,
-  }) = _ResendVerificationRequest;
+@JsonSerializable()
+class ResendVerificationRequest {
+  final String email;
 
-  factory ResendVerificationRequest.fromJson(Map<String, dynamic> json) => _$ResendVerificationRequestFromJson(json);
+  const ResendVerificationRequest({
+    required this.email,
+  });
+
+  factory ResendVerificationRequest.fromJson(Map<String, dynamic> json) {
+    return ResendVerificationRequest(
+      email: json['email'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'email': email,
+    };
+  }
 }
 
 // Response models
-@freezed
-class MessageResponse with _$MessageResponse {
-  const factory MessageResponse({
-    required String message,
-    bool? success,
-  }) = _MessageResponse;
+@JsonSerializable()
+class MessageResponse {
+  final String message;
+  final bool? success;
 
-  factory MessageResponse.fromJson(Map<String, dynamic> json) => _$MessageResponseFromJson(json);
+  const MessageResponse({
+    required this.message,
+    this.success,
+  });
+
+  factory MessageResponse.fromJson(Map<String, dynamic> json) {
+    return MessageResponse(
+      message: json['message'] as String,
+      success: json['success'] as bool?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'message': message,
+      'success': success,
+    };
+  }
 }
 
-@freezed
-class TokenValidationResponse with _$TokenValidationResponse {
-  const factory TokenValidationResponse({
-    required bool isValid,
-    String? message,
-    DateTime? expiresAt,
-  }) = _TokenValidationResponse;
+@JsonSerializable()
+class TokenValidationResponse {
+  final bool isValid;
+  final String? message;
+  final DateTime? expiresAt;
 
-  factory TokenValidationResponse.fromJson(Map<String, dynamic> json) => _$TokenValidationResponseFromJson(json);
+  const TokenValidationResponse({
+    required this.isValid,
+    this.message,
+    this.expiresAt,
+  });
+
+  factory TokenValidationResponse.fromJson(Map<String, dynamic> json) {
+    return TokenValidationResponse(
+      isValid: json['isValid'] as bool,
+      message: json['message'] as String?,
+      expiresAt: json['expiresAt'] != null 
+          ? DateTime.parse(json['expiresAt'] as String)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'isValid': isValid,
+      'message': message,
+      'expiresAt': expiresAt?.toIso8601String(),
+    };
+  }
 }
 
 // Validation extensions

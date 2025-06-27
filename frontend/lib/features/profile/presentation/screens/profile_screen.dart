@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../auth/providers/auth_provider.dart';
+import '../../../auth/providers/auth_provider.dart';
 
 /// Profile screen displaying user information and settings
 class ProfileScreen extends ConsumerWidget {

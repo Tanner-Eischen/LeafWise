@@ -12,7 +12,7 @@ import 'package:plant_social/features/stories/presentation/screens/story_viewer_
 import 'package:plant_social/features/stories/presentation/screens/story_creation_screen.dart';
 import 'package:plant_social/features/stories/presentation/screens/stories_screen.dart';
 import 'package:plant_social/features/profile/presentation/screens/profile_screen.dart';
-import 'package:plant_social/features/profile/presentation/screens/edit_profile_screen.dart';
+import 'package:plant_social/features/profile/presentation/screens/profile_edit_screen.dart';
 import 'package:plant_social/features/friends/presentation/screens/friends_screen.dart';
 import 'package:plant_social/features/friends/presentation/screens/add_friends_screen.dart';
 import 'package:plant_social/features/plant/presentation/screens/plant_features_screen.dart';
@@ -23,7 +23,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   
   return GoRouter(
     initialLocation: '/splash',
-    redirect: (context, state) {
+    redirect: (BuildContext context, GoRouterState state) {
       final isLoggedIn = authState.isAuthenticated;
       final isLoggingIn = state.matchedLocation == '/login' || 
                          state.matchedLocation == '/register';
@@ -45,26 +45,26 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/splash',
         name: 'splash',
-        builder: (context, state) => const SplashScreen(),
+        builder: (BuildContext context, GoRouterState state) => const SplashScreen(),
       ),
       
       // Authentication Routes
       GoRoute(
         path: '/login',
         name: 'login',
-        builder: (context, state) => const LoginScreen(),
+        builder: (BuildContext context, GoRouterState state) => const LoginScreen(),
       ),
       GoRoute(
         path: '/register',
         name: 'register',
-        builder: (context, state) => const RegisterScreen(),
+        builder: (BuildContext context, GoRouterState state) => const RegisterScreen(),
       ),
       
       // Main App Routes
       GoRoute(
         path: '/home',
         name: 'home',
-        builder: (context, state) => const MainScreen(),
+        builder: (BuildContext context, GoRouterState state) => const MainScreen(),
         routes: [
           // Camera Route
           GoRoute(
@@ -130,7 +130,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: 'edit',
                 name: 'edit-profile',
-                builder: (context, state) => const EditProfileScreen(),
+                builder: (context, state) => const ProfileEditScreen(),
               ),
             ],
           ),
@@ -158,7 +158,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         ],
       ),
     ],
-    errorBuilder: (context, state) => Scaffold(
+    errorBuilder: (BuildContext context, GoRouterState state) => Scaffold(
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

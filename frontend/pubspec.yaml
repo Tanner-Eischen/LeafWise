@@ -90,9 +90,9 @@ flutter:
     - assets/icons/
     - assets/animations/
   
-  fonts:
-    - family: PlantSocial
-      fonts:
-        - asset: assets/fonts/PlantSocial-Regular.ttf
-        - asset: assets/fonts/PlantSocial-Bold.ttf
-          weight: 700
+  # fonts:
+  #   - family: PlantSocial
+  #     fonts:
+  #       - asset: assets/fonts/PlantSocial-Regular.ttf
+  #       - asset: assets/fonts/PlantSocial-Bold.ttf
+  #         weight: 700

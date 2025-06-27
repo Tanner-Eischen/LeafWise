@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../auth/providers/auth_provider.dart';
+import '../../../auth/providers/auth_provider.dart';
 
 /// Profile edit screen for updating user information
 class ProfileEditScreen extends ConsumerStatefulWidget {
