@@ -4,10 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:plant_social/core/router/app_router.dart';
 import 'package:plant_social/features/auth/providers/auth_provider.dart';
 import 'package:plant_social/features/home/presentation/screens/home_screen.dart';
-import 'package:plant_social/features/plant/presentation/screens/plant_features_screen.dart';
 
-/// Main screen with bottom tab navigation
-/// Serves as the primary navigation hub for the authenticated app
 class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
 
@@ -25,7 +22,6 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     super.dispose();
   }
 
-  /// Handle bottom navigation tab selection
   void _onTabTapped(int index) {
     setState(() {
       _currentIndex = index;
@@ -37,14 +33,12 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     );
   }
 
-  /// Handle page view changes
   void _onPageChanged(int index) {
     setState(() {
       _currentIndex = index;
     });
   }
 
-  /// Handle logout functionality
   Future<void> _handleLogout() async {
     final shouldLogout = await showDialog<bool>(
       context: context,
@@ -83,10 +77,10 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         controller: _pageController,
         onPageChanged: _onPageChanged,
         children: [
-          const HomeScreen(), // Existing home screen
+          const HomeScreen(), // Home screen
           _buildCameraPlaceholder(context, theme),
           _buildChatPlaceholder(context, theme),
-          const PlantFeaturesScreen(), // Plant features
+          _buildStoriesPlaceholder(context, theme),
           _buildProfilePlaceholder(context, theme, authState.user?.displayName),
         ],
       ),
@@ -115,9 +109,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
             label: 'Chat',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.local_florist_outlined),
-            activeIcon: Icon(Icons.local_florist),
-            label: 'Plants',
+            icon: Icon(Icons.auto_stories_outlined),
+            activeIcon: Icon(Icons.auto_stories),
+            label: 'Stories',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),
@@ -129,7 +123,6 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     );
   }
 
-  /// Placeholder screen for camera functionality
   Widget _buildCameraPlaceholder(BuildContext context, ThemeData theme) {
     return Scaffold(
       appBar: AppBar(
@@ -158,21 +151,12 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                 color: theme.colorScheme.onSurface.withOpacity(0.7),
               ),
             ),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: () {
-                context.push(AppRoutes.camera);
-              },
-              icon: const Icon(Icons.camera_alt),
-              label: const Text('Open Camera'),
-            ),
           ],
         ),
       ),
     );
   }
 
-  /// Placeholder screen for chat functionality
   Widget _buildChatPlaceholder(BuildContext context, ThemeData theme) {
     return Scaffold(
       appBar: AppBar(
@@ -201,17 +185,39 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                 color: theme.colorScheme.onSurface.withOpacity(0.7),
               ),
             ),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Chat feature coming soon!'),
-                  ),
-                );
-              },
-              icon: const Icon(Icons.chat),
-              label: const Text('Start Chatting'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStoriesPlaceholder(BuildContext context, ThemeData theme) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Stories'),
+        backgroundColor: theme.colorScheme.surface,
+        elevation: 0,
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.auto_stories_outlined,
+              size: 64,
+              color: theme.colorScheme.primary,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Stories',
+              style: theme.textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Share your plant moments',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurface.withOpacity(0.7),
+              ),
             ),
           ],
         ),
@@ -219,9 +225,6 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     );
   }
 
-
-
-  /// Placeholder screen for profile functionality
   Widget _buildProfilePlaceholder(BuildContext context, ThemeData theme, String? userName) {
     return Scaffold(
       appBar: AppBar(

@@ -82,7 +82,7 @@ class AuthButton extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (icon != null) ..[
+                  if (icon != null) ...[
                     Icon(
                       icon,
                       size: 20,

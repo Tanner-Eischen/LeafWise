@@ -12,9 +12,6 @@ abstract class AuthRepository {
   Future<MessageResponse> forgotPassword(String email);
   Future<MessageResponse> resetPassword(String token, String newPassword);
   Future<MessageResponse> changePassword(String currentPassword, String newPassword);
-  Future<MessageResponse> verifyEmail(String token);
-  Future<MessageResponse> resendVerification(String email);
-  Future<TokenValidationResponse> validateToken(String token);
 }
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -132,50 +129,6 @@ class AuthRepositoryImpl implements AuthRepository {
       );
       
       return MessageResponse.fromJson(response.data);
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  @override
-  Future<MessageResponse> verifyEmail(String token) async {
-    try {
-      final request = VerifyEmailRequest(token: token);
-      final response = await _apiClient.post(
-        '/auth/verify-email',
-        data: request.toJson(),
-      );
-      
-      return MessageResponse.fromJson(response.data);
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  @override
-  Future<MessageResponse> resendVerification(String email) async {
-    try {
-      final request = ResendVerificationRequest(email: email);
-      final response = await _apiClient.post(
-        '/auth/resend-verification',
-        data: request.toJson(),
-      );
-      
-      return MessageResponse.fromJson(response.data);
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  @override
-  Future<TokenValidationResponse> validateToken(String token) async {
-    try {
-      final response = await _apiClient.post(
-        '/auth/validate-token',
-        data: {'token': token},
-      );
-      
-      return TokenValidationResponse.fromJson(response.data);
     } catch (e) {
       rethrow;
     }

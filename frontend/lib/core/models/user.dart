@@ -1,120 +1,39 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-@JsonSerializable()
-class User {
-  final String id;
-  final String email;
-  final String username;
-  final String? fullName;
-  final String? bio;
-  final String? profilePictureUrl;
-  final String? location;
-  final DateTime? dateOfBirth;
-  final bool isPrivate;
-  final int followersCount;
-  final int followingCount;
-  final int postsCount;
-  final bool isActive;
-  final bool isVerified;
-  final DateTime? lastSeen;
-  final DateTime createdAt;
-  final DateTime? updatedAt;
-  
-  // Plant-related fields for Phase 2
-  final List<String> plantInterests;
-  final String? experienceLevel; // 'beginner', 'intermediate', 'expert'
-  final List<String> favoriteGenres;
-  final String? gardenType; // 'indoor', 'outdoor', 'balcony', 'greenhouse'
-  final String? climate; // 'tropical', 'temperate', 'arid', 'continental'
+part 'user.freezed.dart';
+part 'user.g.dart';
 
-  const User({
-    required this.id,
-    required this.email,
-    required this.username,
-    this.fullName,
-    this.bio,
-    this.profilePictureUrl,
-    this.location,
-    this.dateOfBirth,
-    this.isPrivate = false,
-    this.followersCount = 0,
-    this.followingCount = 0,
-    this.postsCount = 0,
-    this.isActive = true,
-    this.isVerified = false,
-    this.lastSeen,
-    required this.createdAt,
-    this.updatedAt,
-    this.plantInterests = const [],
-    this.experienceLevel,
-    this.favoriteGenres = const [],
-    this.gardenType,
-    this.climate,
-  });
+@freezed
+class User with _$User {
+  const factory User({
+    required String id,
+    required String email,
+    required String username,
+    String? displayName,
+    String? bio,
+    String? profilePictureUrl,
+    String? location,
+    DateTime? dateOfBirth,
+    @Default(false) bool isPrivate,
+    @Default(0) int followersCount,
+    @Default(0) int followingCount,
+    @Default(0) int postsCount,
+    @Default(true) bool isActive,
+    @Default(false) bool isVerified,
+    DateTime? lastSeen,
+    required DateTime createdAt,
+    DateTime? updatedAt,
+    
+    // Plant-specific fields for Phase 2
+    @Default([]) List<String> plantInterests,
+    String? experienceLevel, // 'beginner', 'intermediate', 'expert'
+    @Default([]) List<String> favoriteGenres,
+    String? gardenType, // 'indoor', 'outdoor', 'balcony', 'greenhouse'
+    String? climate, // 'tropical', 'temperate', 'arid', 'continental'
+  }) = _User;
 
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
-      id: json['id'] as String,
-      email: json['email'] as String,
-      username: json['username'] as String,
-      fullName: json['fullName'] as String?,
-      bio: json['bio'] as String?,
-      profilePictureUrl: json['profilePictureUrl'] as String?,
-      location: json['location'] as String?,
-      dateOfBirth: json['dateOfBirth'] != null
-          ? DateTime.parse(json['dateOfBirth'] as String)
-          : null,
-      isPrivate: json['isPrivate'] as bool? ?? false,
-      followersCount: json['followersCount'] as int? ?? 0,
-      followingCount: json['followingCount'] as int? ?? 0,
-      postsCount: json['postsCount'] as int? ?? 0,
-      isActive: json['isActive'] as bool? ?? true,
-      isVerified: json['isVerified'] as bool? ?? false,
-      lastSeen: json['lastSeen'] != null
-          ? DateTime.parse(json['lastSeen'] as String)
-          : null,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: json['updatedAt'] != null
-          ? DateTime.parse(json['updatedAt'] as String)
-          : null,
-      plantInterests: (json['plantInterests'] as List<dynamic>? ?? [])
-          .map((e) => e as String)
-          .toList(),
-      experienceLevel: json['experienceLevel'] as String?,
-      favoriteGenres: (json['favoriteGenres'] as List<dynamic>? ?? [])
-          .map((e) => e as String)
-          .toList(),
-      gardenType: json['gardenType'] as String?,
-      climate: json['climate'] as String?,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'email': email,
-      'username': username,
-      'fullName': fullName,
-      'bio': bio,
-      'profilePictureUrl': profilePictureUrl,
-      'location': location,
-      'dateOfBirth': dateOfBirth?.toIso8601String(),
-      'isPrivate': isPrivate,
-      'followersCount': followersCount,
-      'followingCount': followingCount,
-      'postsCount': postsCount,
-      'isActive': isActive,
-      'isVerified': isVerified,
-      'lastSeen': lastSeen?.toIso8601String(),
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt?.toIso8601String(),
-      'plantInterests': plantInterests,
-      'experienceLevel': experienceLevel,
-      'favoriteGenres': favoriteGenres,
-      'gardenType': gardenType,
-      'climate': climate,
-    };
-  }
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 }
 
 @freezed
@@ -166,15 +85,15 @@ class UpdateUserRequest with _$UpdateUserRequest {
 
 // Extension methods for User
 extension UserExtension on User {
-  String get displayName => fullName?.isNotEmpty == true ? fullName! : username;
+  String get name => displayName ?? username;
   
   String get initials {
-    if (fullName?.isNotEmpty == true) {
-      final parts = fullName!.split(' ');
+    if (displayName?.isNotEmpty == true) {
+      final parts = displayName!.split(' ');
       if (parts.length >= 2) {
         return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
       }
-      return fullName![0].toUpperCase();
+      return displayName![0].toUpperCase();
     }
     return username[0].toUpperCase();
   }

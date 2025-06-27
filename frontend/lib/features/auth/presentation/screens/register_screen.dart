@@ -19,7 +19,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _usernameController = TextEditingController();
-  final _fullNameController = TextEditingController();
+  final _displayNameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
@@ -30,7 +30,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   void dispose() {
     _emailController.dispose();
     _usernameController.dispose();
-    _fullNameController.dispose();
+    _displayNameController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
@@ -50,8 +50,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         username: _usernameController.text.trim(),
         password: _passwordController.text,
         confirmPassword: _confirmPasswordController.text,
-        fullName: _fullNameController.text.trim().isNotEmpty 
-            ? _fullNameController.text.trim() 
+        displayName: _displayNameController.text.trim().isNotEmpty 
+            ? _displayNameController.text.trim() 
             : null,
       );
       
@@ -130,25 +130,20 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final authState = ref.watch(authProvider);
     
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+        title: const Text('Register'),
         leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: theme.colorScheme.onSurface,
-          ),
           onPressed: () => context.go(AppRoutes.login),
+          icon: const Icon(Icons.arrow_back),
         ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24),
           child: Form(
             key: _formKey,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Header
                 Center(
@@ -218,11 +213,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 
                 const SizedBox(height: 16),
                 
-                // Full Name Field (Optional)
+                // Display Name Field (Optional)
                 AuthTextField(
-                  controller: _fullNameController,
-                  label: 'Full Name (Optional)',
-                  hintText: 'Enter your full name',
+                  controller: _displayNameController,
+                  label: 'Display Name (Optional)',
+                  hintText: 'Enter your display name',
                   prefixIcon: Icons.badge_outlined,
                   textInputAction: TextInputAction.next,
                 ),

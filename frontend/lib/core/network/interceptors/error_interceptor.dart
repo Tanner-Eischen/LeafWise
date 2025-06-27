@@ -18,7 +18,7 @@ class ErrorInterceptor extends Interceptor {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
-        return ApiException(
+        return const ApiException(
           message: 'Connection timeout. Please check your internet connection.',
           statusCode: 408,
           type: ApiExceptionType.timeout,
@@ -28,21 +28,21 @@ class ErrorInterceptor extends Interceptor {
         return _handleResponseError(error);
 
       case DioExceptionType.cancel:
-        return ApiException(
+        return const ApiException(
           message: 'Request was cancelled.',
           statusCode: 0,
           type: ApiExceptionType.cancel,
         );
 
       case DioExceptionType.connectionError:
-        return ApiException(
+        return const ApiException(
           message: 'No internet connection. Please check your network settings.',
           statusCode: 0,
           type: ApiExceptionType.network,
         );
 
       case DioExceptionType.badCertificate:
-        return ApiException(
+        return const ApiException(
           message: 'Certificate verification failed.',
           statusCode: 0,
           type: ApiExceptionType.network,
@@ -50,7 +50,7 @@ class ErrorInterceptor extends Interceptor {
 
       case DioExceptionType.unknown:
       default:
-        return ApiException(
+        return const ApiException(
           message: 'An unexpected error occurred. Please try again.',
           statusCode: 0,
           type: ApiExceptionType.unknown,
