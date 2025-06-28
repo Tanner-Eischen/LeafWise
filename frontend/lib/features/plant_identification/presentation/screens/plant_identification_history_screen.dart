@@ -21,7 +21,7 @@ class _PlantIdentificationHistoryScreenState
     super.initState();
     // Load history when screen opens
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(plantIdentificationProvider.notifier).loadHistory();
+      ref.read(plantIdentificationProvider.notifier).loadIdentificationHistory();
     });
   }
 
@@ -40,7 +40,7 @@ class _PlantIdentificationHistoryScreenState
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {
-              ref.read(plantIdentificationProvider.notifier).loadHistory();
+              ref.read(plantIdentificationProvider.notifier).loadIdentificationHistory();
             },
           ),
         ],
@@ -59,7 +59,7 @@ class _PlantIdentificationHistoryScreenState
         child: CustomErrorWidget(
           message: state.error!,
           onRetry: () {
-            ref.read(plantIdentificationProvider.notifier).loadHistory();
+            ref.read(plantIdentificationProvider.notifier).loadIdentificationHistory();
           },
         ),
       );
@@ -71,7 +71,7 @@ class _PlantIdentificationHistoryScreenState
 
     return RefreshIndicator(
       onRefresh: () async {
-        await ref.read(plantIdentificationProvider.notifier).loadHistory();
+        await ref.read(plantIdentificationProvider.notifier).loadIdentificationHistory();
       },
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
@@ -386,7 +386,7 @@ class _PlantIdentificationHistoryScreenState
                     ),
 
                     // Care info
-                    if (identification.careInfo != null) ..[
+                    if (identification.careInfo != null) ...[
                       const SizedBox(height: 16),
                       Text(
                         'Care Information',

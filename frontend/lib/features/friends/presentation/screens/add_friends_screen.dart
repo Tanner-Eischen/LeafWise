@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/models/user.dart';
 
 /// Add friends screen for discovering and connecting with new users
 class AddFriendsScreen extends ConsumerStatefulWidget {
@@ -366,7 +367,7 @@ class _AddFriendsScreenState extends ConsumerState<AddFriendsScreen> {
               radius: 24,
               backgroundColor: theme.colorScheme.primary,
               child: Text(
-                user.name.split(' ').map((name) => name[0]).join(),
+                user.displayName.split(' ').map((name) => name[0]).join(),
                 style: TextStyle(
                   color: theme.colorScheme.onPrimary,
                   fontWeight: FontWeight.bold,
@@ -384,7 +385,7 @@ class _AddFriendsScreenState extends ConsumerState<AddFriendsScreen> {
                     children: [
                       Expanded(
                         child: Text(
-                          user.name,
+                          user.displayName,
                           style: const TextStyle(fontWeight: FontWeight.w500),
                         ),
                       ),
@@ -563,7 +564,7 @@ class _AddFriendsScreenState extends ConsumerState<AddFriendsScreen> {
     
     return allUsers.where((user) {
       final searchLower = query.toLowerCase();
-      return user.name.toLowerCase().contains(searchLower) ||
+      return user.displayName.toLowerCase().contains(searchLower) ||
              user.username.toLowerCase().contains(searchLower) ||
              user.bio.toLowerCase().contains(searchLower);
     }).toList();
@@ -590,7 +591,7 @@ class _AddFriendsScreenState extends ConsumerState<AddFriendsScreen> {
     
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Friend request sent to ${user.name}'),
+        content: Text('Friend request sent to ${user.displayName}'),
         backgroundColor: Colors.green,
       ),
     );
@@ -603,7 +604,7 @@ class _AddFriendsScreenState extends ConsumerState<AddFriendsScreen> {
     
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Friend request to ${user.name} cancelled'),
+        content: Text('Friend request to ${user.displayName} cancelled'),
       ),
     );
   }
@@ -611,7 +612,7 @@ class _AddFriendsScreenState extends ConsumerState<AddFriendsScreen> {
   void _viewProfile(MockUser user) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Opening ${user.name}\'s profile (Demo mode)'),
+        content: Text('Opening ${user.displayName}\'s profile (Demo mode)'),
       ),
     );
   }
@@ -811,4 +812,6 @@ class MockUser {
     this.isVerified = false,
     this.status = UserStatus.notConnected,
   });
+
+  String get displayName => name;
 }

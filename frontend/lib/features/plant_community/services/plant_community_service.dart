@@ -405,7 +405,7 @@ class PlantCommunityService {
     String status,
   ) async {
     try {
-      final response = await _apiService.patch(
+      final response = await _apiService.put(
         '/plant-trades/$tradeId/status',
         data: {'status': status},
       );

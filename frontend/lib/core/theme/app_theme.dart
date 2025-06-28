@@ -264,8 +264,8 @@ class AppTheme {
     );
   }
 
-  static CardTheme _buildCardTheme(bool isLight) {
-    return CardTheme(
+  static CardThemeData _buildCardTheme(bool isLight) {
+    return CardThemeData(
       elevation: 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),

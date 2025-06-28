@@ -1,14 +1,11 @@
-/**
- * Reusable custom button widgets for consistent styling across the app
- * Provides various button styles with loading states and customization options
- */
+/// Reusable custom button widgets for consistent styling across the app
+/// Provides various button styles with loading states and customization options
+library;
 
 import 'package:flutter/material.dart';
 import 'loading_widget.dart';
 
-/**
- * Primary custom button with loading state support
- */
+/// Primary custom button with loading state support
 class CustomButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;
@@ -63,7 +60,7 @@ class CustomButton extends StatelessWidget {
             : Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (icon != null) ..[
+                  if (icon != null) ...[
                     Icon(icon, size: 18),
                     const SizedBox(width: 8),
                   ],
@@ -81,9 +78,7 @@ class CustomButton extends StatelessWidget {
   }
 }
 
-/**
- * Secondary/outline button variant
- */
+/// Secondary/outline button variant
 class CustomOutlineButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;
@@ -141,7 +136,7 @@ class CustomOutlineButton extends StatelessWidget {
             : Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (icon != null) ..[
+                  if (icon != null) ...[
                     Icon(icon, size: 18),
                     const SizedBox(width: 8),
                   ],
@@ -159,9 +154,7 @@ class CustomOutlineButton extends StatelessWidget {
   }
 }
 
-/**
- * Text button variant
- */
+/// Text button variant
 class CustomTextButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;
@@ -200,7 +193,7 @@ class CustomTextButton extends StatelessWidget {
           : Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (icon != null) ..[
+                if (icon != null) ...[
                   Icon(icon, size: 18),
                   const SizedBox(width: 8),
                 ],
@@ -217,9 +210,7 @@ class CustomTextButton extends StatelessWidget {
   }
 }
 
-/**
- * Floating action button variant
- */
+/// Floating action button variant
 class CustomFloatingActionButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final IconData icon;

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:plant_social/core/network/api_client.dart';
 import 'package:plant_social/features/plant_identification/models/plant_identification_models.dart';
+import 'package:plant_social/features/plant_care/models/plant_care_models.dart';
 import 'package:plant_social/features/plant_identification/services/plant_identification_service.dart';
 import 'dart:io';
 
@@ -88,6 +89,13 @@ class PlantIdentificationNotifier extends StateNotifier<PlantIdentificationState
   void clearCurrentIdentification() {
     state = state.copyWith(currentIdentification: null);
   }
+
+  void clearSearch() {
+    state = state.copyWith(
+      identifications: [],
+      error: null,
+    );
+  }
 }
 
 // State notifier provider
@@ -100,6 +108,6 @@ final plantIdentificationHistoryProvider = FutureProvider<List<PlantIdentificati
   (ref) => ref.read(plantIdentificationServiceProvider).getIdentificationHistory(),
 );
 
-final plantSpeciesProvider = FutureProvider.family<PlantIdentification, String>(
+final plantSpeciesProvider = FutureProvider.family<PlantSpecies, String>(
   (ref, speciesId) => ref.read(plantIdentificationServiceProvider).getPlantSpecies(speciesId),
 );

@@ -41,7 +41,7 @@ final userPlantProvider = FutureProvider.family<UserPlant, String>((ref, plantId
 // Plant species provider for selection
 final plantSpeciesSearchProvider = FutureProvider.family<List<PlantSpecies>, String>((ref, query) async {
   final service = ref.watch(plantCareServiceProvider);
-  return service.getPlantSpecies(search: query, limit: 20);
+  return service.searchPlantSpecies(search: query, limit: 20);
 });
 
 // Care statistics provider

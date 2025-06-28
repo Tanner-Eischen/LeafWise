@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:plant_social/features/plant_community/models/plant_community_models.dart';
-import 'package:plant_social/core/theme/app_theme.dart';
-import 'package:plant_social/core/utils/date_utils.dart';
+import 'package:plant_social/core/utils/date_utils.dart' as app_date_utils;
 import 'package:plant_social/core/widgets/user_avatar.dart';
 
 class TradeCard extends StatelessWidget {
@@ -88,8 +87,8 @@ class TradeCard extends StatelessWidget {
       children: [
         // User avatar
         UserAvatar(
-          imageUrl: trade.userAvatar,
-          username: trade.username,
+          imageUrl: trade.userAvatarUrl,
+          username: trade.userDisplayName ?? 'Unknown User',
           size: 32,
         ),
         const SizedBox(width: 12),
@@ -100,13 +99,13 @@ class TradeCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                trade.username,
+                trade.userDisplayName ?? 'Unknown User',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
               ),
               Text(
-                DateUtils.formatRelativeTime(trade.createdAt),
+                app_date_utils.DateUtils.formatRelativeTime(trade.createdAt),
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: Colors.grey[600],
                 ),
@@ -188,7 +187,7 @@ class TradeCard extends StatelessWidget {
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  trade.plantName,
+                  trade.speciesCommonName ?? trade.title,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: Colors.green[700],
@@ -198,10 +197,10 @@ class TradeCard extends StatelessWidget {
             ],
           ),
           
-          if (trade.plantSpecies.isNotEmpty) ..[
+          if (trade.speciesScientificName != null && trade.speciesScientificName!.isNotEmpty) ...[
             const SizedBox(height: 4),
             Text(
-              trade.plantSpecies,
+              trade.speciesScientificName!,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: Colors.grey[600],
                 fontStyle: FontStyle.italic,
@@ -210,7 +209,7 @@ class TradeCard extends StatelessWidget {
           ],
 
           // What they want (for trade/swap)
-          if (trade.tradeType != TradeType.giveaway && trade.wantedPlant.isNotEmpty) ..[
+          if (trade.tradeType != TradeType.giveAway && trade.description.isNotEmpty) ...[
             const SizedBox(height: 8),
             Row(
               children: [
@@ -222,7 +221,7 @@ class TradeCard extends StatelessWidget {
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    'Looking for: ${trade.wantedPlant}',
+                    'Description: ${trade.description}',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: Colors.blue[700],
                     ),
@@ -233,7 +232,7 @@ class TradeCard extends StatelessWidget {
           ],
 
           // Price (for sale)
-          if (trade.tradeType == TradeType.sale && trade.price != null) ..[
+          if (trade.tradeType == TradeType.sell && trade.price != null) ...[
             const SizedBox(height: 8),
             Row(
               children: [
@@ -244,7 +243,7 @@ class TradeCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  '\$${trade.price!.toStringAsFixed(2)}',
+                  '\$${trade.price}',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Colors.orange[700],
@@ -327,7 +326,7 @@ class TradeCard extends StatelessWidget {
     return Row(
       children: [
         // Location
-        if (trade.location.isNotEmpty) ..[
+        if (trade.location.isNotEmpty) ...[
           Icon(
             Icons.location_on_outlined,
             size: 16,
@@ -347,7 +346,7 @@ class TradeCard extends StatelessWidget {
           const Spacer(),
 
         // Interest count
-        if (trade.interestedUsers.isNotEmpty) ..[
+        if (trade.interestedCount > 0) ...[
           const SizedBox(width: 12),
           Row(
             children: [
@@ -358,7 +357,7 @@ class TradeCard extends StatelessWidget {
               ),
               const SizedBox(width: 4),
               Text(
-                '${trade.interestedUsers.length}',
+                '${trade.interestedCount}',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: Colors.grey[600],
                 ),
@@ -376,11 +375,11 @@ class TradeCard extends StatelessWidget {
               IconButton(
                 onPressed: onInterest,
                 icon: Icon(
-                  trade.userInterested
+                  trade.hasExpressedInterest
                       ? Icons.favorite
                       : Icons.favorite_outline,
                   size: 20,
-                  color: trade.userInterested
+                  color: trade.hasExpressedInterest
                       ? Colors.red
                       : Colors.grey[600],
                 ),
@@ -419,9 +418,9 @@ class TradeCard extends StatelessWidget {
     switch (tradeType) {
       case TradeType.trade:
         return Colors.blue;
-      case TradeType.sale:
+      case TradeType.sell:
         return Colors.orange;
-      case TradeType.giveaway:
+      case TradeType.giveAway:
         return Colors.green;
       default:
         return Colors.grey;
@@ -432,9 +431,9 @@ class TradeCard extends StatelessWidget {
     switch (tradeType) {
       case TradeType.trade:
         return Icons.swap_horiz;
-      case TradeType.sale:
+      case TradeType.sell:
         return Icons.attach_money;
-      case TradeType.giveaway:
+      case TradeType.giveAway:
         return Icons.card_giftcard;
       default:
         return Icons.help_outline;

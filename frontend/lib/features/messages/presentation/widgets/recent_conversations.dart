@@ -9,7 +9,7 @@ class RecentConversations extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -40,10 +40,10 @@ class RecentConversations extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 16),
-          
+
           // Sample Conversations
           ..._buildSampleConversations(context, theme),
-          
+
           // Empty State
           if (_getSampleConversations().isEmpty)
             _buildEmptyState(context, theme),
@@ -52,9 +52,10 @@ class RecentConversations extends ConsumerWidget {
     );
   }
 
-  List<Widget> _buildSampleConversations(BuildContext context, ThemeData theme) {
+  List<Widget> _buildSampleConversations(
+      BuildContext context, ThemeData theme) {
     final conversations = _getSampleConversations();
-    
+
     return conversations.take(3).map((conversation) {
       return Padding(
         padding: const EdgeInsets.only(bottom: 12),
@@ -77,7 +78,8 @@ class RecentConversations extends ConsumerWidget {
           children: [
             CircleAvatar(
               radius: 24,
-              backgroundColor: (conversation['avatarColor'] as Color).withOpacity(0.2),
+              backgroundColor:
+                  (conversation['avatarColor'] as Color).withOpacity(0.2),
               child: Text(
                 conversation['name'][0].toUpperCase(),
                 style: theme.textTheme.titleMedium?.copyWith(
@@ -130,7 +132,7 @@ class RecentConversations extends ConsumerWidget {
                 color: theme.colorScheme.onSurface.withOpacity(0.5),
               ),
             ),
-            if (conversation['unreadCount'] as int > 0) ..[
+            if (conversation['unreadCount'] as int > 0) ...[
               const SizedBox(height: 4),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),

@@ -167,7 +167,7 @@ class CareReminderCard extends StatelessWidget {
                     ),
 
                     // Notes if available
-                    if (reminder.notes != null && reminder.notes!.isNotEmpty) ..[
+                    if (reminder.notes != null && reminder.notes!.isNotEmpty) ...[
                       const SizedBox(height: 8),
                       Text(
                         reminder.notes!,

@@ -30,7 +30,7 @@ class VoteButtons extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final dimensions = _getDimensions();
-    
+
     final upvoteButton = _buildVoteButton(
       icon: Icons.keyboard_arrow_up,
       isSelected: userVote == 'upvote',
@@ -65,7 +65,7 @@ class VoteButtons extends StatelessWidget {
           upvoteButton,
           SizedBox(width: dimensions.spacing),
           scoreText,
-          if (downvoteButton != null) ..[
+          if (downvoteButton != null) ...[
             SizedBox(width: dimensions.spacing),
             downvoteButton,
           ],
@@ -78,7 +78,7 @@ class VoteButtons extends StatelessWidget {
           upvoteButton,
           SizedBox(height: dimensions.spacing),
           scoreText,
-          if (downvoteButton != null) ..[
+          if (downvoteButton != null) ...[
             SizedBox(height: dimensions.spacing),
             downvoteButton,
           ],
@@ -194,7 +194,7 @@ class VoteCounter extends StatelessWidget {
     final theme = Theme.of(context);
     final score = upvotes - downvotes;
     final fontSize = _getFontSize();
-    
+
     if (showIndividualCounts) {
       return Row(
         mainAxisSize: MainAxisSize.min,

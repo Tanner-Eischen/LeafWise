@@ -2,21 +2,63 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:plant_social/core/constants/app_constants.dart';
 import 'package:plant_social/core/models/user.dart';
-import 'package:plant_social/core/network/api_client.dart';
 import 'package:plant_social/core/exceptions/api_exception.dart';
 import 'package:plant_social/features/auth/models/auth_models.dart';
 import 'package:plant_social/features/auth/repositories/auth_repository.dart';
 import 'dart:convert';
 
-@freezed
-class AuthState with _$AuthState {
-  const factory AuthState({
+// part 'auth_provider.g.dart'; // Commented out until code generation works
+
+class AuthState {
+  final User? user;
+  final bool isAuthenticated;
+  final bool isLoading;
+  final String? error;
+  final bool isInitialized;
+
+  const AuthState({
+    this.user,
+    this.isAuthenticated = false,
+    this.isLoading = false,
+    this.error,
+    this.isInitialized = false,
+  });
+  
+  AuthState copyWith({
     User? user,
-    @Default(false) bool isAuthenticated,
-    @Default(false) bool isLoading,
+    bool? isAuthenticated,
+    bool? isLoading,
     String? error,
-    @Default(false) bool isInitialized,
-  }) = _AuthState;
+    bool? isInitialized,
+  }) {
+    return AuthState(
+      user: user ?? this.user,
+      isAuthenticated: isAuthenticated ?? this.isAuthenticated,
+      isLoading: isLoading ?? this.isLoading,
+      error: error ?? this.error,
+      isInitialized: isInitialized ?? this.isInitialized,
+    );
+  }
+  
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is AuthState &&
+        other.user == user &&
+        other.isAuthenticated == isAuthenticated &&
+        other.isLoading == isLoading &&
+        other.error == error &&
+        other.isInitialized == isInitialized;
+  }
+  
+  @override
+  int get hashCode {
+    return user.hashCode ^
+        isAuthenticated.hashCode ^
+        isLoading.hashCode ^
+        error.hashCode ^
+        isInitialized.hashCode;
+  }
 }
 
 class AuthNotifier extends StateNotifier<AuthState> {

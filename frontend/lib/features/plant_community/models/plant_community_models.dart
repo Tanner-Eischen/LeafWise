@@ -10,9 +10,11 @@ class PlantQuestion {
   final String content;
   final String? imageUrl;
   final String? plantSpeciesId;
+  final String category;
   final List<String> tags;
   final int upvotes;
   final int downvotes;
+  final int views;
   final int answerCount;
   final bool isSolved;
   final String? acceptedAnswerId;
@@ -38,9 +40,11 @@ class PlantQuestion {
     required this.content,
     this.imageUrl,
     this.plantSpeciesId,
+    this.category = QuestionCategory.general,
     this.tags = const [],
     this.upvotes = 0,
     this.downvotes = 0,
+    this.views = 0,
     this.answerCount = 0,
     this.isSolved = false,
     this.acceptedAnswerId,
@@ -62,9 +66,11 @@ class PlantQuestion {
       content: json['content'] as String,
       imageUrl: json['imageUrl'] as String?,
       plantSpeciesId: json['plantSpeciesId'] as String?,
+      category: json['category'] as String? ?? QuestionCategory.general,
       tags: (json['tags'] as List<dynamic>?)?.cast<String>() ?? [],
       upvotes: json['upvotes'] as int? ?? 0,
       downvotes: json['downvotes'] as int? ?? 0,
+      views: json['views'] as int? ?? 0,
       answerCount: json['answerCount'] as int? ?? 0,
       isSolved: json['isSolved'] as bool? ?? false,
       acceptedAnswerId: json['acceptedAnswerId'] as String?,
@@ -87,9 +93,11 @@ class PlantQuestion {
       'content': content,
       'imageUrl': imageUrl,
       'plantSpeciesId': plantSpeciesId,
+      'category': category,
       'tags': tags,
       'upvotes': upvotes,
       'downvotes': downvotes,
+      'views': views,
       'answerCount': answerCount,
       'isSolved': isSolved,
       'acceptedAnswerId': acceptedAnswerId,
@@ -111,9 +119,11 @@ class PlantQuestion {
     String? content,
     String? imageUrl,
     String? plantSpeciesId,
+    String? category,
     List<String>? tags,
     int? upvotes,
     int? downvotes,
+    int? views,
     int? answerCount,
     bool? isSolved,
     String? acceptedAnswerId,
@@ -133,9 +143,11 @@ class PlantQuestion {
       content: content ?? this.content,
       imageUrl: imageUrl ?? this.imageUrl,
       plantSpeciesId: plantSpeciesId ?? this.plantSpeciesId,
+      category: category ?? this.category,
       tags: tags ?? this.tags,
       upvotes: upvotes ?? this.upvotes,
       downvotes: downvotes ?? this.downvotes,
+      views: views ?? this.views,
       answerCount: answerCount ?? this.answerCount,
       isSolved: isSolved ?? this.isSolved,
       acceptedAnswerId: acceptedAnswerId ?? this.acceptedAnswerId,
@@ -441,8 +453,7 @@ class PlantTradeRequest {
     };
   }
 
-  factory PlantTradeRequest.fromJson(Map<String, dynamic> json) =>
-      _$PlantTradeRequestFromJson(json);
+
 }
 
 @JsonSerializable()

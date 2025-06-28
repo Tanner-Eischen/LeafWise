@@ -403,7 +403,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
               ),
               textAlign: TextAlign.center,
             ),
-            if (buttonText != null && onButtonPressed != null) ..[
+            if (buttonText != null && onButtonPressed != null) ...[
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: onButtonPressed,

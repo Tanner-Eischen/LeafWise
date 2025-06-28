@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:plant_social/features/plant_community/models/plant_community_models.dart';
 import 'package:plant_social/core/theme/app_theme.dart';
-import 'package:plant_social/core/utils/date_utils.dart';
+import 'package:plant_social/core/utils/date_utils.dart' as AppDateUtils;
 import 'package:plant_social/core/widgets/user_avatar.dart';
 import 'package:plant_social/core/widgets/vote_buttons.dart';
 
@@ -72,8 +72,8 @@ class QuestionCard extends StatelessWidget {
               const SizedBox(height: 12),
 
               // Images preview
-              if (question.imageUrls.isNotEmpty) _buildImagePreview(),
-              if (question.imageUrls.isNotEmpty) const SizedBox(height: 12),
+              if (question.imageUrl != null) _buildImagePreview(),
+              if (question.imageUrl != null) const SizedBox(height: 12),
 
               // Footer with stats and actions
               _buildFooter(theme),
@@ -89,8 +89,8 @@ class QuestionCard extends StatelessWidget {
       children: [
         // User avatar
         UserAvatar(
-          imageUrl: question.userAvatar,
-          username: question.username,
+          imageUrl: question.userAvatarUrl,
+          username: question.userDisplayName ?? 'Anonymous',
           size: 32,
         ),
         const SizedBox(width: 12),
@@ -101,13 +101,13 @@ class QuestionCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                question.username,
+                question.userDisplayName ?? 'Anonymous',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
               ),
               Text(
-                DateUtils.formatRelativeTime(question.createdAt),
+                AppDateUtils.DateUtils.formatRelativeTime(question.createdAt),
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: Colors.grey[600],
                 ),
@@ -178,66 +178,29 @@ class QuestionCard extends StatelessWidget {
   }
 
   Widget _buildImagePreview() {
-    final imageCount = question.imageUrls.length;
-    final displayCount = showFullContent ? imageCount : (imageCount > 3 ? 3 : imageCount);
+    if (question.imageUrl == null) return const SizedBox.shrink();
     
-    return SizedBox(
+    return Container(
       height: 80,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: displayCount,
-        itemBuilder: (context, index) {
-          final isLast = index == displayCount - 1;
-          final hasMore = !showFullContent && imageCount > 3;
-          
-          return Container(
-            margin: EdgeInsets.only(right: isLast ? 0 : 8),
-            child: Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    question.imageUrls[index],
-                    width: 80,
-                    height: 80,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        width: 80,
-                        height: 80,
-                        color: Colors.grey[200],
-                        child: const Icon(
-                          Icons.image_not_supported,
-                          color: Colors.grey,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                
-                // Show count overlay on last image if there are more
-                if (isLast && hasMore)
-                  Positioned.fill(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.black54,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Center(
-                        child: Text(
-                          '+${imageCount - 3}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          );
-        },
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Image.network(
+          question.imageUrl!,
+          width: 80,
+          height: 80,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              width: 80,
+              height: 80,
+              color: Colors.grey[200],
+              child: const Icon(
+                Icons.image_not_supported,
+                color: Colors.grey,
+              ),
+            );
+          },
+        ),
       ),
     );
   }

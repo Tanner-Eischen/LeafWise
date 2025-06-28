@@ -356,7 +356,7 @@ class _PlantTradesScreenState extends ConsumerState<PlantTradesScreen>
   }
 
   void _expressInterest(String tradeId) {
-    ref.read(plantCommunityProvider.notifier).expressInterestInTrade(tradeId);
+    ref.read(plantCommunityProvider.notifier).expressInterest(tradeId);
   }
 
   void _navigateToCreateTrade() {

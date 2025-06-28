@@ -174,8 +174,8 @@ class _AddPlantScreenState extends ConsumerState<AddPlantScreen> {
         const SizedBox(height: 12),
         CustomTextField(
           controller: _searchController,
-          hintText: 'Search for plant species...',
-          prefixIcon: Icons.search,
+          hint: 'Search for plant species...',
+          prefixIcon: const Icon(Icons.search),
           onChanged: _searchSpecies,
           validator: (value) {
             if (_selectedSpecies == null) {
@@ -280,9 +280,9 @@ class _AddPlantScreenState extends ConsumerState<AddPlantScreen> {
         const SizedBox(height: 16),
         CustomTextField(
           controller: _nicknameController,
-          labelText: 'Plant Nickname',
-          hintText: 'Give your plant a name...',
-          prefixIcon: Icons.pets,
+          label: 'Plant Nickname',
+          hint: 'Give your plant a name...',
+          prefixIcon: const Icon(Icons.pets),
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
               return 'Please enter a nickname for your plant';
@@ -293,9 +293,9 @@ class _AddPlantScreenState extends ConsumerState<AddPlantScreen> {
         const SizedBox(height: 16),
         CustomTextField(
           controller: _locationController,
-          labelText: 'Location (Optional)',
-          hintText: 'Where is this plant located?',
-          prefixIcon: Icons.location_on,
+          label: 'Location (Optional)',
+          hint: 'Where is this plant located?',
+          prefixIcon: const Icon(Icons.location_on),
         ),
         const SizedBox(height: 16),
         ListTile(
@@ -314,9 +314,9 @@ class _AddPlantScreenState extends ConsumerState<AddPlantScreen> {
         const SizedBox(height: 16),
         CustomTextField(
           controller: _notesController,
-          labelText: 'Notes (Optional)',
-          hintText: 'Any additional notes about your plant...',
-          prefixIcon: Icons.note,
+          label: 'Notes (Optional)',
+          hint: 'Any additional notes about your plant...',
+          prefixIcon: const Icon(Icons.note),
           maxLines: 3,
         ),
       ],
@@ -392,9 +392,7 @@ class _AddPlantScreenState extends ConsumerState<AddPlantScreen> {
     });
 
     try {
-      final results = await ref
-          .read(plantIdentificationProvider.notifier)
-          .searchPlants(query);
+      final results = await ref.read(plantSpeciesSearchProvider(query).future);
       
       setState(() {
         _searchResults = results;
@@ -449,10 +447,7 @@ class _AddPlantScreenState extends ConsumerState<AddPlantScreen> {
             : _notesController.text.trim(),
       );
 
-      await ref.read(plantCareProvider.notifier).addUserPlant(
-            request,
-            imageFile: _selectedImage,
-          );
+      await ref.read(plantCareProvider.notifier).createUserPlant(request);
 
       if (mounted) {
         Navigator.pop(context, true);

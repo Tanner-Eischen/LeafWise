@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:plant_social/core/network/api_client.dart';
 import 'package:plant_social/features/plant_identification/models/plant_identification_models.dart';
+import 'package:plant_social/features/plant_care/models/plant_care_models.dart';
 
 class PlantIdentificationService {
   final ApiClient _apiClient;
@@ -42,10 +43,10 @@ class PlantIdentificationService {
     }
   }
 
-  Future<PlantIdentification> getPlantSpecies(String speciesId) async {
+  Future<PlantSpecies> getPlantSpecies(String speciesId) async {
     try {
       final response = await _apiClient.get('/plants/species/$speciesId');
-      return PlantIdentification.fromJson(response.data['data']);
+      return PlantSpecies.fromJson(response.data['data']);
     } catch (e) {
       throw Exception('Failed to get plant species: $e');
     }

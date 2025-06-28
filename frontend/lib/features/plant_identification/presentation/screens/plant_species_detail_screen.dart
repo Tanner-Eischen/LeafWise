@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:plant_social/features/plant_identification/models/plant_identification_models.dart';
+import 'package:plant_social/features/plant_identification/models/plant_identification_models.dart' as identification_models;
+import 'package:plant_social/features/plant_care/models/plant_care_models.dart';
 import 'package:plant_social/features/plant_identification/providers/plant_identification_provider.dart';
 import 'package:plant_social/core/theme/app_theme.dart';
 import 'package:plant_social/core/widgets/loading_widget.dart';
@@ -26,16 +27,12 @@ class _PlantSpeciesDetailScreenState
   @override
   void initState() {
     super.initState();
-    // Load species details when screen opens
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(plantSpeciesDetailProvider(widget.speciesId).notifier)
-          .loadSpeciesDetail(widget.speciesId);
-    });
+    // Species details will be automatically loaded by the provider
   }
 
   @override
   Widget build(BuildContext context) {
-    final speciesDetailAsync = ref.watch(plantSpeciesDetailProvider(widget.speciesId));
+    final speciesDetailAsync = ref.watch(plantSpeciesProvider(widget.speciesId));
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -71,9 +68,8 @@ class _PlantSpeciesDetailScreenState
         child: CustomErrorWidget(
           message: error,
           onRetry: () {
-            ref.read(plantSpeciesDetailProvider(widget.speciesId).notifier)
-                .loadSpeciesDetail(widget.speciesId);
-          },
+              ref.invalidate(plantSpeciesProvider(widget.speciesId));
+            },
         ),
       ),
     );
@@ -178,10 +174,10 @@ class _PlantSpeciesDetailScreenState
                 ),
                 const SizedBox(height: 8),
 
-                // Family
-                if (species.family != null)
+                // Description
+                if (species.description != null)
                   Text(
-                    'Family: ${species.family}',
+                    'Description: ${species.description}',
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: Colors.grey[600],
                     ),
@@ -189,7 +185,7 @@ class _PlantSpeciesDetailScreenState
                 const SizedBox(height: 24),
 
                 // Description
-                if (species.description != null) ..[
+                if (species.description != null) ...[
                   _buildSection(
                     'Description',
                     species.description!,
@@ -200,20 +196,20 @@ class _PlantSpeciesDetailScreenState
                 ],
 
                 // Care information
-                if (species.careInfo != null) ..[
+                if (species.careInfo != null) ...[
                   _buildCareSection(species.careInfo!, theme),
                   const SizedBox(height: 24),
                 ],
 
                 // Alternative names
-                if (species.alternativeNames.isNotEmpty) ..[
-                  _buildAlternativeNamesSection(species.alternativeNames, theme),
+                if (species.alternativeNames != null && species.alternativeNames!.isNotEmpty) ...[
+                  _buildAlternativeNamesSection(species.alternativeNames!, theme),
                   const SizedBox(height: 24),
                 ],
 
                 // Native regions
-                if (species.nativeRegions.isNotEmpty) ..[
-                  _buildNativeRegionsSection(species.nativeRegions, theme),
+                if (species.nativeRegions != null && species.nativeRegions!.isNotEmpty) ...[
+                  _buildNativeRegionsSection(species.nativeRegions!, theme),
                   const SizedBox(height: 24),
                 ],
 
@@ -444,14 +440,26 @@ class _PlantSpeciesDetailScreenState
   Widget _buildGrowthCharacteristics(PlantSpecies species, ThemeData theme) {
     final characteristics = <String>[];
     
+    characteristics.add('Scientific Name: ${species.scientificName}');
+    
+    if (species.family != null) {
+      characteristics.add('Family: ${species.family}');
+    }
+    
+    if (species.alternativeNames != null && species.alternativeNames!.isNotEmpty) {
+      characteristics.add('Alternative Names: ${species.alternativeNames!.join(', ')}');
+    }
+    
     if (species.maxHeight != null) {
       characteristics.add('Max Height: ${species.maxHeight}');
     }
+    
     if (species.bloomTime != null) {
       characteristics.add('Bloom Time: ${species.bloomTime}');
     }
+    
     if (species.plantType != null) {
-      characteristics.add('Type: ${species.plantType}');
+      characteristics.add('Plant Type: ${species.plantType}');
     }
 
     if (characteristics.isEmpty) return const SizedBox.shrink();

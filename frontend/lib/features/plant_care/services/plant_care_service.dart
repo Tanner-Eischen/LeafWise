@@ -237,7 +237,7 @@ class PlantCareService {
   }
 
   // Plant Species (for reference)
-  Future<List<PlantSpecies>> getPlantSpecies({
+  Future<List<PlantSpecies>> searchPlantSpecies({
     String? search,
     int? limit,
   }) async {

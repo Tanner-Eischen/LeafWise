@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../../../core/models/user.dart';
 import '../../../auth/providers/auth_provider.dart';
 
 /// Profile screen displaying user information and settings
@@ -69,33 +71,41 @@ class ProfileScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: authState.when(
-        data: (state) => _buildProfileContent(context, theme, state),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error, size: 64, color: Colors.red),
-              const SizedBox(height: 16),
-              Text('Error loading profile: $error'),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => ref.refresh(authProvider),
-                child: const Text('Retry'),
-              ),
-            ],
-          ),
-        ),
-      ),
+      body: _buildBody(context, theme, authState, ref),
     );
+  }
+
+  Widget _buildBody(BuildContext context, ThemeData theme, AuthState authState, WidgetRef ref) {
+    if (authState.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (authState.error != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.error, size: 64, color: Colors.red),
+            const SizedBox(height: 16),
+            Text('Error loading profile: ${authState.error}'),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () => ref.refresh(authProvider),
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return _buildProfileContent(context, theme, authState);
   }
 
   Widget _buildProfileContent(BuildContext context, ThemeData theme, AuthState state) {
     // Mock user data for demonstration
     final mockUser = MockUser(
       id: state.user?.id ?? 'user1',
-      name: state.user?.name ?? 'Plant Lover',
+      name: state.user?.displayName ?? 'Plant Lover',
       email: state.user?.email ?? 'plantlover@example.com',
       bio: 'Passionate about plants and sustainable living 🌱\nSharing my green journey with fellow plant enthusiasts!',
       location: 'San Francisco, CA',
@@ -143,7 +153,7 @@ class ProfileScreen extends ConsumerWidget {
               radius: 60,
               backgroundColor: theme.colorScheme.primary,
               child: Text(
-                user.name.split(' ').map((name) => name[0]).join(),
+                user.displayName.split(' ').map((name) => name[0]).join(),
                 style: TextStyle(
                   fontSize: 36,
                   fontWeight: FontWeight.bold,
@@ -188,7 +198,7 @@ class ProfileScreen extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              user.name,
+              user.displayName,
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -619,4 +629,6 @@ class MockUser {
     required this.postsCount,
     required this.plantsCount,
   });
+
+  String get displayName => name;
 }

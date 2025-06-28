@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/models/user.dart';
 import '../../../auth/providers/auth_provider.dart';
 
 /// Profile edit screen for updating user information
@@ -20,11 +21,11 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   
   bool _isLoading = false;
   bool _hasChanges = false;
+  bool _controllersInitialized = false;
 
   @override
   void initState() {
     super.initState();
-    _initializeControllers();
     
     // Add listeners to detect changes
     _nameController.addListener(_onFieldChanged);
@@ -42,11 +43,11 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
     super.dispose();
   }
 
-  void _initializeControllers() {
-    final authState = ref.read(authProvider).value;
+  void _initializeControllers(WidgetRef ref) {
+    final authState = ref.read(authProvider);
     
     // Initialize with mock data for demonstration
-    _nameController.text = authState?.user?.name ?? 'Plant Lover';
+    _nameController.text = authState?.user?.displayName ?? 'Plant Lover';
     _bioController.text = 'Passionate about plants and sustainable living 🌱\nSharing my green journey with fellow plant enthusiasts!';
     _locationController.text = 'San Francisco, CA';
     _websiteController.text = 'https://myplantblog.com';
@@ -63,6 +64,12 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    
+    // Initialize controllers with ref access
+    if (!_controllersInitialized) {
+      _initializeControllers(ref);
+      _controllersInitialized = true;
+    }
     
     return Scaffold(
       appBar: AppBar(

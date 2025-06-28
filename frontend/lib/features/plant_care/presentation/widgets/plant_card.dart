@@ -95,7 +95,7 @@ class PlantCard extends StatelessWidget {
                     // Care status or location
                     Row(
                       children: [
-                        if (plant.location != null) ..[
+                        if (plant.location != null) ...[
                           Icon(
                             Icons.location_on,
                             size: 14,
@@ -112,7 +112,7 @@ class PlantCard extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                        ] else ..[
+                        ] else ...[
                           Icon(
                             Icons.schedule,
                             size: 14,
@@ -187,7 +187,7 @@ class PlantCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          if (overdueCount > 0) ..[
+          if (overdueCount > 0) ...[
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
@@ -216,7 +216,7 @@ class PlantCard extends StatelessWidget {
             ),
             const SizedBox(width: 4),
           ],
-          if (upcomingCount > 0) ..[
+          if (upcomingCount > 0) ...[
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(

@@ -7,8 +7,7 @@ import 'package:plant_social/features/plant_care/presentation/screens/plant_deta
 import 'package:plant_social/features/plant_care/presentation/screens/care_reminders_screen.dart';
 import 'package:plant_social/features/plant_care/presentation/screens/care_logs_screen.dart';
 import 'package:plant_social/features/plant_care/presentation/widgets/plant_card.dart';
-import 'package:plant_social/features/plant_care/presentation/widgets/reminder_card.dart';
-import 'package:plant_social/core/theme/app_theme.dart';
+import 'package:plant_social/features/plant_care/presentation/widgets/care_reminder_card.dart';
 import 'package:plant_social/core/widgets/loading_widget.dart';
 import 'package:plant_social/core/widgets/error_widget.dart';
 
@@ -199,13 +198,14 @@ class _PlantCareDashboardScreenState
         itemCount: state.upcomingReminders.length,
         itemBuilder: (context, index) {
           final reminder = state.upcomingReminders[index];
-          return ReminderCard(
+          return CareReminderCard(
             reminder: reminder,
+            onTap: () {},
             onComplete: () {
               ref.read(plantCareProvider.notifier).completeReminder(reminder.id);
             },
-            onSnooze: (days) {
-              ref.read(plantCareProvider.notifier).snoozeReminder(reminder.id, days);
+            onSnooze: () {
+              ref.read(plantCareProvider.notifier).snoozeReminder(reminder.id, 1);
             },
           );
         },
@@ -229,14 +229,14 @@ class _PlantCareDashboardScreenState
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [theme.primaryColor, theme.primaryColor.withOpacity(0.8)],
+          colors: [theme.primaryColor, theme.primaryColor.withValues(alpha: 0.8)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: theme.primaryColor.withOpacity(0.3),
+            color: theme.primaryColor.withValues(alpha: 0.3),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -255,7 +255,7 @@ class _PlantCareDashboardScreenState
           Container(
             width: 1,
             height: 40,
-            color: Colors.white.withOpacity(0.3),
+            color: Colors.white.withValues(alpha: 0.3),
           ),
           Expanded(
             child: _buildStatItem(
@@ -268,7 +268,7 @@ class _PlantCareDashboardScreenState
           Container(
             width: 1,
             height: 40,
-            color: Colors.white.withOpacity(0.3),
+            color: Colors.white.withValues(alpha: 0.3),
           ),
           Expanded(
             child: _buildStatItem(
@@ -303,7 +303,7 @@ class _PlantCareDashboardScreenState
         Text(
           label,
           style: TextStyle(
-            color: color.withOpacity(0.9),
+            color: color.withValues(alpha: 0.9),
             fontSize: 12,
           ),
         ),

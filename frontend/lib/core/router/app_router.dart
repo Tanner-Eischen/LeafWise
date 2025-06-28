@@ -10,7 +10,6 @@ import 'package:plant_social/features/chat/presentation/screens/chat_screen.dart
 import 'package:plant_social/features/chat/presentation/screens/conversation_screen.dart';
 import 'package:plant_social/features/stories/presentation/screens/story_viewer_screen.dart';
 import 'package:plant_social/features/stories/presentation/screens/story_creation_screen.dart';
-import 'package:plant_social/features/stories/presentation/screens/stories_screen.dart';
 import 'package:plant_social/features/profile/presentation/screens/profile_screen.dart';
 import 'package:plant_social/features/profile/presentation/screens/profile_edit_screen.dart';
 import 'package:plant_social/features/friends/presentation/screens/friends_screen.dart';
@@ -122,10 +121,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'profile',
             name: 'profile',
-            builder: (context, state) {
-              final userId = state.uri.queryParameters['userId'];
-              return ProfileScreen(userId: userId);
-            },
+            builder: (context, state) => const ProfileScreen(),
             routes: [
               GoRoute(
                 path: 'edit',

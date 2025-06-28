@@ -29,17 +29,13 @@ class AuthButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     final effectiveBackgroundColor = backgroundColor ??
-        (isSecondary
-            ? theme.colorScheme.surface
-            : theme.colorScheme.primary);
-    
+        (isSecondary ? theme.colorScheme.surface : theme.colorScheme.primary);
+
     final effectiveTextColor = textColor ??
-        (isSecondary
-            ? theme.colorScheme.primary
-            : theme.colorScheme.onPrimary);
-    
+        (isSecondary ? theme.colorScheme.primary : theme.colorScheme.onPrimary);
+
     return SizedBox(
       width: width ?? double.infinity,
       height: height,
@@ -82,7 +78,7 @@ class AuthButton extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (icon != null) ..[
+                  if (icon != null) ...[
                     Icon(
                       icon,
                       size: 20,
@@ -127,13 +123,12 @@ class AuthIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
-    final effectiveBackgroundColor = backgroundColor ??
-        theme.colorScheme.surface;
-    
-    final effectiveIconColor = iconColor ??
-        theme.colorScheme.onSurface;
-    
+
+    final effectiveBackgroundColor =
+        backgroundColor ?? theme.colorScheme.surface;
+
+    final effectiveIconColor = iconColor ?? theme.colorScheme.onSurface;
+
     return SizedBox(
       width: size,
       height: size,

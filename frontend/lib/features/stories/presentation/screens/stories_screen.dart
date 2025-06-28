@@ -282,6 +282,7 @@ class _StoriesScreenState extends ConsumerState<StoriesScreen>
             Container(
               width: 60,
               height: 60,
+              padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
@@ -289,7 +290,6 @@ class _StoriesScreenState extends ConsumerState<StoriesScreen>
                       ? [Colors.grey, Colors.grey]
                       : [theme.colorScheme.primary, theme.colorScheme.secondary],
                 ),
-                padding: const EdgeInsets.all(2),
               ),
               child: Container(
                 decoration: BoxDecoration(
@@ -588,7 +588,7 @@ class _StoriesScreenState extends ConsumerState<StoriesScreen>
               ),
               textAlign: TextAlign.center,
             ),
-            if (actionLabel != null && onAction != null) ..[
+            if (actionLabel != null && onAction != null) ...[
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: onAction,

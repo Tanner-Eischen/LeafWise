@@ -34,13 +34,17 @@ class LoadingWidget extends StatelessWidget {
               strokeWidth: 3,
             ),
           ),
-          if (message != null) ..[
+          if (message != null) ...[
             const SizedBox(height: 16),
             Text(
               message!,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
-              ),
+                    color: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.color
+                        ?.withValues(alpha: 0.7),
+                  ),
               textAlign: TextAlign.center,
             ),
           ],

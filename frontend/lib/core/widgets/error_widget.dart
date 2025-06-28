@@ -1,13 +1,10 @@
-/**
- * Reusable error widget for consistent error states across the app
- * Provides customizable error displays with retry functionality
- */
+/// Reusable error widget for consistent error states across the app
+/// Provides customizable error displays with retry functionality
+library;
 
 import 'package:flutter/material.dart';
 
-/**
- * Standard error widget with icon, message, and optional retry button
- */
+/// Standard error widget with icon, message, and optional retry button
 class CustomErrorWidget extends StatelessWidget {
   final String message;
   final String? title;
@@ -38,7 +35,7 @@ class CustomErrorWidget extends StatelessWidget {
               color: Theme.of(context).colorScheme.error,
             ),
             const SizedBox(height: 16),
-            if (title != null) ..[
+            if (title != null) ...[
               Text(
                 title!,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -55,7 +52,7 @@ class CustomErrorWidget extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-            if (onRetry != null) ..[
+            if (onRetry != null) ...[
               const SizedBox(height: 24),
               ElevatedButton.icon(
                 onPressed: onRetry,
@@ -74,9 +71,7 @@ class CustomErrorWidget extends StatelessWidget {
   }
 }
 
-/**
- * Compact error widget for inline error states
- */
+/// Compact error widget for inline error states
 class InlineErrorWidget extends StatelessWidget {
   final String message;
   final VoidCallback? onRetry;
@@ -109,7 +104,7 @@ class InlineErrorWidget extends StatelessWidget {
               ),
             ),
           ),
-          if (onRetry != null) ..[
+          if (onRetry != null) ...[
             const SizedBox(width: 8),
             TextButton(
               onPressed: onRetry,
@@ -122,9 +117,7 @@ class InlineErrorWidget extends StatelessWidget {
   }
 }
 
-/**
- * Network error widget with specific messaging
- */
+/// Network error widget with specific messaging
 class NetworkErrorWidget extends StatelessWidget {
   final VoidCallback? onRetry;
 
@@ -145,9 +138,7 @@ class NetworkErrorWidget extends StatelessWidget {
   }
 }
 
-/**
- * Empty state widget for when no data is available
- */
+/// Empty state widget for when no data is available
 class EmptyStateWidget extends StatelessWidget {
   final String message;
   final String? title;
@@ -176,7 +167,7 @@ class EmptyStateWidget extends StatelessWidget {
               color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
-            if (title != null) ..[
+            if (title != null) ...[
               Text(
                 title!,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -193,7 +184,7 @@ class EmptyStateWidget extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-            if (action != null) ..[
+            if (action != null) ...[
               const SizedBox(height: 24),
               action!,
             ],

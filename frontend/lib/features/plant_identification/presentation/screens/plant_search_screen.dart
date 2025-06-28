@@ -143,14 +143,14 @@ class _PlantSearchScreenState extends ConsumerState<PlantSearchScreen> {
       return _buildEmptyState(theme);
     }
 
-    if (state.isSearching) {
+    if (state.isLoading) {
       return const Center(child: LoadingWidget());
     }
 
-    if (state.searchError != null) {
+    if (state.error != null) {
       return Center(
         child: CustomErrorWidget(
-          message: state.searchError!,
+          message: state.error!,
           onRetry: () {
             if (_currentQuery.isNotEmpty) {
               ref.read(plantIdentificationProvider.notifier).searchPlants(_currentQuery);
@@ -160,15 +160,15 @@ class _PlantSearchScreenState extends ConsumerState<PlantSearchScreen> {
       );
     }
 
-    if (state.searchResults.isEmpty) {
+    if (state.identifications.isEmpty) {
       return _buildNoResultsState(theme);
     }
 
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: state.searchResults.length,
+      itemCount: state.identifications.length,
       itemBuilder: (context, index) {
-        final species = state.searchResults[index];
+        final species = state.identifications[index];
         return _buildSearchResultItem(species, theme);
       },
     );
@@ -312,7 +312,7 @@ class _PlantSearchScreenState extends ConsumerState<PlantSearchScreen> {
     );
   }
 
-  Widget _buildSearchResultItem(PlantSpecies species, ThemeData theme) {
+  Widget _buildSearchResultItem(PlantIdentification species, ThemeData theme) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
@@ -386,17 +386,15 @@ class _PlantSearchScreenState extends ConsumerState<PlantSearchScreen> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    if (species.family != null) ..[
-                      const SizedBox(height: 4),
-                      Text(
-                        'Family: ${species.family}',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: Colors.grey[500],
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                    const SizedBox(height: 4),
+                    Text(
+                      'Scientific: ${species.scientificName}',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: Colors.grey[500],
                       ),
-                    ],
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ],
                 ),
               ),

@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -42,7 +41,7 @@ class _PlantDetailScreenState extends ConsumerState<PlantDetailScreen>
   Future<void> _loadPlantDetails() async {
     try {
       final plant = await ref
-          .read(plantCareProvider.notifier)
+          .read(plantCareServiceProvider)
           .getUserPlant(widget.plantId);
       
       setState(() {
@@ -240,7 +239,7 @@ class _PlantDetailScreenState extends ConsumerState<PlantDetailScreen>
               'Days with you',
               '${DateTime.now().difference(_plant!.acquiredDate).inDays} days',
             ),
-            if (_plant!.notes != null && _plant!.notes!.isNotEmpty) ..[
+            if (_plant!.notes != null && _plant!.notes!.isNotEmpty) ...[
               const SizedBox(height: 8),
               Text(
                 'Notes',
@@ -281,7 +280,7 @@ class _PlantDetailScreenState extends ConsumerState<PlantDetailScreen>
             _buildInfoRow(Icons.science, 'Scientific Name', species.scientificName),
             if (species.family != null)
               _buildInfoRow(Icons.category, 'Family', species.family!),
-            if (species.description != null && species.description!.isNotEmpty) ..[
+            if (species.description != null && species.description!.isNotEmpty) ...[
               const SizedBox(height: 12),
               Text(
                 'Description',
@@ -430,7 +429,7 @@ class _PlantDetailScreenState extends ConsumerState<PlantDetailScreen>
     }
 
     final sortedLogs = List<PlantCareLog>.from(_plant!.careLogs!)
-      ..sort((a, b) => b.logDate.compareTo(a.logDate));
+      ..sort((a, b) => b.careDate.compareTo(a.careDate));
 
     return ListView.builder(
       padding: const EdgeInsets.all(16),
@@ -459,7 +458,7 @@ class _PlantDetailScreenState extends ConsumerState<PlantDetailScreen>
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(_formatDate(log.logDate)),
+            Text(_formatDate(log.careDate)),
             if (log.notes != null && log.notes!.isNotEmpty)
               Text(
                 log.notes!,
@@ -593,11 +592,11 @@ class _PlantDetailScreenState extends ConsumerState<PlantDetailScreen>
     final logs = _plant!.careLogs!
         .where((log) => log.careType.toLowerCase() == careType.toLowerCase())
         .toList()
-      ..sort((a, b) => b.logDate.compareTo(a.logDate));
+      ..sort((a, b) => b.careDate.compareTo(a.careDate));
     
     if (logs.isEmpty) return null;
     
-    return _formatDate(logs.first.logDate);
+    return _formatDate(logs.first.careDate);
   }
 
   IconData _getCareTypeIcon(String careType) {

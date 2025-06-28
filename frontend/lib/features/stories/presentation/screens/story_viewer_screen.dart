@@ -156,7 +156,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
               ),
             
             // UI overlay
-            if (_showUI) ..[
+            if (_showUI) ...[
               // Progress bar
               Positioned(
                 top: MediaQuery.of(context).padding.top + 8,
@@ -172,7 +172,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
                     );
                   },
                 ),
-              ),
+            ),
               
               // Header
               Positioned(

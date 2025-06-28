@@ -7,7 +7,7 @@ import 'package:go_router/go_router.dart';
 class ConversationScreen extends ConsumerStatefulWidget {
   final String userId;
   final String? userName;
-  
+
   const ConversationScreen({
     super.key,
     required this.userId,
@@ -32,42 +32,45 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
 
   /// Mock messages for demonstration
   List<MockMessage> get _mockMessages => [
-    MockMessage(
-      id: '1',
-      content: 'Hey! How are your plants doing?',
-      senderId: widget.userId,
-      timestamp: DateTime.now().subtract(const Duration(hours: 2)),
-      isFromCurrentUser: false,
-    ),
-    MockMessage(
-      id: '2',
-      content: 'They\'re doing great! Just repotted my fiddle leaf fig 🌱',
-      senderId: 'current_user',
-      timestamp: DateTime.now().subtract(const Duration(hours: 1, minutes: 45)),
-      isFromCurrentUser: true,
-    ),
-    MockMessage(
-      id: '3',
-      content: 'That\'s awesome! I\'d love to see some photos',
-      senderId: widget.userId,
-      timestamp: DateTime.now().subtract(const Duration(hours: 1, minutes: 30)),
-      isFromCurrentUser: false,
-    ),
-    MockMessage(
-      id: '4',
-      content: 'Sure! I\'ll take some and share them in my story',
-      senderId: 'current_user',
-      timestamp: DateTime.now().subtract(const Duration(hours: 1, minutes: 15)),
-      isFromCurrentUser: true,
-    ),
-    MockMessage(
-      id: '5',
-      content: 'Perfect! Can\'t wait to see them 📸',
-      senderId: widget.userId,
-      timestamp: DateTime.now().subtract(const Duration(minutes: 30)),
-      isFromCurrentUser: false,
-    ),
-  ];
+        MockMessage(
+          id: '1',
+          content: 'Hey! How are your plants doing?',
+          senderId: widget.userId,
+          timestamp: DateTime.now().subtract(const Duration(hours: 2)),
+          isFromCurrentUser: false,
+        ),
+        MockMessage(
+          id: '2',
+          content: 'They\'re doing great! Just repotted my fiddle leaf fig 🌱',
+          senderId: 'current_user',
+          timestamp:
+              DateTime.now().subtract(const Duration(hours: 1, minutes: 45)),
+          isFromCurrentUser: true,
+        ),
+        MockMessage(
+          id: '3',
+          content: 'That\'s awesome! I\'d love to see some photos',
+          senderId: widget.userId,
+          timestamp:
+              DateTime.now().subtract(const Duration(hours: 1, minutes: 30)),
+          isFromCurrentUser: false,
+        ),
+        MockMessage(
+          id: '4',
+          content: 'Sure! I\'ll take some and share them in my story',
+          senderId: 'current_user',
+          timestamp:
+              DateTime.now().subtract(const Duration(hours: 1, minutes: 15)),
+          isFromCurrentUser: true,
+        ),
+        MockMessage(
+          id: '5',
+          content: 'Perfect! Can\'t wait to see them 📸',
+          senderId: widget.userId,
+          timestamp: DateTime.now().subtract(const Duration(minutes: 30)),
+          isFromCurrentUser: false,
+        ),
+      ];
 
   /// Send a message (placeholder implementation)
   Future<void> _sendMessage() async {
@@ -76,7 +79,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
 
     // Clear the input immediately
     _messageController.clear();
-    
+
     // Show typing indicator
     setState(() {
       _isTyping = true;
@@ -85,10 +88,10 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
     try {
       // Simulate API call delay
       await Future.delayed(const Duration(milliseconds: 500));
-      
+
       // In a real app, this would send the message to the backend
       // and update the messages list through a provider
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -96,7 +99,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
             duration: Duration(seconds: 1),
           ),
         );
-        
+
         // Scroll to bottom
         _scrollToBottom();
       }
@@ -130,7 +133,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
@@ -146,7 +149,8 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
               radius: 20,
               backgroundColor: theme.colorScheme.primary,
               child: Text(
-                widget.userName?.split(' ').map((name) => name[0]).join() ?? 'U',
+                widget.userName?.split(' ').map((name) => name[0]).join() ??
+                    'U',
                 style: TextStyle(
                   color: theme.colorScheme.onPrimary,
                   fontWeight: FontWeight.bold,
@@ -210,7 +214,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
               },
             ),
           ),
-          
+
           // Typing indicator
           if (_isTyping)
             Padding(
@@ -232,7 +236,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
                 ],
               ),
             ),
-          
+
           // Message input
           _buildMessageInput(theme),
         ],
@@ -248,12 +252,13 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
             ? MainAxisAlignment.end
             : MainAxisAlignment.start,
         children: [
-          if (!message.isFromCurrentUser) ..[
+          if (!message.isFromCurrentUser) ...[
             CircleAvatar(
               radius: 16,
               backgroundColor: theme.colorScheme.primary,
               child: Text(
-                widget.userName?.split(' ').map((name) => name[0]).join() ?? 'U',
+                widget.userName?.split(' ').map((name) => name[0]).join() ??
+                    'U',
                 style: TextStyle(
                   color: theme.colorScheme.onPrimary,
                   fontSize: 12,
@@ -263,7 +268,6 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
             ),
             const SizedBox(width: 8),
           ],
-          
           Flexible(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -305,8 +309,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
               ),
             ),
           ),
-          
-          if (message.isFromCurrentUser) ..[
+          if (message.isFromCurrentUser) ...[
             const SizedBox(width: 8),
             CircleAvatar(
               radius: 16,
@@ -347,7 +350,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
             },
             icon: const Icon(Icons.attach_file),
           ),
-          
+
           // Message input field
           Expanded(
             child: TextField(
@@ -370,9 +373,9 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
               onSubmitted: (_) => _sendMessage(),
             ),
           ),
-          
+
           const SizedBox(width: 8),
-          
+
           // Send button
           IconButton(
             onPressed: _sendMessage,
@@ -389,7 +392,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
   String _formatMessageTime(DateTime timestamp) {
     final now = DateTime.now();
     final difference = now.difference(timestamp);
-    
+
     if (difference.inMinutes < 1) {
       return 'now';
     } else if (difference.inHours < 1) {
