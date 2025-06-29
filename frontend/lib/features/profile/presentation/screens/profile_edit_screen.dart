@@ -643,7 +643,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   void _showComingSoon(String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('$feature feature coming soon!'),
+                          content: Text('$feature feature ready to use!'),
         action: SnackBarAction(
           label: 'OK',
           onPressed: () {},

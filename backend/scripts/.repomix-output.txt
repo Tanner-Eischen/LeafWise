@@ -1,0 +1,586 @@
+This file is a merged representation of a subset of the codebase, containing specifically included files and files not matching ignore patterns, combined into a single document by Repomix.
+The content has been processed where empty lines have been removed.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+4. Repository files, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Only files matching these patterns are included: **/*, .cursorrules, .cursor/rules/*, .clinerules, CLAUDE.md
+- Files matching these patterns are excluded: .*.*, **/*.pbxproj, **/node_modules/**, **/dist/**, **/build/**, **/compile/**, **/*.spec.*, **/*.pyc, **/.env, **/.env.*, **/*.env, **/*.env.*, **/*.lock, **/*.lockb, **/package-lock.*, **/pnpm-lock.*, **/*.tsbuildinfo, **/certdata.txt
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Empty lines have been removed from all files
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+<additional_info>
+
+</additional_info>
+
+</file_summary>
+
+<directory_structure>
+enable_pgvector.sql
+seed_plant_knowledge.py
+setup_rag_infrastructure.py
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="enable_pgvector.sql">
+-- Enable pgvector extension for vector similarity search
+-- This script should be run by a database administrator or user with appropriate privileges
+-- Enable the pgvector extension
+CREATE EXTENSION IF NOT EXISTS vector;
+-- Verify the extension is installed
+SELECT extname, extversion FROM pg_extension WHERE extname = 'vector';
+</file>
+
+<file path="seed_plant_knowledge.py">
+#!/usr/bin/env python3
+"""Seed script for plant knowledge base."""
+import asyncio
+import json
+import sys
+import os
+from datetime import datetime
+from uuid import uuid4
+from pathlib import Path
+# Add the backend directory to Python path
+backend_dir = Path(__file__).parent.parent
+sys.path.insert(0, str(backend_dir))
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    # Look for .env file in backend directory
+    env_file = backend_dir / '.env'
+    if env_file.exists():
+        load_dotenv(env_file)
+        print(f"✅ Loaded environment variables from {env_file}")
+    else:
+        # Try loading from current directory
+        load_dotenv()
+        print("✅ Loaded environment variables from .env")
+except ImportError:
+    print("⚠️  python-dotenv not available, using system environment variables only")
+except Exception as e:
+    print(f"⚠️  Could not load .env file: {e}")
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+from app.core.database import AsyncSessionLocal
+from app.models.plant_species import PlantSpecies
+from app.models.rag_models import PlantKnowledgeBase
+from app.services.embedding_service import EmbeddingService
+from app.services.vector_database_service import VectorDatabaseService
+# Sample plant knowledge data
+PLANT_KNOWLEDGE_DATA = [
+    {
+        "title": "Monstera Deliciosa Care Guide",
+        "content": "Monstera deliciosa, also known as the Swiss Cheese Plant, is a popular houseplant known for its distinctive split leaves. It thrives in bright, indirect light and prefers well-draining soil. Water when the top inch of soil feels dry, typically every 1-2 weeks. This plant loves humidity and benefits from regular misting. During growing season (spring and summer), feed monthly with a balanced liquid fertilizer. Monstera can grow quite large indoors, reaching 6-8 feet tall. Support with a moss pole for best results. Common problems include yellowing leaves (overwatering) and brown leaf tips (low humidity or fluoride in water).",
+        "content_type": "care_guide",
+        "difficulty_level": "intermediate",
+        "season": "year_round",
+        "tags": ["houseplant", "tropical", "climbing", "low_light_tolerant"],
+        "source": "expert"
+    },
+    {
+        "title": "Snake Plant (Sansevieria) Beginner Care",
+        "content": "Snake plants are perfect for beginners due to their low maintenance requirements. They tolerate low light conditions but prefer bright, indirect light. Water sparingly - only when soil is completely dry, usually every 2-3 weeks in growing season and less in winter. Overwatering is the most common cause of death. Use well-draining cactus soil mix. Snake plants are extremely drought tolerant and can survive weeks without water. They prefer temperatures between 70-90°F and low humidity. Fertilize sparingly, only 2-3 times during growing season. Propagate by leaf cuttings or division.",
+        "content_type": "care_guide",
+        "difficulty_level": "beginner",
+        "season": "year_round",
+        "tags": ["houseplant", "low_maintenance", "drought_tolerant", "air_purifying"],
+        "source": "expert"
+    },
+    {
+        "title": "Fiddle Leaf Fig Common Problems",
+        "content": "Fiddle leaf figs are notorious for being finicky. Brown spots on leaves usually indicate overwatering or bacterial infection - reduce watering and ensure good drainage. Dropping leaves can be caused by sudden changes in light, temperature, or watering schedule - maintain consistency. Yellow leaves typically mean overwatering, while brown crispy edges suggest underwatering or low humidity. Fiddle leaf figs hate being moved, so find a good spot and leave them there. They need bright, indirect light and consistent watering when top 2 inches of soil are dry. Dust leaves regularly for optimal photosynthesis.",
+        "content_type": "problem_solution",
+        "difficulty_level": "advanced",
+        "season": "year_round",
+        "tags": ["houseplant", "finicky", "common_problems", "troubleshooting"],
+        "source": "expert"
+    },
+    {
+        "title": "Pothos Propagation Techniques",
+        "content": "Pothos is one of the easiest plants to propagate. For water propagation: cut a 4-6 inch stem with at least 2 nodes, remove lower leaves, place in water, and change water every few days. Roots will develop in 1-2 weeks. For soil propagation: take cuttings with nodes, dip in rooting hormone (optional), plant in moist potting mix, and keep soil consistently moist but not soggy. Pothos can also be propagated by division when repotting. The best time to propagate is during growing season (spring/summer). New plants will be identical to the parent plant.",
+        "content_type": "technique",
+        "difficulty_level": "beginner",
+        "season": "spring",
+        "tags": ["propagation", "houseplant", "easy", "water_propagation"],
+        "source": "expert"
+    },
+    {
+        "title": "Winter Plant Care Adjustments",
+        "content": "During winter months, most houseplants enter a dormant period and require adjusted care. Reduce watering frequency as plants use less water in lower light and cooler temperatures. Stop or reduce fertilizing from October through February as plants aren't actively growing. Increase humidity around plants as indoor heating can dry the air. Move plants closer to windows for maximum light exposure, but away from cold drafts and heating vents. Some plants may drop leaves naturally - this is normal. Avoid repotting during winter unless absolutely necessary. Monitor for pests more closely as dry indoor air can stress plants and make them more susceptible.",
+        "content_type": "care_guide",
+        "difficulty_level": "intermediate",
+        "season": "winter",
+        "tags": ["seasonal_care", "winter", "dormancy", "houseplant"],
+        "source": "expert"
+    },
+    {
+        "title": "Spider Plant Care and Benefits",
+        "content": "Spider plants (Chlorophytum comosum) are excellent air-purifying houseplants that are nearly impossible to kill. They thrive in bright, indirect light but tolerate various lighting conditions. Water when soil surface feels dry, typically weekly. Spider plants prefer temperatures between 65-75°F and moderate humidity. They produce plantlets (babies) on long stolons that can be propagated easily. These plants are non-toxic to pets and children. NASA studies show spider plants remove formaldehyde and xylene from indoor air. Brown leaf tips usually indicate fluoride in water - use distilled water if this occurs. Fertilize monthly during growing season.",
+        "content_type": "species_info",
+        "difficulty_level": "beginner",
+        "season": "year_round",
+        "tags": ["air_purifying", "pet_safe", "easy_care", "propagation"],
+        "source": "research"
+    }
+]
+async def get_or_create_species(db: AsyncSession, common_name: str, scientific_name: str) -> PlantSpecies:
+    """Get existing species or create a new one."""
+    stmt = select(PlantSpecies).where(PlantSpecies.scientific_name == scientific_name)
+    result = await db.execute(stmt)
+    species = result.scalar_one_or_none()
+    if not species:
+        species = PlantSpecies(
+            scientific_name=scientific_name,
+            common_names=[common_name],
+            care_level="intermediate"
+        )
+        db.add(species)
+        await db.commit()
+        await db.refresh(species)
+    return species
+async def seed_plant_knowledge():
+    """Seed the plant knowledge base with initial data."""
+    print("Starting plant knowledge seeding...")
+    embedding_service = EmbeddingService()
+    vector_service = VectorDatabaseService(embedding_service)
+    async with AsyncSessionLocal() as db:
+        try:
+            # Create some basic plant species if they don't exist
+            species_mapping = {
+                "Monstera Deliciosa": ("Monstera deliciosa", "Monstera deliciosa"),
+                "Snake Plant": ("Sansevieria trifasciata", "Snake Plant"),
+                "Fiddle Leaf Fig": ("Ficus lyrata", "Fiddle Leaf Fig"),
+                "Pothos": ("Epipremnum aureum", "Golden Pothos"),
+                "Spider Plant": ("Chlorophytum comosum", "Spider Plant")
+            }
+            species_dict = {}
+            for common, (scientific, display) in species_mapping.items():
+                species = await get_or_create_species(db, display, scientific)
+                species_dict[common] = species
+            # Create knowledge base entries
+            for knowledge_data in PLANT_KNOWLEDGE_DATA:
+                # Determine plant species for this knowledge entry
+                plant_species = None
+                title = knowledge_data["title"]
+                for species_name, species in species_dict.items():
+                    if species_name.lower() in title.lower():
+                        plant_species = species
+                        break
+                # Create knowledge base entry
+                knowledge_entry = PlantKnowledgeBase(
+                    title=knowledge_data["title"],
+                    content=knowledge_data["content"],
+                    content_type=knowledge_data["content_type"],
+                    plant_species_id=plant_species.id if plant_species else None,
+                    difficulty_level=knowledge_data["difficulty_level"],
+                    season=knowledge_data["season"],
+                    climate_zones=["temperate", "subtropical"],  # Default zones
+                    tags=knowledge_data["tags"],
+                    source=knowledge_data["source"],
+                    verified="verified"
+                )
+                db.add(knowledge_entry)
+                await db.commit()
+                await db.refresh(knowledge_entry)
+                # Create embedding for the knowledge entry
+                content_for_embedding = f"{knowledge_entry.title}. {knowledge_entry.content}"
+                metadata = {
+                    "plant_species_id": str(plant_species.id) if plant_species else None,
+                    "difficulty_level": knowledge_entry.difficulty_level,
+                    "season": knowledge_entry.season,
+                    "content_type": knowledge_entry.content_type,
+                    "tags": knowledge_entry.tags
+                }
+                await vector_service.index_content(
+                    db=db,
+                    content_id=str(knowledge_entry.id),
+                    content_type=knowledge_entry.content_type,
+                    text_content=content_for_embedding,
+                    metadata=metadata
+                )
+                print(f"Created knowledge entry: {knowledge_entry.title}")
+            print(f"Successfully seeded {len(PLANT_KNOWLEDGE_DATA)} knowledge base entries!")
+        except Exception as e:
+            print(f"Error seeding plant knowledge: {str(e)}")
+            await db.rollback()
+            raise
+if __name__ == "__main__":
+    asyncio.run(seed_plant_knowledge())
+</file>
+
+<file path="setup_rag_infrastructure.py">
+#!/usr/bin/env python3
+"""Setup script for RAG infrastructure initialization."""
+import asyncio
+import logging
+import sys
+import os
+from pathlib import Path
+def setup_python_path():
+    """Setup Python path to find the app module."""
+    # Get the absolute path to the backend directory
+    script_path = Path(__file__).resolve()
+    backend_dir = script_path.parent.parent
+    # Add backend directory to Python path if not already there
+    backend_str = str(backend_dir)
+    if backend_str not in sys.path:
+        sys.path.insert(0, backend_str)
+    # Change to backend directory
+    os.chdir(backend_dir)
+    print(f"📁 Working directory: {os.getcwd()}")
+    print(f"🐍 Python path includes: {backend_str}")
+    return backend_dir
+# Setup path before any app imports
+backend_dir = setup_python_path()
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    # Look for .env file in backend directory
+    env_file = backend_dir / '.env'
+    if env_file.exists():
+        load_dotenv(env_file)
+        print(f"✅ Loaded environment variables from {env_file}")
+    else:
+        # Try loading from current directory
+        load_dotenv()
+        print("✅ Loaded environment variables from .env")
+except ImportError:
+    print("⚠️  python-dotenv not available, using system environment variables only")
+except Exception as e:
+    print(f"⚠️  Could not load .env file: {e}")
+# Now try to import app modules
+try:
+    from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+    from sqlalchemy.orm import sessionmaker
+    from sqlalchemy import text
+    from app.core.config import settings
+    from app.core.database import Base
+    from app.services.embedding_service import EmbeddingService
+    from app.services.vector_database_service import VectorDatabaseService
+    from app.services.rag_content_pipeline import RAGContentPipeline
+except ImportError:
+    print("⚠️  App modules not available, some functionality may be limited")
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+class RAGInfrastructureSetup:
+    """Setup and initialization for RAG infrastructure."""
+    def __init__(self):
+        self.engine = None
+        self.session_factory = None
+        self.embedding_service = EmbeddingService()
+        self.vector_service = VectorDatabaseService(self.embedding_service)
+        self.rag_pipeline = RAGContentPipeline(self.embedding_service, self.vector_service)
+    async def setup_database_connection(self):
+        """Setup database connection."""
+        try:
+            # Use the actual database URL from settings
+            database_url = str(settings.SQLALCHEMY_DATABASE_URI)
+            logger.info(f"Connecting to database: {database_url.split('@')[1] if '@' in database_url else database_url}")
+            self.engine = create_async_engine(database_url, echo=False)
+            self.session_factory = sessionmaker(
+                bind=self.engine,
+                class_=AsyncSession,
+                expire_on_commit=False
+            )
+            logger.info("✅ Database connection established")
+        except Exception as e:
+            logger.error(f"❌ Failed to setup database connection: {str(e)}")
+            raise
+    async def enable_pgvector_extension(self):
+        """Enable pgvector extension in the database."""
+        try:
+            async with self.engine.begin() as conn:
+                # Check if pgvector extension is available
+                result = await conn.execute(
+                    text("SELECT 1 FROM pg_available_extensions WHERE name = 'vector'")
+                )
+                if not result.fetchone():
+                    logger.warning("⚠️  pgvector extension is not available in this PostgreSQL installation")
+                    logger.info("💡 To install pgvector:")
+                    logger.info("   - Docker: Use postgres:15 with pgvector extension")
+                    logger.info("   - Local: Install postgresql-15-pgvector package")
+                    return False
+                # Enable the extension
+                await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+                logger.info("✅ pgvector extension enabled successfully")
+                # Verify the extension is installed
+                result = await conn.execute(
+                    text("SELECT extname, extversion FROM pg_extension WHERE extname = 'vector'")
+                )
+                extension_info = result.fetchone()
+                if extension_info:
+                    logger.info(f"✅ pgvector extension verified: version {extension_info[1]}")
+                    return True
+                else:
+                    logger.error("❌ pgvector extension installation verification failed")
+                    return False
+        except Exception as e:
+            logger.error(f"❌ Error enabling pgvector extension: {str(e)}")
+            logger.info("💡 This is normal if pgvector is not installed. RAG system will work without vector similarity.")
+            return False
+    async def create_vector_indexes(self):
+        """Create vector similarity indexes for better performance."""
+        try:
+            async with self.engine.begin() as conn:
+                # Check if tables exist first
+                result = await conn.execute(text("""
+                    SELECT table_name FROM information_schema.tables 
+                    WHERE table_schema = 'public' 
+                    AND table_name IN ('plant_content_embeddings', 'user_preference_embeddings', 'rag_interactions')
+                """))
+                existing_tables = [row[0] for row in result.fetchall()]
+                if 'plant_content_embeddings' in existing_tables:
+                    # Create indexes for plant content embeddings
+                    await conn.execute(text("""
+                        CREATE INDEX IF NOT EXISTS ix_plant_content_embeddings_vector 
+                        ON plant_content_embeddings 
+                        USING ivfflat (embedding vector_cosine_ops) 
+                        WITH (lists = 100)
+                    """))
+                    logger.info("✅ Plant content embeddings index created")
+                if 'user_preference_embeddings' in existing_tables:
+                    # Create indexes for user preference embeddings
+                    await conn.execute(text("""
+                        CREATE INDEX IF NOT EXISTS ix_user_preference_embeddings_vector 
+                        ON user_preference_embeddings 
+                        USING ivfflat (embedding vector_cosine_ops) 
+                        WITH (lists = 100)
+                    """))
+                    logger.info("✅ User preference embeddings index created")
+                if 'rag_interactions' in existing_tables:
+                    # Create indexes for RAG interactions
+                    await conn.execute(text("""
+                        CREATE INDEX IF NOT EXISTS ix_rag_interactions_vector 
+                        ON rag_interactions 
+                        USING ivfflat (query_embedding vector_cosine_ops) 
+                        WITH (lists = 100)
+                    """))
+                    logger.info("✅ RAG interactions index created")
+                logger.info("✅ Vector similarity indexes created successfully")
+                return True
+        except Exception as e:
+            logger.error(f"❌ Error creating vector indexes: {str(e)}")
+            logger.info("💡 This is normal if pgvector is not available. Continuing without vector indexes.")
+            return False
+    async def initialize_knowledge_base(self):
+        """Initialize the plant knowledge base with essential content."""
+        try:
+            async with self.session_factory() as db:
+                logger.info("🧠 Initializing plant knowledge base...")
+                result = await self.rag_pipeline.initialize_knowledge_base(db)
+                if result.get("status") == "success":
+                    logger.info(f"✅ Knowledge base initialized: {result}")
+                    return True
+                else:
+                    logger.error(f"❌ Knowledge base initialization failed: {result}")
+                    return False
+        except Exception as e:
+            logger.error(f"❌ Error initializing knowledge base: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return False
+    async def test_rag_functionality(self):
+        """Test basic RAG functionality to ensure everything is working."""
+        try:
+            async with self.session_factory() as db:
+                logger.info("🧪 Testing RAG functionality...")
+                # Test embedding generation
+                test_text = "How do I care for my houseplants?"
+                embedding = await self.embedding_service.generate_text_embedding(test_text)
+                logger.info(f"✅ Embedding generation test: {len(embedding)} dimensions")
+                # Test vector search
+                search_results = await self.vector_service.similarity_search(
+                    db=db,
+                    query_embedding=embedding,
+                    content_types=["knowledge_base"],
+                    limit=3,
+                    similarity_threshold=0.1
+                )
+                logger.info(f"✅ Vector search test: {len(search_results)} results found")
+                # Test knowledge search
+                knowledge_results = await self.vector_service.search_plant_knowledge(
+                    db=db,
+                    query=test_text,
+                    limit=3
+                )
+                logger.info(f"✅ Knowledge search test: {len(knowledge_results)} knowledge entries found")
+                return True
+        except Exception as e:
+            logger.error(f"❌ Error testing RAG functionality: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return False
+    async def get_system_status(self):
+        """Get comprehensive system status."""
+        try:
+            async with self.session_factory() as db:
+                stats = await self.rag_pipeline.get_indexing_stats(db)
+                logger.info("📊 Current RAG system status:")
+                logger.info(f"   • Total embeddings: {stats.get('total_embeddings', 0)}")
+                logger.info(f"   • Embedding types: {stats.get('embedding_counts', {})}")
+                logger.info(f"   • Content coverage: {stats.get('content_coverage', {})}")
+                return stats
+        except Exception as e:
+            logger.error(f"❌ Error getting system status: {str(e)}")
+            return {}
+    async def run_full_setup(self):
+        """Run the complete RAG infrastructure setup."""
+        logger.info("🚀 Starting RAG infrastructure setup...")
+        logger.info("=" * 60)
+        try:
+            # 1. Setup database connection
+            logger.info("1️⃣  Setting up database connection...")
+            await self.setup_database_connection()
+            # 2. Enable pgvector extension
+            logger.info("2️⃣  Enabling pgvector extension...")
+            pgvector_success = await self.enable_pgvector_extension()
+            if not pgvector_success:
+                logger.warning("⚠️  pgvector setup failed, but continuing...")
+            # 3. Create vector indexes
+            logger.info("3️⃣  Creating vector indexes...")
+            indexes_success = await self.create_vector_indexes()
+            if not indexes_success:
+                logger.warning("⚠️  Vector indexes creation failed, but continuing...")
+            # 4. Initialize knowledge base
+            logger.info("4️⃣  Initializing knowledge base...")
+            kb_success = await self.initialize_knowledge_base()
+            if not kb_success:
+                logger.error("❌ Knowledge base initialization failed")
+                return False
+            # 5. Test functionality
+            logger.info("5️⃣  Testing RAG functionality...")
+            test_success = await self.test_rag_functionality()
+            if not test_success:
+                logger.error("❌ RAG functionality test failed")
+                return False
+            # 6. Get final status
+            logger.info("6️⃣  Getting system status...")
+            await self.get_system_status()
+            logger.info("=" * 60)
+            logger.info("🎉 RAG infrastructure setup completed successfully!")
+            return True
+        except Exception as e:
+            logger.error(f"❌ RAG infrastructure setup failed: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return False
+        finally:
+            if self.engine:
+                await self.engine.dispose()
+def check_environment_variables():
+    """Check and display environment variable status."""
+    print("🔍 Environment Variables Check:")
+    print("-" * 40)
+    required_vars = {
+        "OPENAI_API_KEY": "Required for AI embeddings and RAG functionality",
+        "SQLALCHEMY_DATABASE_URI": "Database connection string"
+    }
+    optional_vars = {
+        "POSTGRES_SERVER": "PostgreSQL server host",
+        "POSTGRES_USER": "PostgreSQL username", 
+        "POSTGRES_PASSWORD": "PostgreSQL password",
+        "POSTGRES_DB": "PostgreSQL database name",
+        "POSTGRES_PORT": "PostgreSQL port"
+    }
+    missing_required = []
+    # Check required variables
+    for var, description in required_vars.items():
+        value = os.getenv(var)
+        if value:
+            # Mask sensitive values
+            if "KEY" in var or "PASSWORD" in var:
+                display_value = f"{value[:8]}..." if len(value) > 8 else "***"
+            else:
+                display_value = value[:50] + "..." if len(value) > 50 else value
+            print(f"✅ {var}: {display_value}")
+        else:
+            print(f"❌ {var}: Not set - {description}")
+            missing_required.append(var)
+    # Check optional variables
+    print("\n📋 Optional Variables:")
+    for var, description in optional_vars.items():
+        value = os.getenv(var)
+        if value:
+            if "PASSWORD" in var:
+                display_value = "***"
+            else:
+                display_value = value
+            print(f"✅ {var}: {display_value}")
+        else:
+            print(f"⚪ {var}: Not set (using default)")
+    print("-" * 40)
+    if missing_required:
+        print(f"❌ Missing required environment variables: {', '.join(missing_required)}")
+        print("💡 Please add these to your backend/.env file:")
+        for var in missing_required:
+            print(f"   {var}=your_value_here")
+        return False
+    else:
+        print("✅ All required environment variables are set!")
+        return True
+async def main():
+    """Main setup function."""
+    setup = RAGInfrastructureSetup()
+    try:
+        success = await setup.run_full_setup()
+        if success:
+            logger.info("✅ RAG infrastructure setup completed successfully!")
+            sys.exit(0)
+        else:
+            logger.error("❌ RAG infrastructure setup failed!")
+            sys.exit(1)
+    except KeyboardInterrupt:
+        logger.info("⏹️  Setup interrupted by user")
+        sys.exit(1)
+    except Exception as e:
+        logger.error(f"💥 Unexpected error during setup: {str(e)}")
+        sys.exit(1)
+if __name__ == "__main__":
+    print("🧠 RAG Infrastructure Setup Script")
+    print("=" * 50)
+    # Check environment variables
+    if not check_environment_variables():
+        sys.exit(1)
+    asyncio.run(main())
+</file>
+
+</files>

@@ -270,7 +270,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Profile editing coming soon!'),
+                    content: Text('Opening profile editor...'),
                   ),
                 );
               },

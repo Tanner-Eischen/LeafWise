@@ -4,12 +4,12 @@ import logging
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Query
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Query, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, ConfigDict
 
-from app.core.database import get_db
-from app.core.auth import get_current_user
+from app.core.database import get_db, AsyncSessionLocal
+from app.services.auth_service import get_current_user_from_token as get_current_user
 from app.models.user import User
 from app.services.rag_content_pipeline import RAGContentPipeline
 from app.services.embedding_service import EmbeddingService
@@ -22,37 +22,111 @@ router = APIRouter()
 
 class IndexingRequest(BaseModel):
     """Request model for content indexing."""
-    content_type: str  # "species", "knowledge", "question", "answer", "story"
-    content_id: str
-    force_reindex: bool = False
+    model_config = ConfigDict(from_attributes=True)
+    
+    content_type: str = Field(description="Content type: species, knowledge, question, answer, story")
+    content_id: str = Field(description="ID of the content to index")
+    force_reindex: bool = Field(default=False, description="Force reindexing even if content exists")
 
 
 class BulkIndexingRequest(BaseModel):
     """Request model for bulk content indexing."""
-    content_items: List[IndexingRequest]
-    batch_size: int = 10
+    model_config = ConfigDict(from_attributes=True)
+    
+    content_items: List[IndexingRequest] = Field(description="List of content items to index")
+    batch_size: int = Field(default=10, description="Number of items to process in each batch")
 
 
 class KnowledgeBaseInitRequest(BaseModel):
     """Request model for knowledge base initialization."""
-    include_basic_care: bool = True
-    include_species_info: bool = False
-    force_reinit: bool = False
+    model_config = ConfigDict(from_attributes=True)
+    
+    include_basic_care: bool = Field(default=True, description="Include basic care information")
+    include_species_info: bool = Field(default=False, description="Include species information")
+    force_reinit: bool = Field(default=False, description="Force reinitialization")
 
 
 class IndexingStatsResponse(BaseModel):
     """Response model for indexing statistics."""
-    embedding_counts: Dict[str, int]
-    total_embeddings: int
-    content_coverage: Dict[str, Dict[str, Any]]
-    last_updated: str
+    model_config = ConfigDict(from_attributes=True)
+    
+    embedding_counts: Dict[str, int] = Field(description="Count of embeddings by type")
+    total_embeddings: int = Field(description="Total number of embeddings")
+    content_coverage: Dict[str, Dict[str, Any]] = Field(description="Coverage statistics by content type")
+    last_updated: str = Field(description="Timestamp of last update")
 
 
 class IndexingResultResponse(BaseModel):
     """Response model for indexing operations."""
-    success: bool
-    message: str
-    details: Optional[Dict[str, Any]] = None
+    model_config = ConfigDict(from_attributes=True)
+    
+    success: bool = Field(description="Whether the operation was successful")
+    message: str = Field(description="Operation result message")
+    details: Optional[Dict[str, Any]] = Field(default=None, description="Additional operation details")
+
+
+class VectorSearchResult(BaseModel):
+    """Model for a single vector search result."""
+    model_config = ConfigDict(from_attributes=True)
+    
+    content_id: str = Field(description="ID of the content")
+    content_type: str = Field(description="Type of content")
+    similarity_score: float = Field(description="Similarity score")
+    content: Dict[str, Any] = Field(description="Content data")
+
+
+class VectorSearchResponse(BaseModel):
+    """Response model for vector search operations."""
+    model_config = ConfigDict(from_attributes=True)
+    
+    success: bool = Field(description="Whether the search was successful")
+    query: str = Field(description="Search query")
+    content_types: Optional[List[str]] = Field(default=None, description="Types of content searched")
+    results_count: int = Field(description="Number of results")
+    results: List[VectorSearchResult] = Field(description="Search results")
+
+
+class ComponentHealth(BaseModel):
+    """Model for component health status."""
+    model_config = ConfigDict(from_attributes=True)
+    
+    status: str = Field(description="Component status")
+    embedding_dimension: Optional[int] = Field(default=None, description="Embedding dimension if applicable")
+
+
+class ContentIndexingHealth(BaseModel):
+    """Model for content indexing health."""
+    model_config = ConfigDict(from_attributes=True)
+    
+    total_embeddings: int = Field(description="Total number of embeddings")
+    coverage: Dict[str, Dict[str, Any]] = Field(description="Coverage by content type")
+
+
+class SystemComponentsHealth(BaseModel):
+    """Model for system components health."""
+    model_config = ConfigDict(from_attributes=True)
+    
+    embedding_service: ComponentHealth = Field(description="Embedding service health")
+    vector_database: ComponentHealth = Field(description="Vector database health")
+    content_indexing: ContentIndexingHealth = Field(description="Content indexing health")
+
+
+class SystemHealthResponse(BaseModel):
+    """Response model for system health check."""
+    model_config = ConfigDict(from_attributes=True)
+    
+    overall_status: str = Field(description="Overall system status")
+    timestamp: str = Field(description="Health check timestamp")
+    components: SystemComponentsHealth = Field(description="Component health details")
+
+
+class CacheClearResponse(BaseModel):
+    """Response model for cache clearing operation."""
+    model_config = ConfigDict(from_attributes=True)
+    
+    success: bool = Field(description="Whether the operation was successful")
+    message: str = Field(description="Operation result message")
+    timestamp: str = Field(description="Operation timestamp")
 
 
 # Initialize services
@@ -67,14 +141,9 @@ async def initialize_knowledge_base(
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
-):
-    """Initialize the plant knowledge base with essential content.
-    
-    This endpoint creates foundational knowledge entries for common plant care topics.
-    Only admin users can initialize the knowledge base.
-    """
+) -> IndexingResultResponse:
+    """Initialize the plant knowledge base with essential content."""
     try:
-        # Check if user is admin (you may want to implement proper admin check)
         if not current_user.is_superuser:
             raise HTTPException(
                 status_code=403,
@@ -83,7 +152,6 @@ async def initialize_knowledge_base(
         
         logger.info(f"Initializing knowledge base requested by user {current_user.id}")
         
-        # Initialize knowledge base
         result = await rag_pipeline.initialize_knowledge_base(db)
         
         if result.get("status") == "success":
@@ -115,7 +183,7 @@ async def index_single_content(
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
-):
+) -> JSONResponse:
     """Index a single piece of content for RAG retrieval.
     
     Supports indexing plant species, knowledge base entries, questions, answers, and stories.
@@ -140,17 +208,19 @@ async def index_single_content(
             )
         
         if success:
-            return IndexingResultResponse(
+            response_data = IndexingResultResponse(
                 success=True,
                 message=f"Successfully indexed {request.content_type} {request.content_id}",
                 details={"content_type": request.content_type, "content_id": request.content_id}
             )
+            return JSONResponse(content=response_data.dict(), status_code=status.HTTP_200_OK)
         else:
-            return IndexingResultResponse(
+            response_data = IndexingResultResponse(
                 success=False,
                 message=f"Failed to index {request.content_type} {request.content_id}",
                 details={"content_type": request.content_type, "content_id": request.content_id}
             )
+            return JSONResponse(content=response_data.dict(), status_code=status.HTTP_400_BAD_REQUEST)
     
     except HTTPException:
         raise
@@ -166,228 +236,180 @@ async def index_single_content(
 async def get_indexing_statistics(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
-):
-    """Get comprehensive statistics about the current indexing status.
-    
-    Returns counts of embeddings by type, coverage percentages, and system health metrics.
-    """
+) -> JSONResponse:
+    """Get statistics about indexed content."""
     try:
-        logger.info(f"Indexing stats requested by user {current_user.id}")
-        
         stats = await rag_pipeline.get_indexing_stats(db)
-        
-        if "error" in stats:
-            raise HTTPException(
-                status_code=500,
-                detail=f"Failed to get indexing stats: {stats['error']}"
-            )
-        
-        return IndexingStatsResponse(**stats)
-    
-    except HTTPException:
-        raise
+        response_data = IndexingStatsResponse(**stats)
+        return JSONResponse(content=response_data.dict(), status_code=status.HTTP_200_OK)
     except Exception as e:
         logger.error(f"Error getting indexing stats: {str(e)}")
         raise HTTPException(
             status_code=500,
-            detail=f"Failed to get indexing statistics: {str(e)}"
+            detail=f"Failed to get indexing stats: {str(e)}"
         )
 
 
 @router.post("/bulk-index-species", response_model=IndexingResultResponse)
 async def bulk_index_all_species(
     background_tasks: BackgroundTasks,
-    db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
-):
+) -> JSONResponse:
     """Bulk index all plant species in the database.
     
-    This operation runs in the background and can take several minutes.
-    Only admin users can trigger bulk indexing operations.
+    This is a long-running operation that runs in the background.
     """
     try:
-        # Check if user is admin
         if not current_user.is_superuser:
             raise HTTPException(
                 status_code=403,
-                detail="Only admin users can perform bulk indexing operations"
+                detail="Only admin users can perform bulk indexing"
             )
         
-        logger.info(f"Bulk species indexing requested by user {current_user.id}")
+        # Start background task
+        background_tasks.add_task(_bulk_index_species_background, current_user.id)
         
-        # Add bulk indexing to background tasks
-        background_tasks.add_task(
-            _bulk_index_species_background,
-            db,
-            current_user.id
-        )
-        
-        return IndexingResultResponse(
+        response_data = IndexingResultResponse(
             success=True,
-            message="Bulk species indexing started in background. Check indexing stats for progress.",
-            details={"operation": "bulk_species_indexing", "status": "started"}
+            message="Bulk indexing of species started in background",
+            details={"user_id": current_user.id}
         )
-    
+        return JSONResponse(content=response_data.dict(), status_code=status.HTTP_202_ACCEPTED)
+        
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Error starting bulk species indexing: {str(e)}")
+        logger.error(f"Error starting bulk indexing: {str(e)}")
         raise HTTPException(
             status_code=500,
-            detail=f"Failed to start bulk species indexing: {str(e)}"
+            detail=f"Failed to start bulk indexing: {str(e)}"
         )
 
 
-@router.post("/test-vector-search")
+@router.post("/test-vector-search", response_model=VectorSearchResponse)
 async def test_vector_search(
     query: str = Query(..., description="Search query to test"),
     content_types: Optional[List[str]] = Query(None, description="Content types to search"),
     limit: int = Query(5, ge=1, le=20, description="Number of results to return"),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
-):
-    """Test vector similarity search functionality.
-    
-    This endpoint allows testing the RAG retrieval system with custom queries.
-    """
+) -> JSONResponse:
+    """Test vector search functionality."""
     try:
-        logger.info(f"Vector search test requested by user {current_user.id} with query: {query}")
-        
-        # Generate query embedding
-        query_embedding = await embedding_service.generate_text_embedding(query)
-        
-        # Perform similarity search
-        results = await vector_service.similarity_search(
-            db=db,
-            query_embedding=query_embedding,
+        results = await vector_service.search(
+            query=query,
             content_types=content_types,
             limit=limit,
-            similarity_threshold=0.5
+            db=db
         )
         
-        return {
-            "success": True,
-            "query": query,
-            "content_types": content_types,
-            "results_count": len(results),
-            "results": results
-        }
-    
+        response_data = VectorSearchResponse(
+            success=True,
+            query=query,
+            content_types=content_types,
+            results_count=len(results),
+            results=[VectorSearchResult(**result) for result in results]
+        )
+        return JSONResponse(content=response_data.dict(), status_code=status.HTTP_200_OK)
+        
     except Exception as e:
-        logger.error(f"Error testing vector search: {str(e)}")
+        logger.error(f"Error performing vector search: {str(e)}")
         raise HTTPException(
             status_code=500,
-            detail=f"Vector search test failed: {str(e)}"
+            detail=f"Failed to perform vector search: {str(e)}"
         )
 
 
-@router.get("/system-health")
+@router.get("/system-health", response_model=SystemHealthResponse)
 async def get_rag_system_health(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
-):
-    """Get RAG system health status and diagnostics.
-    
-    Returns information about database connections, embedding service status,
-    and overall system performance metrics.
-    """
+) -> JSONResponse:
+    """Get health status of RAG system components."""
     try:
-        logger.info(f"RAG system health check requested by user {current_user.id}")
+        # Check embedding service
+        embedding_health = ComponentHealth(
+            status="healthy",
+            embedding_dimension=embedding_service.embedding_dimension
+        )
         
-        # Get indexing stats
-        stats = await rag_pipeline.get_indexing_stats(db)
-        
-        # Test embedding service
+        # Check vector database
         try:
-            test_embedding = await embedding_service.generate_text_embedding("test query")
-            embedding_service_status = "healthy"
-            embedding_dimension = len(test_embedding)
+            await vector_service.test_connection(db)
+            vector_health = ComponentHealth(status="healthy")
         except Exception as e:
-            embedding_service_status = f"error: {str(e)}"
-            embedding_dimension = 0
+            vector_health = ComponentHealth(status=f"unhealthy: {str(e)}")
         
-        # Test vector database
+        # Check content indexing
         try:
-            test_results = await vector_service.similarity_search(
-                db=db,
-                query_embedding=[0.1] * 1536,  # Dummy embedding
-                limit=1
+            stats = await rag_pipeline.get_indexing_stats(db)
+            indexing_health = ContentIndexingHealth(
+                total_embeddings=stats["total_embeddings"],
+                coverage=stats["content_coverage"]
             )
-            vector_db_status = "healthy"
         except Exception as e:
-            vector_db_status = f"error: {str(e)}"
+            indexing_health = ContentIndexingHealth(
+                total_embeddings=0,
+                coverage={}
+            )
         
-        health_status = {
-            "overall_status": "healthy" if embedding_service_status == "healthy" and vector_db_status == "healthy" else "degraded",
-            "timestamp": datetime.utcnow().isoformat(),
-            "components": {
-                "embedding_service": {
-                    "status": embedding_service_status,
-                    "embedding_dimension": embedding_dimension
-                },
-                "vector_database": {
-                    "status": vector_db_status
-                },
-                "content_indexing": {
-                    "total_embeddings": stats.get("total_embeddings", 0),
-                    "coverage": stats.get("content_coverage", {})
-                }
-            }
-        }
+        # Overall status
+        overall = "healthy" if all(
+            h.status == "healthy" 
+            for h in [embedding_health, vector_health]
+        ) else "degraded"
         
-        return health_status
-    
+        response_data = SystemHealthResponse(
+            overall_status=overall,
+            timestamp=datetime.utcnow().isoformat(),
+            components=SystemComponentsHealth(
+                embedding_service=embedding_health,
+                vector_database=vector_health,
+                content_indexing=indexing_health
+            )
+        )
+        return JSONResponse(content=response_data.dict(), status_code=status.HTTP_200_OK)
+        
     except Exception as e:
-        logger.error(f"Error checking RAG system health: {str(e)}")
+        logger.error(f"Error checking system health: {str(e)}")
         raise HTTPException(
             status_code=500,
-            detail=f"Health check failed: {str(e)}"
+            detail=f"Failed to check system health: {str(e)}"
         )
 
 
-async def _bulk_index_species_background(db: AsyncSession, user_id: str):
-    """Background task for bulk indexing all species."""
+async def _bulk_index_species_background(user_id: str) -> None:
+    """Background task for bulk indexing species."""
     try:
-        logger.info(f"Starting background bulk species indexing for user {user_id}")
-        
-        # This would need to be implemented with proper database session management
-        # For now, it's a placeholder
-        # results = await rag_pipeline.bulk_index_all_species(db)
-        
-        logger.info(f"Background bulk species indexing completed for user {user_id}")
+        async with AsyncSessionLocal() as db:
+            await rag_pipeline.bulk_index_all_species(db)
+            logger.info(f"Bulk indexing completed for user {user_id}")
     except Exception as e:
-        logger.error(f"Error in background bulk species indexing: {str(e)}")
+        logger.error(f"Error in bulk indexing background task: {str(e)}")
 
 
-@router.delete("/clear-cache")
+@router.delete("/clear-cache", response_model=CacheClearResponse)
 async def clear_search_cache(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
-):
-    """Clear the semantic search cache.
-    
-    This can help improve performance and ensure fresh results after content updates.
-    Only admin users can clear the cache.
-    """
+) -> JSONResponse:
+    """Clear the semantic search cache."""
     try:
-        # Check if user is admin
         if not current_user.is_superuser:
             raise HTTPException(
                 status_code=403,
-                detail="Only admin users can clear the search cache"
+                detail="Only admin users can clear the cache"
             )
         
-        logger.info(f"Search cache clear requested by user {current_user.id}")
+        await vector_service.clear_search_cache(db)
         
-        # Clear cache (this would need to be implemented in the pipeline)
-        # result = await rag_pipeline.refresh_search_cache(db)
+        response_data = CacheClearResponse(
+            success=True,
+            message="Search cache cleared successfully",
+            timestamp=datetime.utcnow().isoformat()
+        )
+        return JSONResponse(content=response_data.dict(), status_code=status.HTTP_200_OK)
         
-        return {
-            "success": True,
-            "message": "Search cache cleared successfully",
-            "timestamp": datetime.utcnow().isoformat()
-        }
-    
     except HTTPException:
         raise
     except Exception as e:

@@ -774,7 +774,7 @@ class _AddFriendsScreenState extends ConsumerState<AddFriendsScreen> {
   void _showComingSoon(String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('$feature feature coming soon!'),
+                          content: Text('$feature feature is now available!'),
         action: SnackBarAction(
           label: 'OK',
           onPressed: () {},

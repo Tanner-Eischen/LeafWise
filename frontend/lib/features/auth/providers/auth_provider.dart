@@ -4,10 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:plant_social/core/constants/app_constants.dart';
 import 'package:plant_social/core/models/user.dart';
-<<<<<<< HEAD
 import 'package:plant_social/core/exceptions/api_exception.dart';
-=======
->>>>>>> baf556a5d654e56b6d571fc759b0e5caa549cb96
 import 'package:plant_social/features/auth/models/auth_models.dart';
 import 'package:plant_social/features/auth/repositories/auth_repository.dart';
 

@@ -7,7 +7,7 @@ data validation and serialization.
 from typing import Optional, List
 from pydantic import BaseModel, Field, validator
 from datetime import datetime
-
+from app.schemas.auth import UserPublicRead
 
 class UserBase(BaseModel):
     """Base user schema with common fields."""
@@ -234,3 +234,17 @@ class UserBatchOperation(BaseModel):
         if len(v) != len(set(v)):
             raise ValueError('user_ids must be unique')
         return v
+
+
+class UserListResponse(BaseModel):
+    """Schema for paginated user list responses."""
+    users: List[UserPublicRead]
+    total: int
+    skip: int
+    limit: int
+    # Assuming 'pages' is also part of the standard ListResponse pattern if needed
+    # You might need to calculate this in the service layer if not directly from DB
+    pages: Optional[int] = None
+
+    class Config:
+        from_attributes = True

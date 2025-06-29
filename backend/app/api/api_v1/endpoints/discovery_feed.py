@@ -1,6 +1,7 @@
 """Discovery feed API endpoints for personalized content curation."""
 
 from typing import List, Optional, Dict, Any
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -109,20 +110,34 @@ async def analyze_user_behavior(
 async def get_trending_topics(
     time_window: str = Query("week", description="Time window: day, week, month"),
     limit: int = Query(10, ge=1, le=50),
+    use_ml_enhanced: bool = Query(True, description="Use ML-enhanced analysis (fallback to heuristic if fails)"),
+    user_id: Optional[str] = Query(None, description="User ID for personalized trending topics"),
     db: AsyncSession = Depends(get_db)
 ):
-    """Get trending topics in the plant community."""
+    """
+    Get trending topics in the plant community.
+    
+    Now supports ML-enhanced analysis with automatic fallback to heuristic method.
+    """
     try:
         trending_topics = await discovery_service.get_trending_topics(
             db=db,
             time_window=time_window,
-            limit=limit
+            limit=limit,
+            use_ml_enhanced=use_ml_enhanced,
+            user_id=user_id
         )
+        
+        # Determine which method was used
+        ml_used = any(topic.get('ml_enhanced', False) for topic in trending_topics)
         
         return {
             "trending_topics": trending_topics,
             "time_window": time_window,
-            "generated_at": "2025-06-29T00:00:00Z"
+            "ml_enhanced": ml_used,
+            "personalized": user_id is not None,
+            "analysis_method": "ML-enhanced" if ml_used else "Heuristic fallback",
+            "generated_at": datetime.utcnow().isoformat()
         }
         
     except Exception as e:

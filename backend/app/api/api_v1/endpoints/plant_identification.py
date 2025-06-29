@@ -31,6 +31,7 @@ from app.services.plant_identification_service import (
     get_pending_verifications,
     get_identification_statistics
 )
+from app.services.auth_service import AuthService
 
 router = APIRouter()
 
@@ -267,12 +268,8 @@ async def get_pending_identification_verifications(
     current_user: User = Depends(get_current_user)
 ) -> PlantIdentificationListResponse:
     """Get pending identifications for verification (admin only)."""
-    # TODO: Add admin role check
-    # if not current_user.is_admin:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_403_FORBIDDEN,
-    #         detail="Admin access required"
-    #     )
+    # Verify admin permission for accessing pending verifications
+    AuthService.check_admin_permission(current_user, "plant_verification")
     
     try:
         identifications, total = await get_pending_verifications(db, skip, limit)
@@ -415,12 +412,8 @@ async def verify_plant_identification(
     current_user: User = Depends(get_current_user)
 ) -> PlantIdentificationResponse:
     """Verify plant identification (expert/admin only)."""
-    # TODO: Add expert/admin role check
-    # if not (current_user.is_expert or current_user.is_admin):
-    #     raise HTTPException(
-    #         status_code=status.HTTP_403_FORBIDDEN,
-    #         detail="Expert or admin access required"
-    #     )
+    # Verify expert or admin permission for plant identification verification
+    AuthService.check_expert_permission(current_user, "plant_identification")
     
     try:
         identification = await verify_identification(

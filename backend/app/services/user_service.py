@@ -7,6 +7,7 @@ profile management, search, and user statistics.
 import uuid
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timedelta
+from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, or_, func, desc, asc
 from sqlalchemy.orm import selectinload
@@ -63,6 +64,17 @@ class UserService:
         session: AsyncSession
     ) -> Optional[User]:
         """Get user by ID."""
+        result = await session.execute(
+            select(User).where(User.id == user_id)
+        )
+        return result.scalar_one_or_none()
+    
+    async def get_user_by_id_uuid(
+        self, 
+        user_id: UUID, 
+        session: AsyncSession
+    ) -> Optional[User]:
+        """Get user by UUID."""
         result = await session.execute(
             select(User).where(User.id == user_id)
         )
@@ -534,6 +546,109 @@ class UserService:
         )
         
         return friendship_status == "friends"
+    
+    async def get_all_users(
+        self,
+        session: AsyncSession,
+        skip: int = 0,
+        limit: int = 50,
+        role_filter: Optional[str] = None
+    ) -> tuple[List[User], int]:
+        """Get all users with optional role filtering (admin only).
+        
+        Args:
+            session: Database session
+            skip: Number of records to skip
+            limit: Maximum number of records to return
+            role_filter: Optional role filter (admin, expert, moderator)
+            
+        Returns:
+            Tuple of (users list, total count)
+        """
+        # Build base query
+        base_query = select(User).where(User.is_active == True)
+        count_query = select(func.count(User.id)).where(User.is_active == True)
+        
+        # Apply role filter if provided
+        if role_filter:
+            if role_filter == "admin":
+                base_query = base_query.where(User.is_admin == True)
+                count_query = count_query.where(User.is_admin == True)
+            elif role_filter == "expert":
+                base_query = base_query.where(User.is_expert == True)
+                count_query = count_query.where(User.is_expert == True)
+            elif role_filter == "moderator":
+                base_query = base_query.where(User.is_moderator == True)
+                count_query = count_query.where(User.is_moderator == True)
+        
+        # Get total count
+        count_result = await session.execute(count_query)
+        total = count_result.scalar()
+        
+        # Get paginated results
+        result = await session.execute(
+            base_query.order_by(User.created_at.desc())
+            .offset(skip)
+            .limit(limit)
+        )
+        users = result.scalars().all()
+        
+        return list(users), total
+    
+    async def search_users_simple(
+        self,
+        query: str,
+        session: AsyncSession,
+        skip: int = 0,
+        limit: int = 20
+    ) -> tuple[List[User], int]:
+        """Simple user search without complex filtering.
+        
+        Args:
+            query: Search query
+            session: Database session
+            skip: Number of records to skip
+            limit: Maximum number of records to return
+            
+        Returns:
+            Tuple of (users list, total count)
+        """
+        # Build base query
+        base_query = select(User).where(
+            and_(
+                User.is_active == True,
+                or_(
+                    User.username.ilike(f"%{query}%"),
+                    User.display_name.ilike(f"%{query}%"),
+                    User.bio.ilike(f"%{query}%")
+                )
+            )
+        )
+        
+        count_query = select(func.count(User.id)).where(
+            and_(
+                User.is_active == True,
+                or_(
+                    User.username.ilike(f"%{query}%"),
+                    User.display_name.ilike(f"%{query}%"),
+                    User.bio.ilike(f"%{query}%")
+                )
+            )
+        )
+        
+        # Get total count
+        count_result = await session.execute(count_query)
+        total = count_result.scalar()
+        
+        # Get paginated results
+        result = await session.execute(
+            base_query.order_by(User.created_at.desc())
+            .offset(skip)
+            .limit(limit)
+        )
+        users = result.scalars().all()
+        
+        return list(users), total
 
 
 # Global user service instance

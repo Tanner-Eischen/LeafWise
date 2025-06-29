@@ -9,7 +9,7 @@ services:
     container_name: plant_social_db
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: admin
       POSTGRES_DB: plant_social_db
     ports:
       - "5432:5432"

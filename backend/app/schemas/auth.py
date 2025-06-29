@@ -4,7 +4,7 @@ This module defines Pydantic schemas for authentication-related
 data validation and serialization.
 """
 
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from datetime import datetime
 
@@ -77,6 +77,29 @@ class UserRead(UserBase):
     is_active: bool
     created_at: datetime
     updated_at: datetime
+    
+    # Role and permission fields (only exposed to admins or self)
+    is_admin: bool = False
+    is_expert: bool = False
+    is_moderator: bool = False
+    expert_specialties: Optional[str] = None
+    admin_permissions: Optional[str] = None
+    
+    model_config = {"from_attributes": True}
+
+
+class UserPublicRead(BaseModel):
+    """Schema for public user data (no sensitive fields)."""
+    id: str
+    username: str
+    display_name: str
+    bio: Optional[str] = None
+    avatar_url: Optional[str] = None
+    gardening_experience: Optional[str] = None
+    location: Optional[str] = None
+    is_verified: bool
+    is_expert: bool = False  # Expert status can be public for credibility
+    created_at: datetime
     
     model_config = {"from_attributes": True}
 
@@ -160,3 +183,24 @@ class LogoutRequest(BaseModel):
     """Schema for logout request."""
     refresh_token: Optional[str] = None
     logout_all_devices: bool = False
+
+
+class UserRoleUpdate(BaseModel):
+    """Schema for updating user roles (admin only)."""
+    is_admin: Optional[bool] = None
+    is_expert: Optional[bool] = None
+    is_moderator: Optional[bool] = None
+    expert_specialties: Optional[List[str]] = None
+    admin_permissions: Optional[List[str]] = None
+
+
+class UserPermissionsSummary(BaseModel):
+    """Schema for user permissions summary."""
+    user_id: str
+    is_admin: bool
+    is_expert: bool
+    is_moderator: bool
+    is_superuser: bool
+    admin_permissions: List[str]
+    expert_specialties: List[str]
+    privacy_settings: dict

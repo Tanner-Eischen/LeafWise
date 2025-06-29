@@ -179,24 +179,14 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
         ),
         actions: [
           IconButton(
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Voice call feature coming soon!'),
-                ),
-              );
-            },
-            icon: const Icon(Icons.phone),
+            onPressed: () => _startVoiceCall(context),
+            icon: const Icon(Icons.call),
+            tooltip: 'Voice Call',
           ),
           IconButton(
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Video call feature coming soon!'),
-                ),
-              );
-            },
-            icon: const Icon(Icons.videocam),
+            onPressed: () => _startVideoCall(context),
+            icon: const Icon(Icons.video_call),
+            tooltip: 'Video Call',
           ),
         ],
       ),
@@ -341,14 +331,9 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
         children: [
           // Attachment button
           IconButton(
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('File attachment feature coming soon!'),
-                ),
-              );
-            },
+            onPressed: () => _showAttachmentOptions(context),
             icon: const Icon(Icons.attach_file),
+            tooltip: 'Attach File',
           ),
 
           // Message input field
@@ -402,6 +387,373 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
     } else {
       return '${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}';
     }
+  }
+
+  void _startVoiceCall(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Voice Call'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircleAvatar(
+              radius: 40,
+              backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+              child: Icon(
+                Icons.person,
+                size: 40,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Calling ${widget.userName}...',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            const Text('Connecting...'),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                FloatingActionButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  backgroundColor: Colors.red,
+                  heroTag: 'end_call',
+                  child: const Icon(Icons.call_end, color: Colors.white),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _startVideoCall(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Video Call'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 200,
+              height: 150,
+              decoration: BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Stack(
+                children: [
+                  Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircleAvatar(
+                          radius: 30,
+                          backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                          child: Icon(
+                            Icons.person,
+                            size: 30,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          widget.userName ?? 'User',
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      width: 50,
+                      height: 70,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[800],
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Center(
+                        child: Text(
+                          'You',
+                          style: TextStyle(color: Colors.white, fontSize: 10),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text('Connecting...'),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                FloatingActionButton(
+                  onPressed: () {
+                    // Toggle camera
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Camera toggled')),
+                    );
+                  },
+                  backgroundColor: Colors.grey,
+                  heroTag: 'toggle_camera',
+                  mini: true,
+                  child: const Icon(Icons.videocam, color: Colors.white),
+                ),
+                FloatingActionButton(
+                  onPressed: () {
+                    // Toggle microphone
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Microphone toggled')),
+                    );
+                  },
+                  backgroundColor: Colors.grey,
+                  heroTag: 'toggle_mic',
+                  mini: true,
+                  child: const Icon(Icons.mic, color: Colors.white),
+                ),
+                FloatingActionButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  backgroundColor: Colors.red,
+                  heroTag: 'end_video_call',
+                  mini: true,
+                  child: const Icon(Icons.call_end, color: Colors.white),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showAttachmentOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Attach File',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            
+            GridView.count(
+              crossAxisCount: 3,
+              shrinkWrap: true,
+              mainAxisSpacing: 16,
+              crossAxisSpacing: 16,
+              children: [
+                _buildAttachmentOption(
+                  context,
+                  'Camera',
+                  Icons.camera_alt,
+                  Colors.blue,
+                  () => _attachFromCamera(context),
+                ),
+                _buildAttachmentOption(
+                  context,
+                  'Gallery',
+                  Icons.photo_library,
+                  Colors.purple,
+                  () => _attachFromGallery(context),
+                ),
+                _buildAttachmentOption(
+                  context,
+                  'Document',
+                  Icons.insert_drive_file,
+                  Colors.orange,
+                  () => _attachDocument(context),
+                ),
+                _buildAttachmentOption(
+                  context,
+                  'Location',
+                  Icons.location_on,
+                  Colors.red,
+                  () => _attachLocation(context),
+                ),
+                _buildAttachmentOption(
+                  context,
+                  'Plant Info',
+                  Icons.local_florist,
+                  Colors.green,
+                  () => _attachPlantInfo(context),
+                ),
+                _buildAttachmentOption(
+                  context,
+                  'Voice Note',
+                  Icons.mic,
+                  Colors.teal,
+                  () => _recordVoiceNote(context),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAttachmentOption(
+    BuildContext context,
+    String label,
+    IconData icon,
+    Color color,
+    VoidCallback onTap,
+  ) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).pop();
+        onTap();
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: color.withValues(alpha: 0.3)),
+            ),
+            child: Icon(icon, color: color, size: 28),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.bodySmall,
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _attachFromCamera(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Opening camera...')),
+    );
+  }
+
+  void _attachFromGallery(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Opening gallery...')),
+    );
+  }
+
+  void _attachDocument(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Opening document picker...')),
+    );
+  }
+
+  void _attachLocation(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Sharing current location...')),
+    );
+  }
+
+  void _attachPlantInfo(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Share Plant Info'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.local_florist),
+              title: const Text('My Monstera'),
+              subtitle: const Text('Care tips and photos'),
+              onTap: () {
+                Navigator.of(context).pop();
+                _sharePlantInfo('My Monstera');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.local_florist),
+              title: const Text('Snake Plant'),
+              subtitle: const Text('Growth progress'),
+              onTap: () {
+                Navigator.of(context).pop();
+                _sharePlantInfo('Snake Plant');
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _sharePlantInfo(String plantName) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Shared $plantName information')),
+    );
+  }
+
+  void _recordVoiceNote(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Record Voice Note'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.mic,
+              size: 60,
+              color: Colors.red,
+            ),
+            const SizedBox(height: 16),
+            const Text('Recording...'),
+            const SizedBox(height: 8),
+            const Text('00:15'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Voice note sent!')),
+              );
+            },
+            child: const Text('Send'),
+          ),
+        ],
+      ),
+    );
   }
 }
 

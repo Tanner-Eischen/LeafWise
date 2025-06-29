@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.services.plant_achievement_service import PlantAchievementService, PlantMilestoneService
+from app.services.auth_service import AuthService
 from app.models.plant_achievement import UserAchievement, PlantMilestone, UserStats
 from app.schemas.achievement import (
     UserAchievementResponse,
@@ -81,7 +82,9 @@ async def get_plant_milestones(
     db: AsyncSession = Depends(get_db)
 ):
     """Get milestones for a specific plant."""
-    # TODO: Add authorization check to ensure user owns the plant
+    # Verify plant ownership or admin access
+    await AuthService.verify_plant_ownership_or_admin(db, plant_id, current_user)
+    
     milestones = await PlantMilestoneService.get_plant_milestones(db, plant_id)
     return milestones
 
@@ -94,7 +97,9 @@ async def create_plant_milestone(
     db: AsyncSession = Depends(get_db)
 ):
     """Create a new plant milestone."""
-    # TODO: Add authorization check to ensure user owns the plant
+    # Verify plant ownership (admins shouldn't create milestones for other users' plants)
+    await AuthService.check_plant_ownership(db, plant_id, current_user.id)
+    
     milestone = await PlantMilestoneService.create_milestone(
         db=db,
         plant_id=plant_id,
@@ -114,7 +119,9 @@ async def check_automatic_milestones(
     db: AsyncSession = Depends(get_db)
 ):
     """Check and create automatic milestones for a plant."""
-    # TODO: Add authorization check to ensure user owns the plant
+    # Verify plant ownership (only plant owners should trigger milestone checks)
+    await AuthService.check_plant_ownership(db, plant_id, current_user.id)
+    
     newly_created = await PlantMilestoneService.check_automatic_milestones(db, plant_id)
     return {
         "newly_created_count": len(newly_created),

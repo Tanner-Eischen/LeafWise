@@ -1,2 +1,33 @@
 node_modules/
 .env
+
+# Python virtual environment
+venv/
+env/
+.venv/
+.env/
+ENV/
+
+# Python byte-compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Vibe Tools
+.vibe-tools/
+.vibe-tools.env
+vibe-tools.env
+.vibe-tools.config.json
+vibe-tools.config.json
+
+# Vibe Tools
+.vibe-tools/
+.vibe-tools.env
+vibe-tools.env
+.vibe-tools.config.json
+vibe-tools.config.json

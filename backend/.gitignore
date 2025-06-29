@@ -1,0 +1,90 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Virtual environments
+venv/
+env/
+.env/
+.venv/
+ENV/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+coverage.xml
+*.cover
+.hypothesis/
+
+# Logs
+*.log
+logs/
+log/
+
+# Database
+*.sqlite3
+*.db
+
+# FastAPI specific
+.pytest_cache/
+__pycache__/
+.coverage
+coverage.xml
+
+# Alembic
+alembic/*.pyc
+alembic/__pycache__/
+alembic/versions/__pycache__/
+
+# Uploads directory - keep the directory structure but ignore contents
+uploads/*
+!uploads/.gitkeep
+!uploads/audio/.gitkeep
+!uploads/images/.gitkeep
+!uploads/plant_images/.gitkeep
+!uploads/thumbnails/.gitkeep
+!uploads/videos/.gitkeep
+
+# Local development configuration
+*.local.py
+local_settings.py
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Vibe Tools
+.vibe-tools/
+.vibe-tools.env
+vibe-tools.env
+.vibe-tools.config.json
+vibe-tools.config.json 

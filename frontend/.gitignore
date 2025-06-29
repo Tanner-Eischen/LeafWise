@@ -43,6 +43,16 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Environment and configuration
 .env
+/backend/venv/*
+
+# Vibe Tools
+.vibe-tools/
+.vibe-tools.env
+vibe-tools.env
+.vibe-tools.config.json
+vibe-tools.config.json
 vibe-tools.mdc
 vibe-tools.env.mdc

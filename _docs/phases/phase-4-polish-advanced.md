@@ -67,7 +67,7 @@ This final phase focuses on polish, performance optimization, advanced features,
 - Shipping integration provides accurate costs and tracking
 - Review system maintains marketplace quality and trust
 
-### 4. Professional Features & Expert Network
+### 3. Professional Features & Expert Network
 
 **Objective**: Connect users with plant care professionals and expert knowledge
 

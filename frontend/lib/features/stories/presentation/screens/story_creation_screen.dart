@@ -268,36 +268,24 @@ class _StoryCreationScreenState extends ConsumerState<StoryCreationScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _buildActionButton(
-                    icon: Icons.eco,
-                    label: 'Tag Plant',
+                    icon: Icons.local_florist,
+                    label: 'Tag Plants',
                     onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Plant tagging coming soon!'),
-                        ),
-                      );
+                      _showPlantTagDialog(context, theme);
                     },
                   ),
                   _buildActionButton(
                     icon: Icons.location_on,
                     label: 'Add Location',
                     onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Location tagging coming soon!'),
-                        ),
-                      );
+                      _showLocationTagDialog(context, theme);
                     },
                   ),
                   _buildActionButton(
-                    icon: Icons.palette,
+                    icon: Icons.tune,
                     label: 'Filters',
                     onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Filters coming soon!'),
-                        ),
-                      );
+                      _showFiltersDialog(context, theme);
                     },
                   ),
                 ],
@@ -387,6 +375,354 @@ class _StoryCreationScreenState extends ConsumerState<StoryCreationScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  void _showPlantTagDialog(BuildContext context, ThemeData theme) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Tag Plants'),
+        content: SizedBox(
+          width: double.maxFinite,
+          height: 300,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Select plants to tag in your story:',
+                style: theme.textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                child: ListView(
+                  children: [
+                    _buildPlantTagItem(theme, 'Monstera Deliciosa', 'Indoor Plant', true),
+                    _buildPlantTagItem(theme, 'Peace Lily', 'Flowering Plant', false),
+                    _buildPlantTagItem(theme, 'Snake Plant', 'Succulent', false),
+                    _buildPlantTagItem(theme, 'Fiddle Leaf Fig', 'Tree', false),
+                    _buildPlantTagItem(theme, 'Pothos', 'Vine', true),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Plants tagged successfully!')),
+              );
+            },
+            child: const Text('Done'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPlantTagItem(ThemeData theme, String plantName, String category, bool isSelected) {
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return CheckboxListTile(
+          title: Text(plantName),
+          subtitle: Text(category),
+          value: isSelected,
+          onChanged: (value) {
+            setState(() {
+              // Toggle selection
+            });
+          },
+          secondary: CircleAvatar(
+            backgroundColor: theme.primaryColor.withValues(alpha: 0.1),
+            child: Icon(Icons.local_florist, color: theme.primaryColor),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showLocationTagDialog(BuildContext context, ThemeData theme) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Add Location'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Choose how to add location:',
+              style: theme.textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 16),
+            
+            ListTile(
+              leading: const Icon(Icons.my_location),
+              title: const Text('Use Current Location'),
+              subtitle: const Text('GPS location will be used'),
+              onTap: () {
+                Navigator.of(context).pop();
+                _useCurrentLocation();
+              },
+            ),
+            
+            ListTile(
+              leading: const Icon(Icons.search),
+              title: const Text('Search Location'),
+              subtitle: const Text('Search for a specific place'),
+              onTap: () {
+                Navigator.of(context).pop();
+                _showLocationSearchDialog(context, theme);
+              },
+            ),
+            
+            ListTile(
+              leading: const Icon(Icons.home),
+              title: const Text('Select from Saved'),
+              subtitle: const Text('Choose from saved locations'),
+              onTap: () {
+                Navigator.of(context).pop();
+                _showSavedLocationsDialog(context, theme);
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _useCurrentLocation() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Current location added to story!')),
+    );
+  }
+
+  void _showLocationSearchDialog(BuildContext context, ThemeData theme) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Search Location'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              decoration: const InputDecoration(
+                hintText: 'Search for a place...',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (value) {
+                // Implement search functionality
+              },
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 200,
+              child: ListView(
+                children: [
+                  _buildLocationSearchResult(theme, 'Central Park, New York', 'Park'),
+                  _buildLocationSearchResult(theme, 'Brooklyn Botanic Garden', 'Garden'),
+                  _buildLocationSearchResult(theme, 'High Line Park', 'Public Garden'),
+                  _buildLocationSearchResult(theme, 'The New York Botanical Garden', 'Botanical Garden'),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLocationSearchResult(ThemeData theme, String name, String type) {
+    return ListTile(
+      leading: const Icon(Icons.place),
+      title: Text(name),
+      subtitle: Text(type),
+      onTap: () {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Location "$name" added to story!')),
+        );
+      },
+    );
+  }
+
+  void _showSavedLocationsDialog(BuildContext context, ThemeData theme) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Saved Locations'),
+        content: SizedBox(
+          width: double.maxFinite,
+          height: 200,
+          child: ListView(
+            children: [
+              _buildSavedLocationItem(theme, 'My Garden', 'Home', Icons.home),
+              _buildSavedLocationItem(theme, 'Local Nursery', 'Plant Store', Icons.store),
+              _buildSavedLocationItem(theme, 'Community Garden', 'Public Space', Icons.group),
+              _buildSavedLocationItem(theme, 'Office Plants', 'Workplace', Icons.business),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSavedLocationItem(ThemeData theme, String name, String type, IconData icon) {
+    return ListTile(
+      leading: Icon(icon, color: theme.primaryColor),
+      title: Text(name),
+      subtitle: Text(type),
+      onTap: () {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Location "$name" added to story!')),
+        );
+      },
+    );
+  }
+
+  void _showFiltersDialog(BuildContext context, ThemeData theme) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Apply Filters'),
+        content: SizedBox(
+          width: double.maxFinite,
+          height: 400,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Brightness & Color',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                _buildFilterSlider('Brightness', 0.5),
+                _buildFilterSlider('Contrast', 0.5),
+                _buildFilterSlider('Saturation', 0.5),
+                
+                const SizedBox(height: 16),
+                Text(
+                  'Plant Enhancement',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                _buildFilterSlider('Green Boost', 0.3),
+                _buildFilterSlider('Leaf Detail', 0.4),
+                _buildFilterSlider('Natural Light', 0.6),
+                
+                const SizedBox(height: 16),
+                Text(
+                  'Creative Filters',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
+                  children: [
+                    _buildFilterChip('Vintage', false),
+                    _buildFilterChip('Warm', true),
+                    _buildFilterChip('Cool', false),
+                    _buildFilterChip('Dramatic', false),
+                    _buildFilterChip('Soft', false),
+                    _buildFilterChip('Vibrant', false),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Reset'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Filters applied successfully!')),
+              );
+            },
+            child: const Text('Apply'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilterSlider(String label, double value) {
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(label),
+            Slider(
+              value: value,
+              onChanged: (newValue) {
+                setState(() {
+                  value = newValue;
+                });
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildFilterChip(String label, bool isSelected) {
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return FilterChip(
+          label: Text(label),
+          selected: isSelected,
+          onSelected: (selected) {
+            setState(() {
+              isSelected = selected;
+            });
+          },
+        );
+      },
     );
   }
 }

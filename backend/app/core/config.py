@@ -43,9 +43,9 @@ class Settings(BaseSettings):
         return []
     
     # Database settings
-    POSTGRES_SERVER: str = "localhost"
+    POSTGRES_SERVER: str = "postgres"
     POSTGRES_USER: str = "postgres"
-    POSTGRES_PASSWORD: str = "password"
+    POSTGRES_PASSWORD: str = "admin"
     POSTGRES_DB: str = "plant_social_db"
     POSTGRES_PORT: str = "5432"
     SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn] = None
@@ -59,7 +59,7 @@ class Settings(BaseSettings):
         values = info.data if hasattr(info, 'data') else {}
         # Construct URL manually to avoid PostgresDsn issues
         user = values.get("POSTGRES_USER", "postgres")
-        password = values.get("POSTGRES_PASSWORD", "password")
+        password = values.get("POSTGRES_PASSWORD", "admin")
         host = values.get("POSTGRES_SERVER", "localhost")
         port = values.get("POSTGRES_PORT", "5432")
         db = values.get("POSTGRES_DB", "plant_social_db")

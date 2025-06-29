@@ -41,6 +41,13 @@ class User(SQLAlchemyBaseUserTableUUID, Base):
     allow_plant_identification = Column(Boolean, default=True)
     allow_friend_requests = Column(Boolean, default=True)
     
+    # Role and permission fields for authorization
+    is_admin = Column(Boolean, default=False, nullable=False)
+    is_expert = Column(Boolean, default=False, nullable=False)
+    is_moderator = Column(Boolean, default=False, nullable=False)
+    expert_specialties = Column(Text, nullable=True)  # JSON array of plant specialties
+    admin_permissions = Column(Text, nullable=True)  # JSON array of specific admin permissions
+    
     # Timestamps
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

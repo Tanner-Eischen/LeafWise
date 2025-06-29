@@ -48,8 +48,12 @@ class CustomButton extends StatelessWidget {
           backgroundColor: backgroundColor ?? theme.primaryColor,
           foregroundColor: textColor ?? Colors.white,
           disabledBackgroundColor: theme.disabledColor,
-          disabledForegroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.38),
-          padding: padding ?? const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          disabledForegroundColor: theme.colorScheme.onSurface.withOpacity(
+            0.38,
+          ),
+          padding:
+              padding ??
+              const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           shape: RoundedRectangleBorder(
             borderRadius: borderRadius ?? BorderRadius.circular(8),
           ),
@@ -122,7 +126,9 @@ class CustomOutlineButton extends StatelessWidget {
         style: OutlinedButton.styleFrom(
           foregroundColor: effectiveTextColor,
           disabledForegroundColor: theme.disabledColor,
-          padding: padding ?? const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          padding:
+              padding ??
+              const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           side: BorderSide(
             color: isDisabled ? theme.disabledColor : effectiveBorderColor,
             width: 1.5,
@@ -186,7 +192,8 @@ class CustomTextButton extends StatelessWidget {
       style: TextButton.styleFrom(
         foregroundColor: effectiveTextColor,
         disabledForegroundColor: theme.disabledColor,
-        padding: padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding:
+            padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       ),
       child: isLoading
           ? SmallLoadingWidget(color: effectiveTextColor)
@@ -238,11 +245,7 @@ class CustomFloatingActionButton extends StatelessWidget {
       backgroundColor: backgroundColor ?? theme.primaryColor,
       child: isLoading
           ? const SmallLoadingWidget(color: Colors.white)
-          : Icon(
-              icon,
-              color: iconColor ?? Colors.white,
-              size: size ?? 24,
-            ),
+          : Icon(icon, color: iconColor ?? Colors.white, size: size ?? 24),
     );
   }
 }

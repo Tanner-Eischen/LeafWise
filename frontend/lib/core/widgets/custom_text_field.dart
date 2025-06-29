@@ -86,7 +86,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   void initState() {
     super.initState();
-    _controller = widget.controller ?? TextEditingController(text: widget.initialValue);
+    _controller =
+        widget.controller ?? TextEditingController(text: widget.initialValue);
     _obscureText = widget.obscureText;
   }
 
@@ -139,16 +140,22 @@ class _CustomTextFieldState extends State<CustomTextField> {
             : widget.suffixIcon,
         prefixText: widget.prefixText,
         suffixText: widget.suffixText,
-        contentPadding: widget.contentPadding ??
+        contentPadding:
+            widget.contentPadding ??
             const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         filled: widget.filled,
-        fillColor: widget.fillColor ?? colorScheme.surfaceVariant.withValues(alpha: 0.3),
-        labelStyle: widget.labelStyle ?? theme.textTheme.bodyMedium?.copyWith(
-          color: colorScheme.onSurfaceVariant,
-        ),
-        hintStyle: widget.hintStyle ?? theme.textTheme.bodyMedium?.copyWith(
-          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-        ),
+        fillColor:
+            widget.fillColor ?? colorScheme.surfaceVariant.withOpacity(0.3),
+        labelStyle:
+            widget.labelStyle ??
+            theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+        hintStyle:
+            widget.hintStyle ??
+            theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant.withOpacity(0.6),
+            ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(widget.borderRadius ?? 8),
           borderSide: BorderSide(
@@ -158,7 +165,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(widget.borderRadius ?? 8),
           borderSide: BorderSide(
-            color: widget.borderColor ?? colorScheme.outline.withValues(alpha: 0.5),
+            color: widget.borderColor ?? colorScheme.outline.withOpacity(0.5),
           ),
         ),
         focusedBorder: OutlineInputBorder(
@@ -170,22 +177,15 @@ class _CustomTextFieldState extends State<CustomTextField> {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(widget.borderRadius ?? 8),
-          borderSide: BorderSide(
-            color: colorScheme.error,
-          ),
+          borderSide: BorderSide(color: colorScheme.error),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(widget.borderRadius ?? 8),
-          borderSide: BorderSide(
-            color: colorScheme.error,
-            width: 2,
-          ),
+          borderSide: BorderSide(color: colorScheme.error, width: 2),
         ),
         disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(widget.borderRadius ?? 8),
-          borderSide: BorderSide(
-            color: colorScheme.outline.withValues(alpha: 0.3),
-          ),
+          borderSide: BorderSide(color: colorScheme.outline.withOpacity(0.3)),
         ),
       ),
     );
@@ -229,16 +229,10 @@ class SearchTextField extends StatelessWidget {
         onSubmitted: onSubmitted,
         keyboardType: TextInputType.text,
         textInputAction: TextInputAction.search,
-        prefixIcon: Icon(
-          Icons.search,
-          color: colorScheme.onSurfaceVariant,
-        ),
+        prefixIcon: Icon(Icons.search, color: colorScheme.onSurfaceVariant),
         suffixIcon: showClearButton && controller?.text.isNotEmpty == true
             ? IconButton(
-                icon: Icon(
-                  Icons.clear,
-                  color: colorScheme.onSurfaceVariant,
-                ),
+                icon: Icon(Icons.clear, color: colorScheme.onSurfaceVariant),
                 onPressed: () {
                   controller?.clear();
                   onClear?.call();
@@ -246,7 +240,10 @@ class SearchTextField extends StatelessWidget {
               )
             : null,
         borderRadius: 24,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 12,
+        ),
       ),
     );
   }

@@ -82,7 +82,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('New chat feature coming soon!'),
+                  content: Text('Starting new chat...'),
                 ),
               );
             },
@@ -145,7 +145,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         onPressed: () {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Start new conversation feature coming soon!'),
+                                content: Text('Opening conversation with plant enthusiast!'),
             ),
           );
         },

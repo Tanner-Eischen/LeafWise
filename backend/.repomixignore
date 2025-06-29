@@ -1,0 +1,176 @@
+# ===========================================
+# PYTHON VIRTUAL ENVIRONMENTS
+# ===========================================
+venv/
+venv/**/*
+.venv/
+.venv/**/*
+env/
+env/**/*
+.env/
+.env/**/*
+virtualenv/
+virtualenv/**/*
+venv311/
+venv311/**/*
+
+# ===========================================
+# PYTHON CACHE & COMPILED FILES
+# ===========================================
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# ===========================================
+# DATABASE FILES
+# ===========================================
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# ===========================================
+# LOG FILES
+# ===========================================
+*.log
+logs/
+log/
+**/*.log
+
+# ===========================================
+# TEMPORARY FILES
+# ===========================================
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+*.bak
+*.orig
+
+# ===========================================
+# IDE & EDITOR FILES
+# ===========================================
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.spyderproject
+.spyproject
+.ropeproject
+
+# ===========================================
+# BUILD & DISTRIBUTION
+# ===========================================
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ===========================================
+# PACKAGE MANAGERS
+# ===========================================
+pip-log.txt
+pip-delete-this-directory.txt
+.pip-cache/
+
+# ===========================================
+# JUPYTER NOTEBOOK
+# ===========================================
+.ipynb_checkpoints
+*.ipynb
+
+# ===========================================
+# ENVIRONMENT VARIABLES (Security)
+# ===========================================
+.env
+.env.local
+.env.*.local
+.envrc
+
+# ===========================================
+# UPLOADS & MEDIA (Large files)
+# ===========================================
+uploads/
+uploads/**/*
+media/
+static/media/
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.mp4
+*.avi
+*.mov
+*.wav
+*.mp3
+
+# ===========================================
+# DOCUMENTATION BUILD
+# ===========================================
+docs/_build/
+docs/build/
+site/
+
+# ===========================================
+# TESTING
+# ===========================================
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# ===========================================
+# ALEMBIC (Keep structure, exclude large files)
+# ===========================================
+alembic/versions/*.pyc
+
+# ===========================================
+# LARGE ANALYSIS FILES
+# ===========================================
+*.csv
+*.json.gz
+*.pkl
+*.pickle
+
+# ===========================================
+# SECURITY & SECRETS
+# ===========================================
+*.pem
+*.key
+*.crt
+*.p12
+secrets/
+credentials/ 

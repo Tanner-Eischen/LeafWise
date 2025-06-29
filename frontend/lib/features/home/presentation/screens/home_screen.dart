@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-<<<<<<< HEAD
 import 'package:go_router/go_router.dart';
 import 'package:plant_social/core/models/user.dart';
 import 'package:plant_social/core/router/app_router.dart';
-=======
->>>>>>> baf556a5d654e56b6d571fc759b0e5caa549cb96
 import 'package:plant_social/features/auth/providers/auth_provider.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -15,7 +12,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final user = ref.watch(authProvider).user;
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -85,7 +82,7 @@ class HomeScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            
+
             // Quick actions
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -109,7 +106,7 @@ class HomeScreen extends ConsumerWidget {
                           'Share Story',
                           Icons.add_a_photo,
                           () {
-                            // TODO: Navigate to camera
+                            context.pushNamed(AppRoutes.camera);
                           },
                         ),
                       ),
@@ -121,7 +118,7 @@ class HomeScreen extends ConsumerWidget {
                           'Find Friends',
                           Icons.person_add,
                           () {
-                            // TODO: Navigate to friends
+                            context.pushNamed(AppRoutes.friends);
                           },
                         ),
                       ),
@@ -130,7 +127,7 @@ class HomeScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            
+
             // Placeholder for stories
             Container(
               height: 120,
@@ -147,7 +144,7 @@ class HomeScreen extends ConsumerWidget {
                 },
               ),
             ),
-            
+
             // Placeholder for feed
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -162,11 +159,14 @@ class HomeScreen extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  _buildFeedItem(theme, 'Alice Green', 'Just repotted my monstera! 🌱', '2h ago'),
+                  _buildFeedItem(theme, 'Alice Green',
+                      'Just repotted my monstera! 🌱', '2h ago'),
                   const SizedBox(height: 16),
-                  _buildFeedItem(theme, 'Bob Plant', 'Check out my new succulent collection 🌵', '5h ago'),
+                  _buildFeedItem(theme, 'Bob Plant',
+                      'Check out my new succulent collection 🌵', '5h ago'),
                   const SizedBox(height: 16),
-                  _buildFeedItem(theme, 'Carol Bloom', 'Need help identifying this plant!', '1d ago'),
+                  _buildFeedItem(theme, 'Carol Bloom',
+                      'Need help identifying this plant!', '1d ago'),
                 ],
               ),
             ),
@@ -362,7 +362,8 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildFeedItem(ThemeData theme, String userName, String content, String timeAgo) {
+  Widget _buildFeedItem(
+      ThemeData theme, String userName, String content, String timeAgo) {
     return Card(
       elevation: 2,
       shadowColor: theme.colorScheme.shadow.withOpacity(0.1),
@@ -413,17 +414,17 @@ class HomeScreen extends ConsumerWidget {
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 12),
-            
+
             // Content
             Text(
               content,
               style: theme.textTheme.bodyMedium,
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Placeholder for image
             Container(
               height: 200,
@@ -439,9 +440,9 @@ class HomeScreen extends ConsumerWidget {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Action buttons
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

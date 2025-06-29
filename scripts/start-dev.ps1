@@ -68,7 +68,7 @@ if (Test-Path "venv") {
     Write-Host "[OK] Virtual environment found" -ForegroundColor Green
 } else {
     Write-Host "Creating virtual environment..." -ForegroundColor Yellow
-    python -m venv venv
+    python311 -m venv venv
     Write-Host "[OK] Virtual environment created" -ForegroundColor Green
 }
 

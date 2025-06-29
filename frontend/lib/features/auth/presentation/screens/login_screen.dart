@@ -193,16 +193,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     
                     const Spacer(),
                     
-                    TextButton(
-                      onPressed: () {
-                        // TODO: Navigate to forgot password screen
-                        _showErrorSnackBar('Forgot password feature coming soon!');
-                      },
-                      child: Text(
-                        'Forgot Password?',
-                        style: TextStyle(
-                          color: theme.colorScheme.primary,
-                          fontWeight: FontWeight.w500,
+                    // Forgot Password Link
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () => _showForgotPasswordDialog(context),
+                        child: Text(
+                          'Forgot Password?',
+                          style: TextStyle(
+                            color: theme.primaryColor,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                     ),
@@ -247,18 +248,46 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 
                 const SizedBox(height: 24),
                 
-                // Social Login Buttons (Placeholder)
-                OutlinedButton.icon(
-                  onPressed: () {
-                    _showErrorSnackBar('Social login coming soon!');
-                  },
-                  icon: const Icon(Icons.g_mobiledata, size: 24),
-                  label: const Text('Continue with Google'),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    side: BorderSide(
-                      color: theme.colorScheme.outline.withOpacity(0.3),
+                // Social Login Buttons
+                Text(
+                  'Or continue with',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: Colors.grey[600],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildSocialLoginButton(
+                        'Google',
+                        Icons.g_mobiledata,
+                        Colors.red,
+                        () => _handleSocialLogin('Google'),
+                      ),
                     ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildSocialLoginButton(
+                        'Apple',
+                        Icons.apple,
+                        Colors.black,
+                        () => _handleSocialLogin('Apple'),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                
+                SizedBox(
+                  width: double.infinity,
+                  child: _buildSocialLoginButton(
+                    'Facebook',
+                    Icons.facebook,
+                    const Color(0xFF1877F2),
+                    () => _handleSocialLogin('Facebook'),
                   ),
                 ),
                 
@@ -294,5 +323,127 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
       ),
     );
+  }
+
+  void _showForgotPasswordDialog(BuildContext context) {
+    final emailController = TextEditingController();
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Reset Password'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Enter your email address and we\'ll send you a link to reset your password.',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: emailController,
+              keyboardType: TextInputType.emailAddress,
+              decoration: const InputDecoration(
+                labelText: 'Email Address',
+                hintText: 'Enter your email',
+                prefixIcon: Icon(Icons.email),
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final email = emailController.text.trim();
+              if (email.isNotEmpty) {
+                Navigator.of(context).pop();
+                _sendPasswordResetEmail(email);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Please enter your email address')),
+                );
+              }
+            },
+            child: const Text('Send Reset Link'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _sendPasswordResetEmail(String email) {
+    // Simulate sending reset email
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Password reset link sent to $email'),
+        action: SnackBarAction(
+          label: 'Resend',
+          onPressed: () => _sendPasswordResetEmail(email),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSocialLoginButton(String platform, IconData icon, Color color, VoidCallback onPressed) {
+    return OutlinedButton(
+      onPressed: onPressed,
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        side: BorderSide(color: Colors.grey[300]!),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: color, size: 20),
+          const SizedBox(width: 8),
+          Text(
+            platform,
+            style: TextStyle(
+              color: Colors.grey[700],
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _handleSocialLogin(String platform) {
+    // Show loading state
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+            const SizedBox(width: 12),
+            Text('Signing in with $platform...'),
+          ],
+        ),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+
+    // Simulate social login process
+    Future.delayed(const Duration(seconds: 2), () {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('$platform login successful!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    });
   }
 }

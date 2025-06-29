@@ -1,17 +1,12 @@
-"""Main API router for version 1.
-
-This module combines all API endpoints into a single router
-for the FastAPI application.
-"""
 
 from fastapi import APIRouter
 
-from app.api.api_v1.endpoints import (
+from app.api.api_v1.endpoints import(
     auth, messages, stories, friends, users, websocket,
     plant_species, user_plants, plant_care_logs, plant_identification,
     plant_trades, plant_questions, achievements, nurseries, smart_community,
-    content_generation, discovery_feed, ml_enhanced_community, rag_infrastructure
-)
+    content_generation, discovery_feed, ml_enhanced_community, rag_infrastructure,
+    ml_plant_health, ml_trending_topics, analytics, plant_measurements)
 
 api_router = APIRouter()
 
@@ -40,6 +35,14 @@ api_router.include_router(discovery_feed.router, prefix="/discovery", tags=["dis
 
 # ML-enhanced endpoints
 api_router.include_router(ml_enhanced_community.router, prefix="/ml-community", tags=["ml-enhanced-community"])
+api_router.include_router(ml_plant_health.router, prefix="/ml-plant-health", tags=["ml-plant-health"])
+api_router.include_router(ml_trending_topics.router, prefix="/ml-trending", tags=["ml-trending-topics"])
 
 # RAG Infrastructure endpoints
 api_router.include_router(rag_infrastructure.router, prefix="/rag", tags=["rag-infrastructure"])
+
+# Advanced Analytics endpoints
+api_router.include_router(analytics.router, prefix="/analytics", tags=["analytics"])
+
+# Plant Measurement endpoints
+api_router.include_router(plant_measurements.router, prefix="/measurements", tags=["plant-measurements"])

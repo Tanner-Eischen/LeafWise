@@ -48,7 +48,9 @@ class CustomErrorWidget extends StatelessWidget {
             Text(
               message,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                color: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.color?.withOpacity(0.7),
               ),
               textAlign: TextAlign.center,
             ),
@@ -106,10 +108,7 @@ class InlineErrorWidget extends StatelessWidget {
           ),
           if (onRetry != null) ...[
             const SizedBox(width: 8),
-            TextButton(
-              onPressed: onRetry,
-              child: const Text('Retry'),
-            ),
+            TextButton(onPressed: onRetry, child: const Text('Retry')),
           ],
         ],
       ),
@@ -121,10 +120,7 @@ class InlineErrorWidget extends StatelessWidget {
 class NetworkErrorWidget extends StatelessWidget {
   final VoidCallback? onRetry;
 
-  const NetworkErrorWidget({
-    super.key,
-    this.onRetry,
-  });
+  const NetworkErrorWidget({super.key, this.onRetry});
 
   @override
   Widget build(BuildContext context) {
@@ -164,14 +160,18 @@ class EmptyStateWidget extends StatelessWidget {
             Icon(
               icon ?? Icons.inbox_outlined,
               size: 64,
-              color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.5),
+              color: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.color?.withOpacity(0.5),
             ),
             const SizedBox(height: 16),
             if (title != null) ...[
               Text(
                 title!,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                  color: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.color?.withOpacity(0.7),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -180,14 +180,13 @@ class EmptyStateWidget extends StatelessWidget {
             Text(
               message,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.5),
+                color: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.color?.withOpacity(0.5),
               ),
               textAlign: TextAlign.center,
             ),
-            if (action != null) ...[
-              const SizedBox(height: 24),
-              action!,
-            ],
+            if (action != null) ...[const SizedBox(height: 24), action!],
           ],
         ),
       ),

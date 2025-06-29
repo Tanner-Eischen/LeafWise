@@ -1,14 +1,8 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-<<<<<<< HEAD
 
 part 'user.g.dart';
 part 'user.freezed.dart';
-=======
->>>>>>> baf556a5d654e56b6d571fc759b0e5caa549cb96
-
-part 'user.freezed.dart';
-part 'user.g.dart';
 
 @freezed
 class User with _$User {

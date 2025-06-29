@@ -5,7 +5,7 @@ using FastAPI-Users and custom business logic.
 """
 
 import uuid
-from typing import Optional, Dict, Any, AsyncGenerator
+from typing import Optional, Dict, Any, AsyncGenerator, List
 from datetime import datetime, timedelta
 from fastapi import Depends, HTTPException, status
 from fastapi_users import BaseUserManager, UUIDIDMixin
@@ -16,10 +16,13 @@ from sqlalchemy import select, and_
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 import redis.asyncio as redis
+import secrets
+import json
 
 from app.core.config import settings
 from app.core.database import AsyncSessionLocal
 from app.models.user import User
+from app.models.user_plant import UserPlant
 from app.schemas.auth import UserCreate, UserUpdate
 
 
@@ -130,9 +133,10 @@ async def get_user_manager(user_db: SQLAlchemyUserDatabase = Depends(get_user_db
 
 
 class AuthService:
-    """Authentication service for custom auth operations."""
+    """Authentication and authorization service with comprehensive role-based access control."""
     
     def __init__(self):
+        """Initialize the authentication service."""
         self.pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
         self.redis_client = None
     
@@ -401,6 +405,368 @@ class AuthService:
         """Close Redis connection."""
         if self.redis_client:
             await self.redis_client.close()
+
+    # Authorization and Role-Based Access Control Methods
+    
+    @staticmethod
+    def check_admin_permission(user: User, required_permission: Optional[str] = None) -> bool:
+        """Check if user has admin permissions.
+        
+        Args:
+            user: User to check
+            required_permission: Specific permission required (optional)
+            
+        Returns:
+            True if user has admin access, False otherwise
+            
+        Raises:
+            HTTPException: If user lacks admin permissions
+        """
+        if not user.is_admin:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Admin privileges required"
+            )
+        
+        # Check specific permission if required
+        if required_permission and user.admin_permissions:
+            try:
+                permissions = json.loads(user.admin_permissions)
+                if required_permission not in permissions and "all" not in permissions:
+                    raise HTTPException(
+                        status_code=status.HTTP_403_FORBIDDEN,
+                        detail=f"Admin permission '{required_permission}' required"
+                    )
+            except (json.JSONDecodeError, TypeError):
+                # If permissions can't be parsed, allow only super admin
+                if not user.is_superuser:
+                    raise HTTPException(
+                        status_code=status.HTTP_403_FORBIDDEN,
+                        detail=f"Admin permission '{required_permission}' required"
+                    )
+        
+        return True
+    
+    @staticmethod
+    def check_expert_permission(
+        user: User, 
+        required_specialty: Optional[str] = None
+    ) -> bool:
+        """Check if user has expert permissions.
+        
+        Args:
+            user: User to check
+            required_specialty: Specific plant specialty required (optional)
+            
+        Returns:
+            True if user has expert access, False otherwise
+            
+        Raises:
+            HTTPException: If user lacks expert permissions
+        """
+        if not (user.is_expert or user.is_admin):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Expert or admin privileges required"
+            )
+        
+        # Admins can bypass specialty checks
+        if user.is_admin:
+            return True
+        
+        # Check specific specialty if required
+        if required_specialty and user.expert_specialties:
+            try:
+                specialties = json.loads(user.expert_specialties)
+                if required_specialty not in specialties and "all_plants" not in specialties:
+                    raise HTTPException(
+                        status_code=status.HTTP_403_FORBIDDEN,
+                        detail=f"Expert specialty in '{required_specialty}' required"
+                    )
+            except (json.JSONDecodeError, TypeError):
+                # If specialties can't be parsed, check if they're a general expert
+                pass
+        
+        return True
+    
+    @staticmethod
+    def check_moderator_permission(user: User) -> bool:
+        """Check if user has moderator permissions.
+        
+        Args:
+            user: User to check
+            
+        Returns:
+            True if user has moderator access, False otherwise
+            
+        Raises:
+            HTTPException: If user lacks moderator permissions
+        """
+        if not (user.is_moderator or user.is_admin):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Moderator or admin privileges required"
+            )
+        
+        return True
+    
+    @staticmethod
+    async def check_plant_ownership(
+        db: AsyncSession,
+        plant_id: uuid.UUID,
+        user_id: uuid.UUID
+    ) -> bool:
+        """Check if user owns the specified plant.
+        
+        Args:
+            db: Database session
+            plant_id: Plant ID to check
+            user_id: User ID to verify ownership
+            
+        Returns:
+            True if user owns the plant, False otherwise
+            
+        Raises:
+            HTTPException: If plant not found or user doesn't own it
+        """
+        result = await db.execute(
+            select(UserPlant).where(
+                and_(
+                    UserPlant.id == plant_id,
+                    UserPlant.user_id == user_id,
+                    UserPlant.is_active == True
+                )
+            )
+        )
+        plant = result.scalar_one_or_none()
+        
+        if not plant:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Plant not found or you don't have permission to access it"
+            )
+        
+        return True
+    
+    @staticmethod
+    async def verify_plant_ownership_or_admin(
+        db: AsyncSession,
+        plant_id: uuid.UUID,
+        user: User
+    ) -> bool:
+        """Check if user owns the plant or has admin privileges.
+        
+        Args:
+            db: Database session
+            plant_id: Plant ID to check
+            user: User to verify
+            
+        Returns:
+            True if user owns plant or is admin, False otherwise
+            
+        Raises:
+            HTTPException: If unauthorized access
+        """
+        # Admins can access any plant
+        if user.is_admin:
+            return True
+        
+        # Check plant ownership
+        return await AuthService.check_plant_ownership(db, plant_id, user.id)
+    
+    @staticmethod
+    def check_privacy_permissions(
+        target_user: User,
+        requesting_user: User,
+        resource_type: str = "profile"
+    ) -> bool:
+        """Check privacy permissions for accessing user resources.
+        
+        Args:
+            target_user: User whose resource is being accessed
+            requesting_user: User making the request
+            resource_type: Type of resource being accessed
+            
+        Returns:
+            True if access is allowed, False otherwise
+            
+        Raises:
+            HTTPException: If access is denied
+        """
+        # Users can always access their own resources
+        if target_user.id == requesting_user.id:
+            return True
+        
+        # Admins can access any resource
+        if requesting_user.is_admin:
+            return True
+        
+        # Check privacy settings
+        if target_user.is_private:
+            # For private users, check if they're friends (simplified for now)
+            # In a full implementation, you'd check friendship status
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"User's {resource_type} is private"
+            )
+        
+        # Check specific resource permissions
+        if resource_type == "plant_identification" and not target_user.allow_plant_identification:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="User doesn't allow plant identification requests"
+            )
+        
+        return True
+    
+    @staticmethod
+    def get_user_permissions_summary(user: User) -> Dict[str, Any]:
+        """Get a summary of user's permissions and roles.
+        
+        Args:
+            user: User to analyze
+            
+        Returns:
+            Dictionary containing user's permission summary
+        """
+        permissions_summary = {
+            "user_id": str(user.id),
+            "is_admin": user.is_admin,
+            "is_expert": user.is_expert,
+            "is_moderator": user.is_moderator,
+            "is_superuser": getattr(user, 'is_superuser', False),
+            "admin_permissions": [],
+            "expert_specialties": [],
+            "privacy_settings": {
+                "is_private": user.is_private,
+                "allow_plant_identification": user.allow_plant_identification,
+                "allow_friend_requests": user.allow_friend_requests,
+            }
+        }
+        
+        # Parse admin permissions
+        if user.admin_permissions:
+            try:
+                permissions_summary["admin_permissions"] = json.loads(user.admin_permissions)
+            except (json.JSONDecodeError, TypeError):
+                permissions_summary["admin_permissions"] = []
+        
+        # Parse expert specialties
+        if user.expert_specialties:
+            try:
+                permissions_summary["expert_specialties"] = json.loads(user.expert_specialties)
+            except (json.JSONDecodeError, TypeError):
+                permissions_summary["expert_specialties"] = []
+        
+        return permissions_summary
+    
+    @staticmethod
+    async def grant_role(
+        db: AsyncSession,
+        user_id: uuid.UUID,
+        role: str,
+        permissions: Optional[List[str]] = None,
+        granted_by_user_id: Optional[uuid.UUID] = None
+    ) -> bool:
+        """Grant a role to a user (admin only operation).
+        
+        Args:
+            db: Database session
+            user_id: User to grant role to
+            role: Role to grant (admin, expert, moderator)
+            permissions: Optional specific permissions for the role
+            granted_by_user_id: ID of user granting the role
+            
+        Returns:
+            True if role granted successfully
+            
+        Raises:
+            HTTPException: If operation fails
+        """
+        # Get the user
+        result = await db.execute(select(User).where(User.id == user_id))
+        user = result.scalar_one_or_none()
+        
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+        
+        # Grant the role
+        if role == "admin":
+            user.is_admin = True
+            if permissions:
+                user.admin_permissions = json.dumps(permissions)
+        elif role == "expert":
+            user.is_expert = True
+            if permissions:
+                user.expert_specialties = json.dumps(permissions)
+        elif role == "moderator":
+            user.is_moderator = True
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid role specified"
+            )
+        
+        user.updated_at = datetime.utcnow()
+        await db.commit()
+        await db.refresh(user)
+        
+        return True
+    
+    @staticmethod
+    async def revoke_role(
+        db: AsyncSession,
+        user_id: uuid.UUID,
+        role: str,
+        revoked_by_user_id: Optional[uuid.UUID] = None
+    ) -> bool:
+        """Revoke a role from a user (admin only operation).
+        
+        Args:
+            db: Database session
+            user_id: User to revoke role from
+            role: Role to revoke (admin, expert, moderator)
+            revoked_by_user_id: ID of user revoking the role
+            
+        Returns:
+            True if role revoked successfully
+            
+        Raises:
+            HTTPException: If operation fails
+        """
+        # Get the user
+        result = await db.execute(select(User).where(User.id == user_id))
+        user = result.scalar_one_or_none()
+        
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+        
+        # Revoke the role
+        if role == "admin":
+            user.is_admin = False
+            user.admin_permissions = None
+        elif role == "expert":
+            user.is_expert = False
+            user.expert_specialties = None
+        elif role == "moderator":
+            user.is_moderator = False
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid role specified"
+            )
+        
+        user.updated_at = datetime.utcnow()
+        await db.commit()
+        await db.refresh(user)
+        
+        return True
 
 
 # Global auth service instance

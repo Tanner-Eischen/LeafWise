@@ -9,41 +9,43 @@ import 'package:plant_social/features/camera/widgets/plant_ar_filters.dart';
 /// Camera screen for capturing photos and videos with AR plant features
 /// Implements camera functionality with AR overlays connected to real backend data
 class CameraScreen extends ConsumerStatefulWidget {
-  final String? selectedPlantId; // Optional plant ID for personalized AR data
-  final String? userLocation; // Optional user location for environmental data
+  final String? selectedPlantId;
+  final String? selectedPlantType; // New parameter for plant type
+  final String? userLocation;
 
   const CameraScreen({
-    super.key,
+    Key? key,
     this.selectedPlantId,
+    this.selectedPlantType,
     this.userLocation,
-  });
+  }) : super(key: key);
 
   @override
   ConsumerState<CameraScreen> createState() => _CameraScreenState();
 }
 
 class _CameraScreenState extends ConsumerState<CameraScreen> {
-  CameraController? _cameraController;
-  List<CameraDescription>? _cameras;
+  CameraController? _controller;
   bool _isInitialized = false;
-  bool _isLoading = true;
-  String? _error;
-  bool _isCapturing = false;
-  int _selectedCameraIndex = 0;
-  
-  // AR Filter state
   String? _currentFilter;
-  bool _showARFilters = true;
+  bool _isCapturing = false;
+  String? _selectedPlantType; // Track selected plant type
+  String? _selectedPlantId; // Track selected plant ID
+  String? _error; // Error message state
+  bool _isLoading = true; // Loading state
+  bool _showARFilters = false; // AR filters visibility state
 
   @override
   void initState() {
     super.initState();
+    _selectedPlantType = widget.selectedPlantType;
+    _selectedPlantId = widget.selectedPlantId;
     _initializeCamera();
   }
 
   @override
   void dispose() {
-    _cameraController?.dispose();
+    _controller?.dispose();
     super.dispose();
   }
 
@@ -62,9 +64,9 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
       }
 
       // Get available cameras
-      _cameras = await availableCameras();
+      final cameras = await availableCameras();
       
-      if (_cameras == null || _cameras!.isEmpty) {
+      if (cameras.isEmpty) {
         setState(() {
           _error = 'No cameras found on this device';
           _isLoading = false;
@@ -73,37 +75,26 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
       }
 
       // Initialize camera controller
-      await _setupCamera(_selectedCameraIndex);
-    } catch (e) {
-      setState(() {
-        _error = 'Failed to initialize camera: ${e.toString()}';
-        _isLoading = false;
-      });
-    }
-  }
+      _controller = CameraController(
+        cameras.first,
+        ResolutionPreset.high,
+        enableAudio: false,
+      );
 
-  /// Setup camera controller for specified camera index
-  Future<void> _setupCamera(int cameraIndex) async {
-    if (_cameras == null || _cameras!.isEmpty) return;
-
-    // Dispose existing controller
-    await _cameraController?.dispose();
-
-    // Create new controller
-    _cameraController = CameraController(
-      _cameras![cameraIndex],
-      ResolutionPreset.high,
-      enableAudio: false,
-    );
-
-    try {
-      await _cameraController!.initialize();
-      
-      if (mounted) {
+      try {
+        await _controller!.initialize();
+        
+        if (mounted) {
+          setState(() {
+            _isInitialized = true;
+            _isLoading = false;
+            _error = null;
+          });
+        }
+      } catch (e) {
         setState(() {
-          _isInitialized = true;
+          _error = 'Failed to initialize camera: ${e.toString()}';
           _isLoading = false;
-          _error = null;
         });
       }
     } catch (e) {
@@ -114,16 +105,59 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
     }
   }
 
-  /// Switch between front and back cameras
-  Future<void> _switchCamera() async {
-    if (_cameras == null || _cameras!.length < 2) return;
+  /// Capture photo
+  Future<void> _capturePhoto() async {
+    if (_controller == null || !_controller!.value.isInitialized) return;
 
-    setState(() {
-      _selectedCameraIndex = _selectedCameraIndex == 0 ? 1 : 0;
-      _isLoading = true;
-    });
+    if (_isCapturing) return;
 
-    await _setupCamera(_selectedCameraIndex);
+    try {
+      setState(() {
+        _isCapturing = true;
+      });
+
+      final image = await _controller!.takePicture();
+      
+      // Handle the captured image based on current filter
+      await _handleCapturedImage(image);
+      
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to capture photo: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isCapturing = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _handleCapturedImage(XFile image) async {
+    if (_currentFilter == 'plant_identification') {
+      // Plant identification is handled by the AR overlay
+      return;
+    }
+    
+    // Handle other capture scenarios
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Photo captured successfully!'),
+          backgroundColor: Colors.green,
+          action: SnackBarAction(
+            label: 'View',
+            onPressed: null, // TODO: Implement view action
+          ),
+        ),
+      );
+    }
   }
 
   /// Toggle AR filters visibility
@@ -143,43 +177,6 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
     });
   }
 
-  /// Capture photo
-  Future<void> _capturePhoto() async {
-    if (_cameraController == null || !_cameraController!.value.isInitialized) {
-      return;
-    }
-
-    if (_isCapturing) return;
-
-    try {
-      setState(() {
-        _isCapturing = true;
-      });
-
-      final XFile photo = await _cameraController!.takePicture();
-      
-      if (mounted) {
-        // Navigate to story creation with captured image
-        context.push(
-          '${AppRoutes.storyCreation}?imagePath=${photo.path}',
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to capture photo: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } finally {
-      setState(() {
-        _isCapturing = false;
-      });
-    }
-  }
-
   /// Request camera permission
   Future<void> _requestPermission() async {
     final permission = await Permission.camera.request();
@@ -192,6 +189,51 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     
+    // Show error state
+    if (_error != null) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            onPressed: () => context.pop(),
+            icon: const Icon(Icons.close, color: Colors.white),
+          ),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error_outline, size: 64, color: theme.colorScheme.error),
+              const SizedBox(height: 16),
+              Text(
+                _error!,
+                style: theme.textTheme.titleMedium?.copyWith(color: Colors.white),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: _requestPermission,
+                child: const Text('Grant Permission'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Show loading state
+    if (_isLoading) {
+      return const Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: CircularProgressIndicator(color: Colors.white),
+        ),
+      );
+    }
+
+    // Show camera preview
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -206,241 +248,54 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
           style: TextStyle(color: Colors.white),
         ),
         actions: [
-          // AR Filters toggle
           IconButton(
             onPressed: _toggleARFilters,
             icon: Icon(
-              _showARFilters ? Icons.visibility : Icons.visibility_off,
-              color: _showARFilters ? Colors.green : Colors.white,
-            ),
-            tooltip: 'Toggle AR Filters',
-          ),
-          if (_cameras != null && _cameras!.length > 1)
-            IconButton(
-              onPressed: _isLoading ? null : _switchCamera,
-              icon: const Icon(Icons.flip_camera_ios, color: Colors.white),
-            ),
-        ],
-      ),
-      body: _buildBody(theme),
-    );
-  }
-
-  Widget _buildBody(ThemeData theme) {
-    if (_isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(color: Colors.white),
-      );
-    }
-
-    if (_error != null) {
-      return _buildErrorState(theme);
-    }
-
-    if (!_isInitialized || _cameraController == null) {
-      return const Center(
-        child: Text(
-          'Camera not available',
-          style: TextStyle(color: Colors.white),
-        ),
-      );
-    }
-
-    return Stack(
-      children: [
-        // Camera preview
-        Positioned.fill(
-          child: CameraPreview(_cameraController!),
-        ),
-        
-        // AR Filters overlay
-        if (_showARFilters)
-          Positioned.fill(
-            child: PlantARFilters(
-              cameraController: _cameraController!,
-              onFilterSelected: _onFilterSelected,
-              currentFilter: _currentFilter,
-              selectedPlantId: widget.selectedPlantId,
-              userLocation: widget.userLocation ?? 'Unknown',
-            ),
-          ),
-        
-        // Camera controls
-        Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: _buildCameraControls(theme),
-        ),
-        
-        // Current filter indicator
-        if (_currentFilter != null)
-          Positioned(
-            top: 20,
-            left: 20,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.7),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.green, width: 1),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.auto_awesome, color: Colors.green, size: 16),
-                  const SizedBox(width: 4),
-                  Text(
-                    _getFilterDisplayName(_currentFilter!),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildErrorState(ThemeData theme) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.camera_alt_outlined,
-              size: 64,
+              _showARFilters ? Icons.filter_alt : Icons.filter_alt_outlined,
               color: Colors.white,
             ),
-            const SizedBox(height: 16),
-            Text(
-              'Camera Error',
-              style: theme.textTheme.headlineSmall?.copyWith(
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              _error!,
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: Colors.white70,
-              ),
-            ),
-            const SizedBox(height: 24),
-            if (_error!.contains('permission'))
-              ElevatedButton(
-                onPressed: _requestPermission,
-                child: const Text('Grant Permission'),
-              )
-            else
-              ElevatedButton(
-                onPressed: _initializeCamera,
-                child: const Text('Retry'),
-              ),
-          ],
-        ),
+          ),
+        ],
       ),
-    );
-  }
-
-  Widget _buildCameraControls(ThemeData theme) {
-    return Container(
-      padding: const EdgeInsets.all(24.0),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.bottomCenter,
-          end: Alignment.topCenter,
-          colors: [
-            Colors.black.withOpacity(0.8),
-            Colors.transparent,
-          ],
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      body: Stack(
         children: [
-          // Gallery button
-          GestureDetector(
-            onTap: () {
-              // TODO: Navigate to gallery or plant selection
-            },
-            child: Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(28),
-                border: Border.all(color: Colors.white.withOpacity(0.3)),
-              ),
-              child: const Icon(
-                Icons.photo_library,
-                color: Colors.white,
-              ),
+          // Camera preview
+          if (_controller != null && _controller!.value.isInitialized)
+            Center(
+              child: CameraPreview(_controller!),
             ),
-          ),
-          
+
+          // AR filters overlay
+          if (_showARFilters && _controller != null)
+            PlantARFilters(
+              cameraController: _controller!,
+              onFilterSelected: _onFilterSelected,
+              currentFilter: _currentFilter,
+              selectedPlantId: _selectedPlantId,
+              selectedPlantType: _selectedPlantType,
+              userLocation: widget.userLocation,
+            ),
+
           // Capture button
-          GestureDetector(
-            onTap: _isCapturing ? null : _capturePhoto,
-            child: Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: _isCapturing 
-                    ? Colors.grey 
-                    : Colors.white,
-                borderRadius: BorderRadius.circular(40),
-                border: Border.all(
-                  color: _currentFilter != null ? Colors.green : Colors.white,
-                  width: 4,
-                ),
-              ),
-              child: _isCapturing
-                  ? const Center(
-                      child: CircularProgressIndicator(
-                        color: Colors.black,
-                        strokeWidth: 2,
-                      ),
-                    )
-                  : Icon(
-                      _currentFilter == 'plant_identification' 
-                        ? Icons.search 
-                        : Icons.camera_alt,
-                      color: Colors.black,
-                      size: 32,
+          Positioned(
+            bottom: 32,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: GestureDetector(
+                onTap: _isCapturing ? null : _capturePhoto,
+                child: Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: _isCapturing ? Colors.grey : Colors.white,
+                    border: Border.all(
+                      color: Colors.white,
+                      width: 4,
                     ),
-            ),
-          ),
-          
-          // Plant selection button
-          GestureDetector(
-            onTap: () {
-              _showPlantSelectionDialog();
-            },
-            child: Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                color: widget.selectedPlantId != null 
-                  ? Colors.green.withOpacity(0.8)
-                  : Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(28),
-                border: Border.all(
-                  color: widget.selectedPlantId != null 
-                    ? Colors.green 
-                    : Colors.white.withOpacity(0.3)
+                  ),
                 ),
-              ),
-              child: Icon(
-                Icons.local_florist,
-                color: widget.selectedPlantId != null ? Colors.white : Colors.white,
               ),
             ),
           ),
@@ -448,54 +303,4 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
       ),
     );
   }
-
-  /// Show plant selection dialog
-  void _showPlantSelectionDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Select Plant'),
-        content: const Text(
-          'Choose a plant from your collection to get personalized AR data like health metrics, care reminders, and growth timeline.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              // TODO: Navigate to plant selection screen
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Plant selection feature coming soon!'),
-                  backgroundColor: Colors.green,
-                ),
-              );
-            },
-            child: const Text('Select Plant'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Get display name for filter
-  String _getFilterDisplayName(String filterType) {
-    switch (filterType) {
-      case 'growth_timelapse':
-        return 'Growth Timeline';
-      case 'health_overlay':
-        return 'Health Analysis';
-      case 'seasonal_transformation':
-        return 'Seasonal Care';
-      case 'plant_identification':
-        return 'Plant ID';
-      case 'care_reminder':
-        return 'Care Reminders';
-      default:
-        return 'AR Filter';
-    }
-  }
-}
+} 

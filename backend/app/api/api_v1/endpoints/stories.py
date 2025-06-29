@@ -34,64 +34,45 @@ async def create_story_endpoint(
     privacy_level: str = "friends",
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
-):
+) -> StoryRead:
     """Create a new story.
     
     Args:
-        file: Media file for the story (image or video)
-        caption: Optional caption for the story
-        privacy_level: Privacy level (public, friends, close_friends)
+        file: Media file (image/video)
+        caption: Optional story caption
+        privacy_level: Story privacy setting
         current_user: Current authenticated user
         db: Database session
         
     Returns:
-        StoryRead: Created story
-        
-    Raises:
-        HTTPException: If file upload fails or invalid privacy level
+        StoryRead: Created story data
     """
-    # Validate privacy level
-    valid_privacy_levels = ["public", "friends", "close_friends"]
-    if privacy_level not in valid_privacy_levels:
+    try:
+        # Upload media file
+        media_url = await upload_media_file(file, "stories")
+        
+        # Create story data
+        story_data = StoryCreate(
+            media_url=media_url,
+            caption=caption,
+            privacy_level=privacy_level,
+            story_type=StoryType.get_type_from_file(file)
+        )
+        
+        # Create story
+        story = await create_story(db, current_user.id, story_data)
+        return StoryRead.from_orm(story)
+        
+    except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid privacy level. Must be one of: {valid_privacy_levels}"
+            detail=str(e)
         )
-    
-    # Upload media file
-    try:
-        media_url, file_size, duration = await upload_media_file(file)
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Failed to upload media: {str(e)}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to create story: {str(e)}"
         )
-    
-    # Determine story type based on file type
-    content_type = file.content_type or ""
-    if content_type.startswith("image/"):
-        story_type = StoryType.IMAGE
-    elif content_type.startswith("video/"):
-        story_type = StoryType.VIDEO
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Unsupported media type. Only images and videos are allowed."
-        )
-    
-    # Create story data
-    story_data = StoryCreate(
-        content_type=story_type,
-        media_url=media_url,
-        caption=caption,
-        file_size=file_size,
-        duration=duration,
-        privacy_level=privacy_level
-    )
-    
-    # Create story
-    story = await create_story(db, current_user.id, story_data)
-    return StoryRead.from_orm(story)
 
 
 @router.get("/feed", response_model=List[StoryRead])
@@ -100,7 +81,7 @@ async def get_stories_feed(
     offset: int = Query(0, ge=0),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
-):
+) -> List[StoryRead]:
     """Get stories feed from friends.
     
     Args:
@@ -112,8 +93,14 @@ async def get_stories_feed(
     Returns:
         List[StoryRead]: List of stories from friends
     """
-    stories = await get_friends_stories(db, current_user.id, limit, offset)
-    return [StoryRead.from_orm(story) for story in stories]
+    try:
+        stories = await get_friends_stories(db, current_user.id, limit, offset)
+        return [StoryRead.from_orm(story) for story in stories]
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get stories feed: {str(e)}"
+        )
 
 
 @router.get("/user/{user_id}", response_model=List[StoryRead])
@@ -121,7 +108,7 @@ async def get_user_stories_endpoint(
     user_id: str,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
-):
+) -> List[StoryRead]:
     """Get stories from a specific user.
     
     Args:
@@ -135,8 +122,14 @@ async def get_user_stories_endpoint(
     Note: Only returns stories that the current user is allowed to see
     based on privacy settings and friendship status.
     """
-    stories = await get_user_stories(db, user_id, viewer_id=current_user.id)
-    return [StoryRead.from_orm(story) for story in stories]
+    try:
+        stories = await get_user_stories(db, user_id, viewer_id=current_user.id)
+        return [StoryRead.from_orm(story) for story in stories]
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get user stories: {str(e)}"
+        )
 
 
 @router.get("/my-stories", response_model=List[StoryRead])
@@ -186,116 +179,115 @@ async def get_story(
     return StoryRead.from_orm(story)
 
 
-@router.post("/{story_id}/view")
+@router.post("/{story_id}/view", status_code=status.HTTP_204_NO_CONTENT)
 async def view_story_endpoint(
     story_id: str,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
-):
-    """Mark a story as viewed.
+) -> None:
+    """Record a story view.
     
     Args:
-        story_id: ID of the story to mark as viewed
+        story_id: ID of the story being viewed
         current_user: Current authenticated user
         db: Database session
-        
-    Returns:
-        dict: Success message
-        
-    Raises:
-        HTTPException: If story not found or not authorized to view
     """
-    story = await get_story_by_id(db, story_id, viewer_id=current_user.id)
-    if not story:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Story not found or not authorized to view"
+    try:
+        view_data = StoryViewCreate(
+            story_id=story_id,
+            viewer_id=str(current_user.id)
         )
-    
-    # Don't record views for own stories
-    if str(story.user_id) == str(current_user.id):
-        return {"message": "Story viewed (own story)"}
-    
-    await view_story(db, story_id, current_user.id)
-    return {"message": "Story viewed successfully"}
+        await view_story(db, view_data)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to record story view: {str(e)}"
+        )
 
 
-@router.get("/{story_id}/views")
+@router.get("/{story_id}/views", response_model=List[str])
 async def get_story_views_endpoint(
     story_id: str,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
-):
-    """Get views for a story.
+) -> List[str]:
+    """Get list of users who viewed a story.
     
     Args:
-        story_id: ID of the story to get views for
+        story_id: ID of the story
         current_user: Current authenticated user
         db: Database session
         
     Returns:
-        dict: Story views data
-        
-    Raises:
-        HTTPException: If story not found or not authorized
+        List[str]: List of viewer user IDs
     """
-    story = await get_story_by_id(db, story_id, viewer_id=current_user.id)
-    if not story:
+    try:
+        # Check if story exists and belongs to user
+        story = await get_story_by_id(db, story_id)
+        if not story:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Story not found"
+            )
+        
+        if str(story.user_id) != str(current_user.id):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Not authorized to view story statistics"
+            )
+        
+        viewer_ids = await get_story_views(db, story_id)
+        return viewer_ids
+    except HTTPException:
+        raise
+    except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Story not found"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get story views: {str(e)}"
         )
-    
-    # Only story owner can see views
-    if str(story.user_id) != str(current_user.id):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to view story analytics"
-        )
-    
-    views = await get_story_views(db, story_id)
-    return {
-        "story_id": story_id,
-        "total_views": len(views),
-        "views": views
-    }
 
 
-@router.delete("/{story_id}")
+@router.delete("/{story_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_story_endpoint(
     story_id: str,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
-):
+) -> None:
     """Delete a story.
     
     Args:
         story_id: ID of the story to delete
         current_user: Current authenticated user
         db: Database session
-        
-    Returns:
-        dict: Success message
-        
-    Raises:
-        HTTPException: If story not found or not authorized
     """
-    story = await get_story_by_id(db, story_id, viewer_id=current_user.id)
-    if not story:
+    try:
+        # Check if story exists and belongs to user
+        story = await get_story_by_id(db, story_id)
+        if not story:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Story not found"
+            )
+        
+        if str(story.user_id) != str(current_user.id):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Not authorized to delete this story"
+            )
+        
+        await delete_story(db, story_id)
+    except HTTPException:
+        raise
+    except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Story not found"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to delete story: {str(e)}"
         )
-    
-    # Only story owner can delete
-    if str(story.user_id) != str(current_user.id):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to delete this story"
-        )
-    
-    await delete_story(db, story_id)
-    return {"message": "Story deleted successfully"}
 
 
 @router.get("/archive/my-stories", response_model=List[StoryRead])
