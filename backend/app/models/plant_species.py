@@ -38,6 +38,7 @@ class PlantSpecies(Base):
     identifications = relationship("PlantIdentification", back_populates="species")
     trades = relationship("PlantTrade", back_populates="species")
     questions = relationship("PlantQuestion", back_populates="species")
+    knowledge_base_entries = relationship("PlantKnowledgeBase", back_populates="plant_species")
     
     def __repr__(self) -> str:
         return f"<PlantSpecies(id={self.id}, scientific_name='{self.scientific_name}')>"

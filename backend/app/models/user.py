@@ -55,6 +55,15 @@ class User(SQLAlchemyBaseUserTableUUID, Base):
     
     # Plant-related relationships
     plants = relationship("UserPlant", back_populates="user")
+    achievements = relationship("UserAchievement", back_populates="user")
+    stats = relationship("UserStats", back_populates="user", uselist=False)
+    nursery_reviews = relationship("NurseryReview", back_populates="user")
+    favorite_nurseries = relationship("UserNurseryFavorite", back_populates="user")
+    
+    # RAG-related relationships
+    preference_embeddings = relationship("UserPreferenceEmbedding", back_populates="user")
+    rag_interactions = relationship("RAGInteraction", back_populates="user")
+    knowledge_contributions = relationship("PlantKnowledgeBase", back_populates="author")
     
     def __repr__(self) -> str:
         """String representation of the user."""

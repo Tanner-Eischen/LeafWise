@@ -1,11 +1,17 @@
+import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:plant_social/core/constants/app_constants.dart';
 import 'package:plant_social/core/models/user.dart';
+<<<<<<< HEAD
 import 'package:plant_social/core/exceptions/api_exception.dart';
+=======
+>>>>>>> baf556a5d654e56b6d571fc759b0e5caa549cb96
 import 'package:plant_social/features/auth/models/auth_models.dart';
 import 'package:plant_social/features/auth/repositories/auth_repository.dart';
-import 'dart:convert';
+
+part 'auth_provider.freezed.dart';
 
 // part 'auth_provider.g.dart'; // Commented out until code generation works
 
@@ -138,16 +144,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
         isLoading: false,
         error: null,
       );
-    } on ApiException catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.message,
-      );
-      rethrow;
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: 'An unexpected error occurred',
+        error: e.toString(),
       );
       rethrow;
     }
@@ -168,16 +168,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
         isLoading: false,
         error: null,
       );
-    } on ApiException catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.message,
-      );
-      rethrow;
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: 'An unexpected error occurred',
+        error: e.toString(),
       );
       rethrow;
     }
@@ -231,72 +225,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     );
     
     state = state.copyWith(user: updatedUser);
-  }
-
-  Future<void> forgotPassword(String email) async {
-    try {
-      state = state.copyWith(isLoading: true, error: null);
-      
-      await _authRepository.forgotPassword(email);
-      
-      state = state.copyWith(isLoading: false);
-    } on ApiException catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.message,
-      );
-      rethrow;
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: 'An unexpected error occurred',
-      );
-      rethrow;
-    }
-  }
-
-  Future<void> resetPassword(String token, String newPassword) async {
-    try {
-      state = state.copyWith(isLoading: true, error: null);
-      
-      await _authRepository.resetPassword(token, newPassword);
-      
-      state = state.copyWith(isLoading: false);
-    } on ApiException catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.message,
-      );
-      rethrow;
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: 'An unexpected error occurred',
-      );
-      rethrow;
-    }
-  }
-
-  Future<void> changePassword(String currentPassword, String newPassword) async {
-    try {
-      state = state.copyWith(isLoading: true, error: null);
-      
-      await _authRepository.changePassword(currentPassword, newPassword);
-      
-      state = state.copyWith(isLoading: false);
-    } on ApiException catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.message,
-      );
-      rethrow;
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: 'An unexpected error occurred',
-      );
-      rethrow;
-    }
   }
 
   Future<void> _storeAuthData(AuthResponse authResponse) async {

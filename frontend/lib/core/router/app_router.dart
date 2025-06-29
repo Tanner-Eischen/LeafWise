@@ -5,6 +5,7 @@ import 'package:plant_social/features/auth/presentation/screens/login_screen.dar
 import 'package:plant_social/features/auth/presentation/screens/register_screen.dart';
 import 'package:plant_social/features/auth/presentation/screens/splash_screen.dart';
 import 'package:plant_social/features/home/presentation/screens/main_screen.dart';
+<<<<<<< HEAD
 import 'package:plant_social/features/camera/presentation/screens/camera_screen.dart';
 import 'package:plant_social/features/chat/presentation/screens/chat_screen.dart';
 import 'package:plant_social/features/chat/presentation/screens/conversation_screen.dart';
@@ -15,6 +16,8 @@ import 'package:plant_social/features/profile/presentation/screens/profile_edit_
 import 'package:plant_social/features/friends/presentation/screens/friends_screen.dart';
 import 'package:plant_social/features/friends/presentation/screens/add_friends_screen.dart';
 import 'package:plant_social/features/plant/presentation/screens/plant_features_screen.dart';
+=======
+>>>>>>> baf556a5d654e56b6d571fc759b0e5caa549cb96
 import 'package:plant_social/features/auth/providers/auth_provider.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -64,6 +67,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/home',
         name: 'home',
         builder: (BuildContext context, GoRouterState state) => const MainScreen(),
+<<<<<<< HEAD
         routes: [
           // Camera Route
           GoRoute(
@@ -152,6 +156,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const PlantFeaturesScreen(),
           ),
         ],
+=======
+>>>>>>> baf556a5d654e56b6d571fc759b0e5caa549cb96
       ),
     ],
     errorBuilder: (BuildContext context, GoRouterState state) => Scaffold(
@@ -192,14 +198,4 @@ class AppRoutes {
   static const String login = '/login';
   static const String register = '/register';
   static const String home = '/home';
-  static const String camera = '/home/camera';
-  static const String storyCreation = '/home/camera/story-creation';
-  static const String chat = '/home/chat';
-  static const String conversation = '/home/chat/conversation';
-  static const String storyViewer = '/home/story';
-  static const String profile = '/home/profile';
-  static const String editProfile = '/home/profile/edit';
-  static const String friends = '/home/friends';
-  static const String addFriends = '/home/friends/add';
-  static const String plants = '/home/plants';
 }

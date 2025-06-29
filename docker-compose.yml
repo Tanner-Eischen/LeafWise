@@ -3,8 +3,10 @@ version: '3.8'
 services:
   # PostgreSQL Database
   postgres:
-    image: postgres:15-alpine
-    container_name: plant_social_postgres
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.postgres
+    container_name: plant_social_db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
@@ -16,13 +18,13 @@ services:
       - ./backend/database/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
+      interval: 5s
       timeout: 5s
       retries: 5
 
   # Redis for caching and real-time messaging
   redis:
-    image: redis:7-alpine
+    image: redis:7
     container_name: plant_social_redis
     ports:
       - "6379:6379"
@@ -30,7 +32,7 @@ services:
       - redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
+      interval: 5s
       timeout: 5s
       retries: 5
 
@@ -60,30 +62,19 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: plant_social_backend
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:password@postgres:5432/plant_social_db
+      - REDIS_URL=redis://redis:6379/0
     ports:
       - "8000:8000"
-    environment:
-      - POSTGRES_SERVER=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=plant_social_db
-      - REDIS_HOST=redis
-      - AWS_ACCESS_KEY_ID=test
-      - AWS_SECRET_ACCESS_KEY=test
-      - AWS_REGION=us-east-1
-      - S3_BUCKET_NAME=plant-social-media
+    volumes:
+      - ./backend:/app
+      - ./backend/uploads:/app/uploads
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
-      localstack:
-        condition: service_healthy
-    volumes:
-      - ./backend:/app
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-    profiles:
-      - full  # Only start with --profile full
 
 volumes:
   postgres_data:

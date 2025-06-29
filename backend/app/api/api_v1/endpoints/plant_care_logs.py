@@ -29,8 +29,16 @@ from app.services.plant_care_log_service import (
     delete_care_log,
     get_care_statistics
 )
+from app.services.personalized_plant_care_service import PersonalizedPlantCareService
+from app.services.vector_database_service import VectorDatabaseService
+from app.services.embedding_service import EmbeddingService
 
 router = APIRouter()
+
+# Initialize services
+embedding_service = EmbeddingService()
+vector_service = VectorDatabaseService(embedding_service)
+personalized_care_service = PersonalizedPlantCareService(vector_service, embedding_service)
 
 
 @router.post(
@@ -273,4 +281,109 @@ async def create_bulk_care_logs(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to create care logs"
+        )
+
+
+# Personalized Plant Care Endpoints
+
+@router.get("/personalized/{user_id}/{plant_id}/care-schedule")
+async def get_personalized_care_schedule(
+    user_id: str,
+    plant_id: str,
+    db: AsyncSession = Depends(get_db)
+):
+    """Get personalized care schedule for a specific plant."""
+    try:
+        schedule = await personalized_care_service.get_personalized_care_schedule(
+            db=db,
+            user_id=user_id,
+            plant_id=plant_id
+        )
+        return schedule
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error generating care schedule: {str(e)}"
+        )
+
+
+@router.get("/personalized/{user_id}/{plant_id}/health-prediction")
+async def get_plant_health_prediction(
+    user_id: str,
+    plant_id: str,
+    db: AsyncSession = Depends(get_db)
+):
+    """Get plant health prediction based on care patterns."""
+    try:
+        prediction = await personalized_care_service.predict_plant_health(
+            db=db,
+            user_id=user_id,
+            plant_id=plant_id
+        )
+        return prediction
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error predicting plant health: {str(e)}"
+        )
+
+
+@router.get("/personalized/{user_id}/care-patterns")
+async def analyze_user_care_patterns(
+    user_id: str,
+    db: AsyncSession = Depends(get_db)
+):
+    """Analyze user's plant care patterns."""
+    try:
+        patterns = await personalized_care_service.analyze_care_patterns(
+            db=db,
+            user_id=user_id
+        )
+        return patterns
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error analyzing care patterns: {str(e)}"
+        )
+
+
+@router.post("/personalized/{user_id}/{plant_id}/care-advice")
+async def get_personalized_care_advice(
+    user_id: str,
+    plant_id: str,
+    question: str,
+    db: AsyncSession = Depends(get_db)
+):
+    """Get personalized plant care advice."""
+    try:
+        advice = await personalized_care_service.get_personalized_care_advice(
+            db=db,
+            user_id=user_id,
+            plant_id=plant_id,
+            question=question
+        )
+        return advice
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error generating care advice: {str(e)}"
+        )
+
+
+@router.get("/personalized/{user_id}/seasonal-recommendations")
+async def get_seasonal_recommendations(
+    user_id: str,
+    db: AsyncSession = Depends(get_db)
+):
+    """Get seasonal care recommendations for all user's plants."""
+    try:
+        recommendations = await personalized_care_service.get_seasonal_recommendations(
+            db=db,
+            user_id=user_id
+        )
+        return recommendations
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error generating seasonal recommendations: {str(e)}"
         )

@@ -15,6 +15,15 @@ from app.models.plant_photo import PlantPhoto
 from app.models.plant_identification import PlantIdentification
 from app.models.plant_trade import PlantTrade, TradeStatus, TradeType
 from app.models.plant_question import PlantQuestion, PlantAnswer
+from app.models.plant_achievement import PlantAchievement, UserAchievement, PlantMilestone, UserStats
+from app.models.local_nursery import LocalNursery, NurseryReview, NurseryEvent, UserNurseryFavorite
+from app.models.rag_models import (
+    PlantContentEmbedding, 
+    UserPreferenceEmbedding, 
+    RAGInteraction, 
+    PlantKnowledgeBase,
+    SemanticSearchCache
+)
 
 __all__ = [
     "User",
@@ -33,4 +42,17 @@ __all__ = [
     "TradeType",
     "PlantQuestion",
     "PlantAnswer",
+    "PlantAchievement",
+    "UserAchievement", 
+    "PlantMilestone",
+    "UserStats",
+    "LocalNursery",
+    "NurseryReview",
+    "NurseryEvent",
+    "UserNurseryFavorite",
+    "PlantContentEmbedding",
+    "UserPreferenceEmbedding",
+    "RAGInteraction",
+    "PlantKnowledgeBase",
+    "SemanticSearchCache"
 ]

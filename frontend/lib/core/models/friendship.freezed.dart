@@ -63,6 +63,9 @@ abstract class $FriendshipCopyWith<$Res> {
       DateTime? updatedAt,
       User? requester,
       User? addressee});
+
+  $UserCopyWith<$Res>? get requester;
+  $UserCopyWith<$Res>? get addressee;
 }
 
 /// @nodoc
@@ -144,6 +147,34 @@ class _$FriendshipCopyWithImpl<$Res, $Val extends Friendship>
               as User?,
     ) as $Val);
   }
+
+  /// Create a copy of Friendship
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserCopyWith<$Res>? get requester {
+    if (_value.requester == null) {
+      return null;
+    }
+
+    return $UserCopyWith<$Res>(_value.requester!, (value) {
+      return _then(_value.copyWith(requester: value) as $Val);
+    });
+  }
+
+  /// Create a copy of Friendship
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserCopyWith<$Res>? get addressee {
+    if (_value.addressee == null) {
+      return null;
+    }
+
+    return $UserCopyWith<$Res>(_value.addressee!, (value) {
+      return _then(_value.copyWith(addressee: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
@@ -167,6 +198,11 @@ abstract class _$$FriendshipImplCopyWith<$Res>
       DateTime? updatedAt,
       User? requester,
       User? addressee});
+
+  @override
+  $UserCopyWith<$Res>? get requester;
+  @override
+  $UserCopyWith<$Res>? get addressee;
 }
 
 /// @nodoc
@@ -453,6 +489,9 @@ abstract class $FriendRequestCopyWith<$Res> {
       DateTime createdAt,
       User? fromUser,
       User? toUser});
+
+  $UserCopyWith<$Res>? get fromUser;
+  $UserCopyWith<$Res>? get toUser;
 }
 
 /// @nodoc
@@ -514,6 +553,34 @@ class _$FriendRequestCopyWithImpl<$Res, $Val extends FriendRequest>
               as User?,
     ) as $Val);
   }
+
+  /// Create a copy of FriendRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserCopyWith<$Res>? get fromUser {
+    if (_value.fromUser == null) {
+      return null;
+    }
+
+    return $UserCopyWith<$Res>(_value.fromUser!, (value) {
+      return _then(_value.copyWith(fromUser: value) as $Val);
+    });
+  }
+
+  /// Create a copy of FriendRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserCopyWith<$Res>? get toUser {
+    if (_value.toUser == null) {
+      return null;
+    }
+
+    return $UserCopyWith<$Res>(_value.toUser!, (value) {
+      return _then(_value.copyWith(toUser: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
@@ -533,6 +600,11 @@ abstract class _$$FriendRequestImplCopyWith<$Res>
       DateTime createdAt,
       User? fromUser,
       User? toUser});
+
+  @override
+  $UserCopyWith<$Res>? get fromUser;
+  @override
+  $UserCopyWith<$Res>? get toUser;
 }
 
 /// @nodoc

@@ -11,6 +11,75 @@ FastAPI-based backend for the Plant Social platform with real-time messaging, st
 - **File Storage**: AWS S3 integration with LocalStack for development
 - **Database**: PostgreSQL with async SQLAlchemy and pgvector for future RAG
 - **Caching**: Redis for sessions and real-time features
+- **AI Plant Identification**: Advanced plant identification using OpenAI Vision API
+
+## AI Plant Identification
+
+The application includes sophisticated AI-powered plant identification using OpenAI's Vision API:
+
+### Features
+- **Image Upload & Analysis**: Upload plant photos for instant AI identification
+- **Species Matching**: Automatic matching with plant species database
+- **Confidence Scoring**: AI provides confidence scores for identification accuracy
+- **Multiple Suggestions**: Alternative plant suggestions when uncertain
+- **Care Recommendations**: Personalized care tips based on identified species
+- **Plant Characteristics**: Detailed analysis of leaf shape, growth habits, etc.
+
+### API Endpoints
+
+#### Upload & Identify
+```
+POST /api/v1/plant-identification/upload
+```
+Upload a plant image and get AI identification results with database storage.
+
+#### Analyze Only
+```
+POST /api/v1/plant-identification/analyze
+```
+Analyze a plant image without saving to database (for quick identification).
+
+#### Get AI Details
+```
+GET /api/v1/plant-identification/{id}/ai-details
+```
+Get detailed AI analysis for a specific identification.
+
+### Configuration
+
+Set your OpenAI API key in the environment:
+```bash
+export OPENAI_API_KEY="your-openai-api-key"
+```
+
+Or add it to your `.env` file:
+```
+OPENAI_API_KEY=your-openai-api-key
+```
+
+### Image Processing
+
+- **Supported Formats**: JPEG, PNG, WebP
+- **Max File Size**: 10MB
+- **Auto-Resize**: Images larger than 1920x1920 are automatically resized
+- **Format Conversion**: RGBA/Transparency converted to RGB for compatibility
+
+### AI Analysis
+
+The AI provides comprehensive plant analysis including:
+
+- **Primary Identification**: Most likely plant species
+- **Alternative Suggestions**: Multiple possibilities with confidence scores
+- **Plant Characteristics**: Leaf shape, arrangement, flower color, growth habit
+- **Care Recommendations**: Light, water, soil requirements, difficulty level
+- **Scientific Names**: Botanical nomenclature when available
+
+### Fallback Behavior
+
+When OpenAI API is unavailable:
+- Service gracefully falls back to mock identification
+- Error handling preserves user experience
+- Detailed error logging for debugging
 
 ## Quick Start
 
@@ -150,6 +219,7 @@ The application uses PostgreSQL with the following main tables:
 - **stories**: 24-hour ephemeral content
 - **story_views**: Story view tracking
 - **friendships**: Friend relationships and requests
+- **plant_identifications**: Plant identification records
 
 ## Environment Variables
 

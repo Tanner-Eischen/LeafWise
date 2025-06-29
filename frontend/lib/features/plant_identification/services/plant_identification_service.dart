@@ -10,70 +10,262 @@ class PlantIdentificationService {
 
   PlantIdentificationService(this._apiClient);
 
-  Future<PlantIdentification> identifyPlant(File imageFile) async {
+  /// Upload and identify a plant image with full AI analysis and database storage
+  Future<PlantIdentification> identifyPlant(File imageFile, {
+    String? location,
+    String? notes,
+  }) async {
     try {
-      // Convert image to base64
-      final bytes = await imageFile.readAsBytes();
-      final base64Image = base64Encode(bytes);
-
-      final request = PlantIdentificationRequest(
-        imageBase64: base64Image,
-        timestamp: DateTime.now(),
-      );
+      // Create multipart form data for file upload
+      final formData = FormData.fromMap({
+        'file': await MultipartFile.fromFile(
+          imageFile.path,
+          filename: imageFile.path.split('/').last,
+        ),
+        if (location != null) 'location': location,
+        if (notes != null) 'notes': notes,
+      });
 
       final response = await _apiClient.post(
-        '/plants/identify',
-        data: request.toJson(),
+        '/plant-id/upload',
+        data: formData,
+        options: Options(
+          contentType: 'multipart/form-data',
+        ),
       );
 
-      return PlantIdentification.fromJson(response.data['data']);
+      return _parseIdentificationResponse(response.data);
     } catch (e) {
       throw Exception('Failed to identify plant: $e');
     }
   }
 
-  Future<List<PlantIdentification>> getIdentificationHistory() async {
+  /// Analyze a plant image without saving to database (quick identification)
+  Future<PlantIdentificationResult> analyzePlant(File imageFile) async {
     try {
-      final response = await _apiClient.get('/plants/identification-history');
+      // Create multipart form data for file upload
+      final formData = FormData.fromMap({
+        'file': await MultipartFile.fromFile(
+          imageFile.path,
+          filename: imageFile.path.split('/').last,
+        ),
+      });
+
+      final response = await _apiClient.post(
+        '/plant-id/analyze',
+        data: formData,
+        options: Options(
+          contentType: 'multipart/form-data',
+        ),
+      );
+
+      return PlantIdentificationResult.fromJson(response.data);
+    } catch (e) {
+      throw Exception('Failed to analyze plant: $e');
+    }
+  }
+
+  Future<List<PlantIdentification>> getIdentificationHistory({
+    int skip = 0,
+    int limit = 20,
+  }) async {
+    try {
+      final response = await _apiClient.get(
+        '/plant-id/',
+        queryParameters: {
+          'skip': skip,
+          'limit': limit,
+        },
+      );
       
-      final List<dynamic> data = response.data['data'];
-      return data.map((json) => PlantIdentification.fromJson(json)).toList();
+      // Parse the paginated response
+      final List<dynamic> items = response.data['items'];
+      return items.map((json) => _parseIdentificationResponse(json)).toList();
     } catch (e) {
       throw Exception('Failed to get identification history: $e');
     }
   }
 
+  Future<PlantIdentification> getIdentification(String identificationId) async {
+    try {
+      final response = await _apiClient.get('/plant-id/$identificationId');
+      return _parseIdentificationResponse(response.data);
+    } catch (e) {
+      throw Exception('Failed to get identification: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> getIdentificationAIDetails(String identificationId) async {
+    try {
+      final response = await _apiClient.get('/plant-id/$identificationId/ai-details');
+      return response.data;
+    } catch (e) {
+      throw Exception('Failed to get AI details: $e');
+    }
+  }
+
   Future<PlantSpecies> getPlantSpecies(String speciesId) async {
     try {
-      final response = await _apiClient.get('/plants/species/$speciesId');
-      return PlantSpecies.fromJson(response.data['data']);
+      final response = await _apiClient.get('/plant-species/$speciesId');
+      return _parsePlantSpeciesResponse(response.data);
     } catch (e) {
       throw Exception('Failed to get plant species: $e');
     }
   }
 
-  Future<List<PlantIdentification>> searchPlants(String query) async {
+  Future<List<PlantSpecies>> searchPlantSpecies(String query) async {
     try {
       final response = await _apiClient.get(
-        '/plants/search',
+        '/plant-species/search',
         queryParameters: {'q': query},
       );
       
-      final List<dynamic> data = response.data['data'];
-      return data.map((json) => PlantIdentification.fromJson(json)).toList();
+      final List<dynamic> data = response.data['items'] ?? response.data;
+      return data.map((json) => _parsePlantSpeciesResponse(json)).toList();
     } catch (e) {
-      throw Exception('Failed to search plants: $e');
+      throw Exception('Failed to search plant species: $e');
     }
   }
 
-  Future<void> saveIdentificationToCollection(String identificationId) async {
+  Future<void> updateIdentification(
+    String identificationId,
+    Map<String, dynamic> updateData,
+  ) async {
     try {
-      await _apiClient.post(
-        '/plants/collection/add',
-        data: {'identification_id': identificationId},
+      await _apiClient.put(
+        '/plant-id/$identificationId',
+        data: updateData,
       );
     } catch (e) {
-      throw Exception('Failed to save plant to collection: $e');
+      throw Exception('Failed to update identification: $e');
     }
+  }
+
+  Future<void> deleteIdentification(String identificationId) async {
+    try {
+      await _apiClient.delete('/plant-id/$identificationId');
+    } catch (e) {
+      throw Exception('Failed to delete identification: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> getIdentificationStats() async {
+    try {
+      final response = await _apiClient.get('/plant-id/stats');
+      return response.data;
+    } catch (e) {
+      throw Exception('Failed to get identification statistics: $e');
+    }
+  }
+
+  /// Helper method to parse identification response and handle data format differences
+  PlantIdentification _parseIdentificationResponse(Map<String, dynamic> data) {
+    // Convert backend response format to frontend model format
+    return PlantIdentification(
+      id: data['id'].toString(),
+      scientificName: data['species']?['scientific_name'] ?? data['identified_name'] ?? 'Unknown',
+      commonName: data['species']?['common_name'] ?? data['identified_name'] ?? 'Unknown Plant',
+      confidence: (data['confidence_score'] ?? 0.0).toDouble(),
+      alternativeNames: _extractAlternativeNames(data),
+      imageUrl: data['image_path'] ?? '',
+      careInfo: _extractCareInfo(data),
+      identifiedAt: DateTime.parse(data['created_at'] ?? DateTime.now().toIso8601String()),
+      description: data['species']?['description'],
+      tags: _extractTags(data),
+    );
+  }
+
+  List<String> _extractAlternativeNames(Map<String, dynamic> data) {
+    final List<String> names = [];
+    
+    // Add scientific name if different from common name
+    final scientificName = data['species']?['scientific_name'];
+    if (scientificName != null && scientificName != data['identified_name']) {
+      names.add(scientificName);
+    }
+    
+    // Add common names from species data
+    final commonNames = data['species']?['common_names'];
+    if (commonNames is List) {
+      names.addAll(commonNames.cast<String>());
+    }
+    
+    return names;
+  }
+
+  PlantCareInfo _extractCareInfo(Map<String, dynamic> data) {
+    final species = data['species'];
+    
+    return PlantCareInfo(
+      lightRequirement: species?['light_requirements'] ?? 'Unknown',
+      waterFrequency: species?['water_frequency_days'] != null 
+          ? 'Every ${species['water_frequency_days']} days'
+          : 'Unknown',
+      careLevel: species?['care_level'] ?? 'Unknown',
+      humidity: species?['humidity_preference'],
+      temperature: species?['temperature_range'],
+      toxicity: species?['toxicity_info'],
+      careNotes: species?['care_notes'] != null 
+          ? [species['care_notes']] 
+          : null,
+    );
+  }
+
+  List<String>? _extractTags(Map<String, dynamic> data) {
+    final species = data['species'];
+    final List<String> tags = [];
+    
+    // Add plant type/category as tags
+    if (species?['plant_type'] != null) {
+      tags.add(species['plant_type']);
+    }
+    
+    // Add care difficulty as tag
+    if (species?['care_difficulty'] != null) {
+      tags.add(species['care_difficulty']);
+    }
+    
+    return tags.isNotEmpty ? tags : null;
+  }
+
+  /// Helper method to convert backend plant species format to frontend model
+  PlantSpecies _parsePlantSpeciesResponse(Map<String, dynamic> data) {
+    return PlantSpecies(
+      id: data['id'].toString(),
+      commonName: data['common_names']?.isNotEmpty == true 
+          ? data['common_names'][0] 
+          : data['scientific_name'] ?? 'Unknown Plant',
+      scientificName: data['scientific_name'] ?? 'Unknown',
+      family: data['family'],
+      description: data['description'],
+      imageUrl: data['image_url'],
+      alternativeNames: data['common_names']?.cast<String>(),
+      nativeRegions: null, // Not provided by backend
+      maxHeight: null, // Not provided by backend
+      bloomTime: null, // Not provided by backend
+      plantType: null, // Not provided by backend
+      careInfo: PlantCareInfo(
+        lightRequirement: data['light_requirements'] ?? 'Unknown',
+        waterFrequency: data['water_frequency_days'] != null 
+            ? 'Every ${data['water_frequency_days']} days'
+            : 'Unknown',
+        careLevel: data['care_level'] ?? 'Unknown',
+        humidity: data['humidity_preference'],
+        temperature: data['temperature_range'],
+        toxicity: data['toxicity_info'],
+        fertilizer: null, // Not provided by backend
+        repotting: null, // Not provided by backend
+        pruning: null, // Not provided by backend
+        additionalCare: data['care_notes'] != null 
+            ? {'notes': data['care_notes']} 
+            : null,
+      ),
+      createdAt: data['created_at'] != null 
+          ? DateTime.parse(data['created_at']) 
+          : DateTime.now(),
+      updatedAt: data['updated_at'] != null 
+          ? DateTime.parse(data['updated_at']) 
+          : DateTime.now(),
+    );
   }
 }

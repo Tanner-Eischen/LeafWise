@@ -88,6 +88,8 @@ abstract class $StoryCopyWith<$Res> {
       Map<String, dynamic>? plantData,
       String? careStage,
       List<String>? careTips});
+
+  $UserCopyWith<$Res>? get user;
 }
 
 /// @nodoc
@@ -229,6 +231,20 @@ class _$StoryCopyWithImpl<$Res, $Val extends Story>
               as List<String>?,
     ) as $Val);
   }
+
+  /// Create a copy of Story
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserCopyWith<$Res>? get user {
+    if (_value.user == null) {
+      return null;
+    }
+
+    return $UserCopyWith<$Res>(_value.user!, (value) {
+      return _then(_value.copyWith(user: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
@@ -263,6 +279,9 @@ abstract class _$$StoryImplCopyWith<$Res> implements $StoryCopyWith<$Res> {
       Map<String, dynamic>? plantData,
       String? careStage,
       List<String>? careTips});
+
+  @override
+  $UserCopyWith<$Res>? get user;
 }
 
 /// @nodoc
@@ -749,6 +768,8 @@ abstract class $StoryViewCopyWith<$Res> {
       String userId,
       DateTime viewedAt,
       User? user});
+
+  $UserCopyWith<$Res>? get user;
 }
 
 /// @nodoc
@@ -795,6 +816,20 @@ class _$StoryViewCopyWithImpl<$Res, $Val extends StoryView>
               as User?,
     ) as $Val);
   }
+
+  /// Create a copy of StoryView
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserCopyWith<$Res>? get user {
+    if (_value.user == null) {
+      return null;
+    }
+
+    return $UserCopyWith<$Res>(_value.user!, (value) {
+      return _then(_value.copyWith(user: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
@@ -811,6 +846,9 @@ abstract class _$$StoryViewImplCopyWith<$Res>
       String userId,
       DateTime viewedAt,
       User? user});
+
+  @override
+  $UserCopyWith<$Res>? get user;
 }
 
 /// @nodoc
@@ -985,6 +1023,8 @@ abstract class $StoryLikeCopyWith<$Res> {
       String userId,
       DateTime createdAt,
       User? user});
+
+  $UserCopyWith<$Res>? get user;
 }
 
 /// @nodoc
@@ -1031,6 +1071,20 @@ class _$StoryLikeCopyWithImpl<$Res, $Val extends StoryLike>
               as User?,
     ) as $Val);
   }
+
+  /// Create a copy of StoryLike
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserCopyWith<$Res>? get user {
+    if (_value.user == null) {
+      return null;
+    }
+
+    return $UserCopyWith<$Res>(_value.user!, (value) {
+      return _then(_value.copyWith(user: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
@@ -1047,6 +1101,9 @@ abstract class _$$StoryLikeImplCopyWith<$Res>
       String userId,
       DateTime createdAt,
       User? user});
+
+  @override
+  $UserCopyWith<$Res>? get user;
 }
 
 /// @nodoc
@@ -1235,6 +1292,8 @@ abstract class $StoryCommentCopyWith<$Res> {
       DateTime? updatedAt,
       User? user,
       List<StoryComment> replies});
+
+  $UserCopyWith<$Res>? get user;
 }
 
 /// @nodoc
@@ -1311,6 +1370,20 @@ class _$StoryCommentCopyWithImpl<$Res, $Val extends StoryComment>
               as List<StoryComment>,
     ) as $Val);
   }
+
+  /// Create a copy of StoryComment
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserCopyWith<$Res>? get user {
+    if (_value.user == null) {
+      return null;
+    }
+
+    return $UserCopyWith<$Res>(_value.user!, (value) {
+      return _then(_value.copyWith(user: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
@@ -1333,6 +1406,9 @@ abstract class _$$StoryCommentImplCopyWith<$Res>
       DateTime? updatedAt,
       User? user,
       List<StoryComment> replies});
+
+  @override
+  $UserCopyWith<$Res>? get user;
 }
 
 /// @nodoc
@@ -2029,6 +2105,8 @@ abstract class $StoryFeedCopyWith<$Res> {
   @useResult
   $Res call(
       {String userId, User user, List<Story> stories, bool hasUnviewedStories});
+
+  $UserCopyWith<$Res> get user;
 }
 
 /// @nodoc
@@ -2070,6 +2148,16 @@ class _$StoryFeedCopyWithImpl<$Res, $Val extends StoryFeed>
               as bool,
     ) as $Val);
   }
+
+  /// Create a copy of StoryFeed
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserCopyWith<$Res> get user {
+    return $UserCopyWith<$Res>(_value.user, (value) {
+      return _then(_value.copyWith(user: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
@@ -2082,6 +2170,9 @@ abstract class _$$StoryFeedImplCopyWith<$Res>
   @useResult
   $Res call(
       {String userId, User user, List<Story> stories, bool hasUnviewedStories});
+
+  @override
+  $UserCopyWith<$Res> get user;
 }
 
 /// @nodoc

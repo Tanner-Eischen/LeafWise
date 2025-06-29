@@ -40,6 +40,7 @@ class UserPlant(Base):
     species = relationship("PlantSpecies", back_populates="user_plants")
     care_logs = relationship("PlantCareLog", back_populates="plant")
     photos = relationship("PlantPhoto", back_populates="plant")
+    milestones = relationship("PlantMilestone", back_populates="plant")
     
     def __repr__(self) -> str:
         return f"<UserPlant(id={self.id}, nickname='{self.nickname}', user_id={self.user_id})>"

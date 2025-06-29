@@ -21,6 +21,7 @@ from app.schemas.plant_identification import (
     PlantIdentificationResultResponse
 )
 from app.services.plant_identification_service import (
+    PlantIdentificationService,
     create_identification,
     get_identification_by_id,
     get_user_identifications,
@@ -32,6 +33,9 @@ from app.services.plant_identification_service import (
 )
 
 router = APIRouter()
+
+# Initialize the plant identification service
+plant_id_service = PlantIdentificationService()
 
 
 @router.post(
@@ -76,7 +80,7 @@ async def upload_and_identify(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ) -> PlantIdentificationResponse:
-    """Upload image and create identification request."""
+    """Upload image and create identification request with AI analysis."""
     # Validate file type
     if not file.content_type or not file.content_type.startswith('image/'):
         raise HTTPException(
@@ -84,7 +88,7 @@ async def upload_and_identify(
             detail="File must be an image"
         )
     
-    # Validate file size (e.g., max 10MB)
+    # Validate file size (max 10MB)
     max_size = 10 * 1024 * 1024  # 10MB
     if file.size and file.size > max_size:
         raise HTTPException(
@@ -93,32 +97,29 @@ async def upload_and_identify(
         )
     
     try:
-        # In a real implementation, you would:
-        # 1. Save the uploaded file to storage (S3, local filesystem, etc.)
-        # 2. Call an AI service for plant identification
-        # 3. Process the results
+        # Read image data
+        image_data = await file.read()
         
-        # For now, we'll create a placeholder identification
-        # TODO: Implement actual file upload and AI identification
-        image_url = f"https://example.com/uploads/{file.filename}"  # Placeholder
+        if not image_data:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Empty file uploaded"
+            )
         
-        identification_data = PlantIdentificationCreate(
-            image_url=image_url,
+        # Process image with AI identification
+        identification = await plant_id_service.process_plant_image(
+            image_data=image_data,
+            filename=file.filename or "unknown.jpg",
+            user_id=current_user.id,
+            db=db,
             location=location,
-            notes=notes,
-            confidence_score=0.85,  # Placeholder
-            identified_species_id=None,  # Would be set by AI service
-            ai_suggestions=[
-                {
-                    "species_name": "Unknown Species",
-                    "confidence": 0.85,
-                    "scientific_name": "Species unknown"
-                }
-            ]
+            notes=notes
         )
         
-        identification = await create_identification(db, current_user.id, identification_data)
         return PlantIdentificationResponse.from_orm(identification)
+        
+    except HTTPException:
+        raise
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -127,7 +128,97 @@ async def upload_and_identify(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to process identification"
+            detail=f"Failed to process identification: {str(e)}"
+        )
+
+
+@router.post(
+    "/analyze",
+    response_model=PlantIdentificationResultResponse,
+    summary="Analyze plant image",
+    description="Analyze a plant image without saving the identification."
+)
+async def analyze_plant_image(
+    file: UploadFile = File(..., description="Plant image file"),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+) -> PlantIdentificationResultResponse:
+    """Analyze plant image and return identification results without saving."""
+    # Validate file type
+    if not file.content_type or not file.content_type.startswith('image/'):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="File must be an image"
+        )
+    
+    # Validate file size (max 10MB)
+    max_size = 10 * 1024 * 1024  # 10MB
+    if file.size and file.size > max_size:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="File size too large. Maximum size is 10MB"
+        )
+    
+    try:
+        # Read image data
+        image_data = await file.read()
+        
+        if not image_data:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Empty file uploaded"
+            )
+        
+        # Perform AI identification without saving
+        identification_result = await plant_id_service._identify_plant_with_ai(
+            image_path=None,  # We don't save the image for analysis-only
+            image_data=image_data
+        )
+        
+        # Find species suggestions from database
+        species_suggestions = []
+        if identification_result.get("suggestions"):
+            for suggestion in identification_result["suggestions"][:3]:  # Top 3 suggestions
+                species_match = await plant_id_service._find_species_match(
+                    db,
+                    suggestion.get("name", ""),
+                    [suggestion]
+                )
+                if species_match:
+                    # Get the full species data
+                    from app.models.plant_species import PlantSpecies
+                    result = await db.execute(
+                        select(PlantSpecies).where(PlantSpecies.id == species_match["species_id"])
+                    )
+                    species = result.scalar_one_or_none()
+                    if species:
+                        from app.schemas.plant_species import PlantSpeciesResponse
+                        species_suggestions.append(PlantSpeciesResponse.from_orm(species))
+        
+        # Format care recommendations
+        care_recommendations = ""
+        if identification_result.get("care_recommendations"):
+            care_data = identification_result["care_recommendations"]
+            care_recommendations = f"""
+Light: {care_data.get('light_requirements', 'Unknown')}
+Water: {care_data.get('water_requirements', 'Unknown')}
+Soil: {care_data.get('soil_type', 'Unknown')}
+Difficulty: {care_data.get('difficulty_level', 'Unknown')}
+            """.strip()
+        
+        return PlantIdentificationResultResponse(
+            identified_name=identification_result["identified_name"],
+            confidence_score=identification_result["confidence_score"],
+            species_suggestions=species_suggestions,
+            care_recommendations=care_recommendations
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to analyze image: {str(e)}"
         )
 
 
@@ -238,6 +329,41 @@ async def get_identification(
             detail="Identification not found"
         )
     return PlantIdentificationResponse.from_orm(identification)
+
+
+@router.get(
+    "/{identification_id}/ai-details",
+    summary="Get AI identification details",
+    description="Get detailed AI analysis for a specific identification."
+)
+async def get_ai_identification_details(
+    identification_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+) -> dict:
+    """Get detailed AI analysis for an identification."""
+    try:
+        ai_details = await plant_id_service.get_identification_with_ai_details(
+            db=db,
+            identification_id=identification_id,
+            user_id=current_user.id
+        )
+        
+        if not ai_details:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Identification not found"
+            )
+        
+        return ai_details
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get AI details: {str(e)}"
+        )
 
 
 @router.put(

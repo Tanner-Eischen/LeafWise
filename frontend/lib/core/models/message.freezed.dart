@@ -75,6 +75,8 @@ abstract class $MessageCopyWith<$Res> {
       User? sender,
       String? plantId,
       Map<String, dynamic>? plantData});
+
+  $UserCopyWith<$Res>? get sender;
 }
 
 /// @nodoc
@@ -186,6 +188,20 @@ class _$MessageCopyWithImpl<$Res, $Val extends Message>
               as Map<String, dynamic>?,
     ) as $Val);
   }
+
+  /// Create a copy of Message
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserCopyWith<$Res>? get sender {
+    if (_value.sender == null) {
+      return null;
+    }
+
+    return $UserCopyWith<$Res>(_value.sender!, (value) {
+      return _then(_value.copyWith(sender: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
@@ -214,6 +230,9 @@ abstract class _$$MessageImplCopyWith<$Res> implements $MessageCopyWith<$Res> {
       User? sender,
       String? plantId,
       Map<String, dynamic>? plantData});
+
+  @override
+  $UserCopyWith<$Res>? get sender;
 }
 
 /// @nodoc
@@ -610,6 +629,7 @@ abstract class $ConversationCopyWith<$Res> {
       User? otherUser});
 
   $MessageCopyWith<$Res>? get lastMessage;
+  $UserCopyWith<$Res>? get otherUser;
 }
 
 /// @nodoc
@@ -705,6 +725,20 @@ class _$ConversationCopyWithImpl<$Res, $Val extends Conversation>
       return _then(_value.copyWith(lastMessage: value) as $Val);
     });
   }
+
+  /// Create a copy of Conversation
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserCopyWith<$Res>? get otherUser {
+    if (_value.otherUser == null) {
+      return null;
+    }
+
+    return $UserCopyWith<$Res>(_value.otherUser!, (value) {
+      return _then(_value.copyWith(otherUser: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
@@ -731,6 +765,8 @@ abstract class _$$ConversationImplCopyWith<$Res>
 
   @override
   $MessageCopyWith<$Res>? get lastMessage;
+  @override
+  $UserCopyWith<$Res>? get otherUser;
 }
 
 /// @nodoc
@@ -1363,6 +1399,8 @@ abstract class $MessageReactionCopyWith<$Res> {
       String emoji,
       DateTime createdAt,
       User? user});
+
+  $UserCopyWith<$Res>? get user;
 }
 
 /// @nodoc
@@ -1414,6 +1452,20 @@ class _$MessageReactionCopyWithImpl<$Res, $Val extends MessageReaction>
               as User?,
     ) as $Val);
   }
+
+  /// Create a copy of MessageReaction
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserCopyWith<$Res>? get user {
+    if (_value.user == null) {
+      return null;
+    }
+
+    return $UserCopyWith<$Res>(_value.user!, (value) {
+      return _then(_value.copyWith(user: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
@@ -1431,6 +1483,9 @@ abstract class _$$MessageReactionImplCopyWith<$Res>
       String emoji,
       DateTime createdAt,
       User? user});
+
+  @override
+  $UserCopyWith<$Res>? get user;
 }
 
 /// @nodoc

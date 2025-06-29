@@ -4,27 +4,13 @@ This module sets up the SQLAlchemy async engine, session factory,
 and base model class for the application.
 """
 
-from sqlalchemy import MetaData
+from sqlalchemy import MetaData, text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
 
 from app.core.config import settings
-
-# Create async engine
-engine = create_async_engine(
-    str(settings.SQLALCHEMY_DATABASE_URI),
-    poolclass=NullPool,
-    echo=False,  # Set to True for SQL query logging
-)
-
-# Create async session factory
-AsyncSessionLocal = sessionmaker(
-    engine,
-    class_=AsyncSession,
-    expire_on_commit=False,
-)
 
 # Create base model class with naming convention
 convention = {
@@ -37,6 +23,22 @@ convention = {
 
 metadata = MetaData(naming_convention=convention)
 Base = declarative_base(metadata=metadata)
+
+# Note: Model imports are handled in app/models/__init__.py to avoid circular imports
+
+# Create async engine
+engine = create_async_engine(
+    str(settings.SQLALCHEMY_DATABASE_URI),
+    poolclass=NullPool,
+    echo=True,  # Enable SQL query logging for debugging
+)
+
+# Create async session factory
+AsyncSessionLocal = sessionmaker(
+    engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+)
 
 
 async def get_db() -> AsyncSession:
@@ -59,9 +61,8 @@ async def init_db() -> None:
     Should be called during application startup.
     """
     async with engine.begin() as conn:
-        # Import all models here to ensure they are registered
-        from app.models import user, message, story, friendship  # noqa
-        
+        # Enable vector extension
+        await conn.execute(text('CREATE EXTENSION IF NOT EXISTS vector;'))
         # Create all tables
         await conn.run_sync(Base.metadata.create_all)
 

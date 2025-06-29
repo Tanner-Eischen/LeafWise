@@ -5,22 +5,455 @@ including image processing, species matching, and verification.
 """
 
 import os
+import base64
+import logging
 from datetime import datetime
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Tuple
 from uuid import UUID
+from io import BytesIO
+from pathlib import Path
 
+import aiofiles
+from openai import AsyncOpenAI
+from PIL import Image
 from sqlalchemy import and_, func, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 
+from app.core.config import settings
 from app.models.plant_identification import PlantIdentification
 from app.models.plant_species import PlantSpecies
 from app.schemas.plant_identification import PlantIdentificationCreate, PlantIdentificationUpdate
 
+logger = logging.getLogger(__name__)
+
 
 class PlantIdentificationService:
     """Service for managing plant identification."""
+    
+    def __init__(self):
+        """Initialize the plant identification service."""
+        self.openai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY) if settings.OPENAI_API_KEY else None
+        self.upload_dir = Path("uploads/plant_images")
+        self.upload_dir.mkdir(parents=True, exist_ok=True)
+    
+    async def process_plant_image(
+        self,
+        image_data: bytes,
+        filename: str,
+        user_id: UUID,
+        db: AsyncSession,
+        location: Optional[str] = None,
+        notes: Optional[str] = None
+    ) -> PlantIdentification:
+        """Process uploaded plant image and perform AI identification.
+        
+        Args:
+            image_data: Binary image data
+            filename: Original filename
+            user_id: User ID
+            db: Database session
+            location: Optional location where photo was taken
+            notes: Optional user notes
+            
+        Returns:
+            PlantIdentification with AI results
+        """
+        try:
+            # Save image file
+            image_path = await self._save_image(image_data, filename, user_id)
+            
+            # Perform AI identification
+            identification_result = await self._identify_plant_with_ai(image_path, image_data)
+            
+            # Find matching species in database
+            species_match = await self._find_species_match(
+                db, 
+                identification_result["identified_name"],
+                identification_result["suggestions"]
+            )
+            
+            # Create identification record
+            identification_data = PlantIdentificationCreate(
+                image_path=str(image_path)
+            )
+            
+            identification = PlantIdentification(
+                user_id=user_id,
+                image_path=str(image_path),
+                confidence_score=identification_result["confidence_score"],
+                identified_name=identification_result["identified_name"],
+                species_id=species_match["species_id"] if species_match else None,
+                is_verified=False
+            )
+            
+            db.add(identification)
+            await db.commit()
+            await db.refresh(identification)
+            
+            logger.info(f"Plant identification completed for user {user_id}: {identification_result['identified_name']}")
+            return identification
+            
+        except Exception as e:
+            logger.error(f"Error processing plant image: {str(e)}")
+            raise
+    
+    async def _save_image(self, image_data: bytes, filename: str, user_id: UUID) -> Path:
+        """Save uploaded image to filesystem.
+        
+        Args:
+            image_data: Binary image data
+            filename: Original filename
+            user_id: User ID
+            
+        Returns:
+            Path to saved image
+        """
+        try:
+            # Process and resize image
+            image = Image.open(BytesIO(image_data))
+            
+            # Convert to RGB if necessary
+            if image.mode in ('RGBA', 'LA', 'P'):
+                image = image.convert('RGB')
+            
+            # Resize if too large (max 1920x1920)
+            max_size = (1920, 1920)
+            if image.size[0] > max_size[0] or image.size[1] > max_size[1]:
+                image.thumbnail(max_size, Image.Resampling.LANCZOS)
+            
+            # Generate unique filename
+            timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+            file_extension = Path(filename).suffix.lower()
+            if not file_extension:
+                file_extension = '.jpg'
+            
+            new_filename = f"{user_id}_{timestamp}{file_extension}"
+            image_path = self.upload_dir / new_filename
+            
+            # Save image
+            image.save(image_path, 'JPEG', quality=85, optimize=True)
+            
+            logger.info(f"Image saved: {image_path}")
+            return image_path
+            
+        except Exception as e:
+            logger.error(f"Error saving image: {str(e)}")
+            raise
+    
+    async def _identify_plant_with_ai(self, image_path: Path, image_data: bytes) -> Dict[str, Any]:
+        """Identify plant using OpenAI Vision API.
+        
+        Args:
+            image_path: Path to saved image
+            image_data: Binary image data
+            
+        Returns:
+            Dictionary with identification results
+        """
+        if not self.openai_client:
+            logger.warning("OpenAI API key not configured, returning mock identification")
+            return self._get_mock_identification()
+        
+        try:
+            # Encode image to base64
+            base64_image = base64.b64encode(image_data).decode('utf-8')
+            
+            # Prepare the prompt for plant identification
+            prompt = """
+            You are an expert botanist. Analyze this plant image and provide identification information.
+            
+            Please respond with a JSON object containing:
+            {
+                "identified_name": "Most likely plant name (common name)",
+                "scientific_name": "Scientific name if confident",
+                "confidence_score": 0.0-1.0,
+                "suggestions": [
+                    {
+                        "name": "Alternative plant name",
+                        "scientific_name": "Scientific name",
+                        "confidence": 0.0-1.0,
+                        "reasoning": "Why this could be the plant"
+                    }
+                ],
+                "plant_characteristics": {
+                    "leaf_shape": "Description",
+                    "leaf_arrangement": "Description", 
+                    "flower_color": "Color if visible",
+                    "growth_habit": "Description"
+                },
+                "care_recommendations": {
+                    "light_requirements": "Light needs",
+                    "water_requirements": "Watering needs",
+                    "soil_type": "Soil preferences",
+                    "difficulty_level": "beginner/intermediate/advanced"
+                },
+                "additional_notes": "Any other relevant information"
+            }
+            
+            Focus on accuracy and provide multiple suggestions if uncertain. 
+            If you cannot identify the plant confidently, indicate this in the confidence score and suggestions.
+            """
+            
+            # Make API call to OpenAI Vision
+            response = await self.openai_client.chat.completions.create(
+                model="gpt-4-vision-preview",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "text", "text": prompt},
+                            {
+                                "type": "image_url",
+                                "image_url": {
+                                    "url": f"data:image/jpeg;base64,{base64_image}",
+                                    "detail": "high"
+                                }
+                            }
+                        ]
+                    }
+                ],
+                max_tokens=1000,
+                temperature=0.1
+            )
+            
+            # Parse the response
+            ai_response = response.choices[0].message.content
+            
+            # Try to extract JSON from response
+            try:
+                import json
+                # Find JSON in the response (it might be wrapped in markdown)
+                json_start = ai_response.find('{')
+                json_end = ai_response.rfind('}') + 1
+                if json_start != -1 and json_end > json_start:
+                    json_str = ai_response[json_start:json_end]
+                    identification_data = json.loads(json_str)
+                else:
+                    raise ValueError("No JSON found in response")
+            except (json.JSONDecodeError, ValueError):
+                # Fallback: parse the response manually
+                identification_data = self._parse_ai_response_fallback(ai_response)
+            
+            # Validate and clean the data
+            result = {
+                "identified_name": identification_data.get("identified_name", "Unknown Plant"),
+                "scientific_name": identification_data.get("scientific_name", ""),
+                "confidence_score": float(identification_data.get("confidence_score", 0.5)),
+                "suggestions": identification_data.get("suggestions", []),
+                "plant_characteristics": identification_data.get("plant_characteristics", {}),
+                "care_recommendations": identification_data.get("care_recommendations", {}),
+                "additional_notes": identification_data.get("additional_notes", "")
+            }
+            
+            logger.info(f"AI identification completed: {result['identified_name']} (confidence: {result['confidence_score']})")
+            return result
+            
+        except Exception as e:
+            logger.error(f"Error in AI identification: {str(e)}")
+            # Return fallback identification
+            return {
+                "identified_name": "Plant identification unavailable",
+                "scientific_name": "",
+                "confidence_score": 0.0,
+                "suggestions": [],
+                "plant_characteristics": {},
+                "care_recommendations": {},
+                "additional_notes": f"AI identification failed: {str(e)}"
+            }
+    
+    def _parse_ai_response_fallback(self, response: str) -> Dict[str, Any]:
+        """Fallback parser for AI response when JSON parsing fails.
+        
+        Args:
+            response: AI response text
+            
+        Returns:
+            Parsed identification data
+        """
+        # Simple text parsing fallback
+        lines = response.split('\n')
+        
+        identified_name = "Unknown Plant"
+        confidence_score = 0.5
+        
+        for line in lines:
+            line = line.strip()
+            if 'identified' in line.lower() or 'plant' in line.lower():
+                # Try to extract plant name
+                if ':' in line:
+                    identified_name = line.split(':', 1)[1].strip()
+                    break
+        
+        return {
+            "identified_name": identified_name,
+            "scientific_name": "",
+            "confidence_score": confidence_score,
+            "suggestions": [],
+            "plant_characteristics": {},
+            "care_recommendations": {},
+            "additional_notes": "Parsed from text response"
+        }
+    
+    def _get_mock_identification(self) -> Dict[str, Any]:
+        """Get mock identification data when AI service is unavailable.
+        
+        Returns:
+            Mock identification data
+        """
+        return {
+            "identified_name": "Pothos",
+            "scientific_name": "Epipremnum aureum",
+            "confidence_score": 0.75,
+            "suggestions": [
+                {
+                    "name": "Golden Pothos",
+                    "scientific_name": "Epipremnum aureum",
+                    "confidence": 0.75,
+                    "reasoning": "Heart-shaped leaves with variegation pattern"
+                },
+                {
+                    "name": "Philodendron",
+                    "scientific_name": "Philodendron hederaceum",
+                    "confidence": 0.60,
+                    "reasoning": "Similar leaf shape and growth pattern"
+                }
+            ],
+            "plant_characteristics": {
+                "leaf_shape": "Heart-shaped",
+                "leaf_arrangement": "Alternate",
+                "growth_habit": "Trailing vine"
+            },
+            "care_recommendations": {
+                "light_requirements": "Bright, indirect light",
+                "water_requirements": "Water when soil is dry",
+                "soil_type": "Well-draining potting mix",
+                "difficulty_level": "beginner"
+            },
+            "additional_notes": "Mock identification - OpenAI API not configured"
+        }
+    
+    async def _find_species_match(
+        self, 
+        db: AsyncSession, 
+        identified_name: str, 
+        suggestions: List[Dict[str, Any]]
+    ) -> Optional[Dict[str, Any]]:
+        """Find matching plant species in database.
+        
+        Args:
+            db: Database session
+            identified_name: Primary identified name
+            suggestions: List of alternative suggestions
+            
+        Returns:
+            Dictionary with species match info or None
+        """
+        try:
+            # Search for exact matches first
+            search_names = [identified_name]
+            
+            # Add scientific names from suggestions
+            for suggestion in suggestions:
+                if suggestion.get("scientific_name"):
+                    search_names.append(suggestion["scientific_name"])
+                if suggestion.get("name"):
+                    search_names.append(suggestion["name"])
+            
+            # Query database for matches
+            for name in search_names:
+                # Try exact match on scientific name
+                result = await db.execute(
+                    select(PlantSpecies).where(
+                        func.lower(PlantSpecies.scientific_name) == name.lower()
+                    )
+                )
+                species = result.scalar_one_or_none()
+                
+                if species:
+                    return {
+                        "species_id": species.id,
+                        "match_type": "scientific_name",
+                        "match_confidence": 0.9
+                    }
+                
+                # Try exact match on common name
+                result = await db.execute(
+                    select(PlantSpecies).where(
+                        func.lower(PlantSpecies.common_name) == name.lower()
+                    )
+                )
+                species = result.scalar_one_or_none()
+                
+                if species:
+                    return {
+                        "species_id": species.id,
+                        "match_type": "common_name", 
+                        "match_confidence": 0.8
+                    }
+            
+            # Try fuzzy matching (simplified)
+            for name in search_names[:3]:  # Limit to top 3 names
+                result = await db.execute(
+                    select(PlantSpecies).where(
+                        func.lower(PlantSpecies.scientific_name).contains(name.lower().split()[0])
+                    ).limit(1)
+                )
+                species = result.scalar_one_or_none()
+                
+                if species:
+                    return {
+                        "species_id": species.id,
+                        "match_type": "fuzzy",
+                        "match_confidence": 0.6
+                    }
+            
+            return None
+            
+        except Exception as e:
+            logger.error(f"Error finding species match: {str(e)}")
+            return None
+    
+    async def get_identification_with_ai_details(
+        self,
+        db: AsyncSession,
+        identification_id: UUID,
+        user_id: Optional[UUID] = None
+    ) -> Optional[Dict[str, Any]]:
+        """Get identification with detailed AI analysis.
+        
+        Args:
+            db: Database session
+            identification_id: Identification ID
+            user_id: Optional user ID for ownership check
+            
+        Returns:
+            Identification with AI details or None
+        """
+        try:
+            identification = await self.get_identification_by_id(db, identification_id, user_id)
+            
+            if not identification:
+                return None
+            
+            # If we have the image, we could re-analyze it for more details
+            # For now, return the stored identification with enhanced info
+            result = {
+                "identification": identification,
+                "ai_analysis": {
+                    "confidence_score": identification.confidence_score,
+                    "identified_name": identification.identified_name,
+                    "analysis_date": identification.created_at,
+                    "model_version": "gpt-4-vision-preview"
+                }
+            }
+            
+            return result
+            
+        except Exception as e:
+            logger.error(f"Error getting identification with AI details: {str(e)}")
+            return None
     
     @staticmethod
     async def create_identification(
