@@ -122,7 +122,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   borderSide: BorderSide.none,
                 ),
                 filled: true,
-                fillColor: theme.colorScheme.surfaceVariant.withOpacity(0.5),
+                fillColor: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
               ),
             ),
           ),

@@ -28,9 +28,9 @@ class PlantARIdentification {
   });
 
   factory PlantARIdentification.fromJson(Map<String, dynamic> json) =>
-      _PlantARIdentificationFromJson(json);
+      _$PlantARIdentificationFromJson(json);
 
-  Map<String, dynamic> toJson() => _PlantARIdentificationToJson(this);
+  Map<String, dynamic> toJson() => _$PlantARIdentificationToJson(this);
 }
 
 /// Plant care information for AR display
@@ -55,9 +55,9 @@ class PlantCareInfo {
   });
 
   factory PlantCareInfo.fromJson(Map<String, dynamic> json) =>
-      _PlantCareInfoFromJson(json);
+      _$PlantCareInfoFromJson(json);
 
-  Map<String, dynamic> toJson() => _PlantCareInfoToJson(this);
+  Map<String, dynamic> toJson() => _$PlantCareInfoToJson(this);
 }
 
 /// Plant health indicator for AR visualization
@@ -78,7 +78,7 @@ class PlantHealthIndicator {
   });
 
   factory PlantHealthIndicator.fromJson(Map<String, dynamic> json) =>
-      _PlantHealthIndicatorFromJson(json);
+      _$PlantHealthIndicatorFromJson(json);
 
-  Map<String, dynamic> toJson() => _PlantHealthIndicatorToJson(this);
+  Map<String, dynamic> toJson() => _$PlantHealthIndicatorToJson(this);
 }

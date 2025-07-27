@@ -8,6 +8,8 @@ import 'package:plant_social/features/plant_care/presentation/screens/care_remin
 import 'package:plant_social/features/plant_care/presentation/screens/care_logs_screen.dart';
 import 'package:plant_social/features/plant_care/presentation/widgets/plant_card.dart';
 import 'package:plant_social/features/plant_care/presentation/widgets/care_reminder_card.dart';
+import 'package:plant_social/features/seasonal_ai/presentation/widgets/seasonal_predictions_widget.dart';
+import 'package:plant_social/features/timelapse/presentation/widgets/timelapse_tracking_widget.dart';
 import 'package:plant_social/core/widgets/loading_widget.dart';
 import 'package:plant_social/core/widgets/error_widget.dart';
 
@@ -247,10 +249,10 @@ class _PlantCareDashboardScreenState
           ),
           child: Column(
             children: [
-              Row(
+              const Row(
                 children: [
                   Icon(Icons.analytics, color: Colors.white, size: 20),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                   Text(
                     'ML-Enhanced Plant Analytics',
                     style: TextStyle(
@@ -319,6 +321,14 @@ class _PlantCareDashboardScreenState
               
               // Community Analytics Card
               _buildCommunityAnalyticsCard(theme),
+              const SizedBox(height: 12),
+              
+              // Seasonal AI Predictions Widget
+              const SeasonalPredictionsWidget(),
+              const SizedBox(height: 12),
+              
+              // Time-lapse Tracking Widget
+              const TimelapseTrackingWidget(),
             ],
           ),
         ),
@@ -514,7 +524,7 @@ class _PlantCareDashboardScreenState
                             ),
                           ),
                           const SizedBox(width: 8),
-                          Icon(Icons.health_and_safety, color: Colors.green, size: 20),
+                          const Icon(Icons.health_and_safety, color: Colors.green, size: 20),
                         ],
                       ),
                     ],
@@ -566,7 +576,7 @@ class _PlantCareDashboardScreenState
               ),
               child: Row(
                 children: [
-                  Icon(Icons.trending_up, color: Colors.blue),
+                  const Icon(Icons.trending_up, color: Colors.blue),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Column(

@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:camera/camera.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:go_router/go_router.dart';
-import 'package:plant_social/core/router/app_router.dart';
 import 'package:plant_social/features/camera/widgets/plant_ar_filters.dart';
 
 /// Camera screen for capturing photos and videos with AR plant features
@@ -14,11 +13,11 @@ class CameraScreen extends ConsumerStatefulWidget {
   final String? userLocation;
 
   const CameraScreen({
-    Key? key,
+    super.key,
     this.selectedPlantId,
     this.selectedPlantType,
     this.userLocation,
-  }) : super(key: key);
+  });
 
   @override
   ConsumerState<CameraScreen> createState() => _CameraScreenState();
@@ -54,7 +53,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
     try {
       // Request camera permission
       final cameraPermission = await Permission.camera.request();
-      
+
       if (cameraPermission != PermissionStatus.granted) {
         setState(() {
           _error = 'Camera permission is required to use this feature';
@@ -65,7 +64,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
 
       // Get available cameras
       final cameras = await availableCameras();
-      
+
       if (cameras.isEmpty) {
         setState(() {
           _error = 'No cameras found on this device';
@@ -83,7 +82,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
 
       try {
         await _controller!.initialize();
-        
+
         if (mounted) {
           setState(() {
             _isInitialized = true;
@@ -117,10 +116,9 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
       });
 
       final image = await _controller!.takePicture();
-      
+
       // Handle the captured image based on current filter
       await _handleCapturedImage(image);
-      
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -144,16 +142,18 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
       // Plant identification is handled by the AR overlay
       return;
     }
-    
+
     // Handle other capture scenarios
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Photo captured successfully!'),
+        SnackBar(
+          content: const Text('Photo captured successfully!'),
           backgroundColor: Colors.green,
           action: SnackBarAction(
             label: 'View',
-            onPressed: null, // TODO: Implement view action
+            onPressed: () {
+              // TODO: Implement view action
+            },
           ),
         ),
       );
@@ -188,7 +188,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     // Show error state
     if (_error != null) {
       return Scaffold(
@@ -205,11 +205,17 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.error_outline, size: 64, color: theme.colorScheme.error),
+              Icon(
+                Icons.error_outline,
+                size: 64,
+                color: theme.colorScheme.error,
+              ),
               const SizedBox(height: 16),
               Text(
                 _error!,
-                style: theme.textTheme.titleMedium?.copyWith(color: Colors.white),
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: Colors.white,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
@@ -227,9 +233,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
     if (_isLoading) {
       return const Scaffold(
         backgroundColor: Colors.black,
-        body: Center(
-          child: CircularProgressIndicator(color: Colors.white),
-        ),
+        body: Center(child: CircularProgressIndicator(color: Colors.white)),
       );
     }
 
@@ -261,9 +265,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
         children: [
           // Camera preview
           if (_controller != null && _controller!.value.isInitialized)
-            Center(
-              child: CameraPreview(_controller!),
-            ),
+            Center(child: CameraPreview(_controller!)),
 
           // AR filters overlay
           if (_showARFilters && _controller != null)
@@ -290,10 +292,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: _isCapturing ? Colors.grey : Colors.white,
-                    border: Border.all(
-                      color: Colors.white,
-                      width: 4,
-                    ),
+                    border: Border.all(color: Colors.white, width: 4),
                   ),
                 ),
               ),
@@ -303,4 +302,4 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
       ),
     );
   }
-} 
+}

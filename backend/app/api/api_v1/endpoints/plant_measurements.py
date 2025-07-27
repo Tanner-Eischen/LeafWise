@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.services.plant_measurement_service import PlantMeasurementService
-from app.services.auth_service import get_current_user
+from app.services.auth_service import get_current_user_from_token as get_current_user
 from app.models.user import User
 
 router = APIRouter()

@@ -16,7 +16,11 @@ class StoryType(str, Enum):
     VIDEO = "video"
     PLANT_SHOWCASE = "plant_showcase"  # Special plant-focused story
     PLANT_TIMELAPSE = "plant_timelapse"  # Plant growth timelapse
+    TIMELAPSE_VIDEO = "timelapse_video"  # Enhanced time-lapse with growth data
+    SEASONAL_PREDICTION = "seasonal_prediction"  # AI seasonal predictions
+    GROWTH_MILESTONE = "growth_milestone"  # Growth achievement showcase
     GARDEN_TOUR = "garden_tour"  # Garden/collection showcase
+    CHALLENGE_UPDATE = "challenge_update"  # Community challenge progress
 
 
 class StoryPrivacyLevel(str, Enum):
@@ -288,3 +292,139 @@ class StoryBatch(BaseModel):
         if operation == 'add_to_highlight' and not v:
             raise ValueError('highlight_id is required for add_to_highlight operation')
         return v
+
+
+class TimelapseStoryData(BaseModel):
+    """Schema for time-lapse story specific data."""
+    timelapse_session_id: str
+    plant_id: str
+    plant_nickname: str
+    tracking_duration_days: Optional[int] = None
+    photo_count: int = 0
+    growth_milestones: List[dict] = []
+    growth_rate: Optional[float] = None
+    care_events: List[dict] = []
+    
+    class Config:
+        from_attributes = True
+
+
+class SeasonalPredictionStoryData(BaseModel):
+    """Schema for seasonal prediction story data."""
+    plant_id: str
+    plant_nickname: str
+    prediction_type: str = "seasonal_forecast"
+    prediction_data: dict
+    confidence_score: Optional[float] = None
+    seasonal_adjustments: List[dict] = []
+    risk_factors: List[dict] = []
+    optimal_activities: List[dict] = []
+    
+    class Config:
+        from_attributes = True
+
+
+class GrowthMilestoneStoryData(BaseModel):
+    """Schema for growth milestone story data."""
+    plant_id: str
+    plant_nickname: str
+    milestone_type: str
+    milestone_description: str
+    achievement_date: datetime
+    before_after_comparison: Optional[dict] = None
+    growth_metrics: Optional[dict] = None
+    timelapse_session_id: Optional[str] = None
+    
+    class Config:
+        from_attributes = True
+
+
+class ChallengeUpdateStoryData(BaseModel):
+    """Schema for community challenge update story data."""
+    challenge_id: str
+    challenge_title: str
+    plant_id: str
+    plant_nickname: str
+    progress_update: dict
+    current_rank: Optional[int] = None
+    total_participants: Optional[int] = None
+    achievements_earned: List[dict] = []
+    
+    class Config:
+        from_attributes = True
+
+
+class TimelapseStoryCreate(StoryCreate):
+    """Schema for creating time-lapse stories."""
+    content_type: StoryType = StoryType.TIMELAPSE_VIDEO
+    timelapse_data: TimelapseStoryData
+    
+    @validator('duration')
+    def validate_timelapse_duration(cls, v, values):
+        # Time-lapse videos can be longer than regular stories
+        if v is not None and v > 300:  # Max 5 minutes for time-lapse
+            raise ValueError('Time-lapse duration cannot exceed 300 seconds')
+        return v
+
+
+class SeasonalPredictionStoryCreate(StoryCreate):
+    """Schema for creating seasonal prediction stories."""
+    content_type: StoryType = StoryType.SEASONAL_PREDICTION
+    prediction_data: SeasonalPredictionStoryData
+    
+    @validator('media_url')
+    def validate_prediction_media(cls, v):
+        # Seasonal predictions might not always have media
+        return v
+
+
+class GrowthMilestoneStoryCreate(StoryCreate):
+    """Schema for creating growth milestone stories."""
+    content_type: StoryType = StoryType.GROWTH_MILESTONE
+    milestone_data: GrowthMilestoneStoryData
+
+
+class ChallengeUpdateStoryCreate(StoryCreate):
+    """Schema for creating challenge update stories."""
+    content_type: StoryType = StoryType.CHALLENGE_UPDATE
+    challenge_data: ChallengeUpdateStoryData
+
+
+class EnhancedStoryRead(StoryRead):
+    """Enhanced story read schema with additional metadata."""
+    metadata: Optional[dict] = None  # For storing type-specific data
+    
+    # Time-lapse specific fields
+    timelapse_data: Optional[TimelapseStoryData] = None
+    
+    # Seasonal prediction specific fields
+    prediction_data: Optional[SeasonalPredictionStoryData] = None
+    
+    # Growth milestone specific fields
+    milestone_data: Optional[GrowthMilestoneStoryData] = None
+    
+    # Challenge update specific fields
+    challenge_data: Optional[ChallengeUpdateStoryData] = None
+    
+    class Config:
+        from_attributes = True
+
+
+class StoryNotificationData(BaseModel):
+    """Schema for story-related notifications."""
+    notification_type: str
+    story_id: str
+    story_type: StoryType
+    user_id: str
+    username: str
+    display_name: str
+    plant_nickname: Optional[str] = None
+    
+    # Type-specific notification data
+    timelapse_stats: Optional[dict] = None
+    milestone_info: Optional[dict] = None
+    challenge_info: Optional[dict] = None
+    prediction_summary: Optional[dict] = None
+    
+    class Config:
+        from_attributes = True

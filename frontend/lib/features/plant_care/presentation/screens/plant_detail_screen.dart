@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:plant_social/features/plant_care/models/plant_care_models.dart';
 import 'package:plant_social/features/plant_care/providers/plant_care_provider.dart';
 import 'package:plant_social/features/plant_care/presentation/widgets/care_reminder_card.dart';
-import 'package:plant_social/core/theme/app_theme.dart';
-import 'package:plant_social/core/widgets/custom_button.dart';
 
 class PlantDetailScreen extends ConsumerStatefulWidget {
   final String plantId;

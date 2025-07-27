@@ -322,7 +322,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
               },
             ),
             IconButton(
-              icon: Icon(
+              icon: const Icon(
                 Icons.check,
                 color: Colors.green,
               ),

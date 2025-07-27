@@ -16,6 +16,8 @@ from app.models.story import Story, StoryView
 from app.schemas.story import StoryType, StoryPrivacyLevel
 from app.models.user import User
 from app.models.friendship import Friendship, FriendshipStatus
+from app.models.timelapse import TimelapseSession, GrowthPhoto
+from app.models.seasonal_ai import SeasonalPrediction
 from app.schemas.story import (
     StoryCreate, StoryUpdate, StoryRead, StoryFeed,
     StoryViewCreate, StoryView, StoryAnalytics, StorySearch
@@ -523,6 +525,211 @@ class StoryService:
         
         return count
     
+    async def create_timelapse_story(
+        self,
+        user_id: str,
+        timelapse_session_id: str,
+        story_data: StoryCreate,
+        session: AsyncSession
+    ) -> Optional[Story]:
+        """Create a story from a time-lapse video with enhanced metadata."""
+        # Get the time-lapse session
+        timelapse_session = await session.execute(
+            select(TimelapseSession).options(
+                selectinload(TimelapseSession.plant),
+                selectinload(TimelapseSession.growth_photos)
+            ).where(TimelapseSession.id == timelapse_session_id)
+        )
+        timelapse = timelapse_session.scalar_one_or_none()
+        
+        if not timelapse or str(timelapse.user_id) != user_id:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Time-lapse session not found"
+            )
+        
+        # Enhance story data with time-lapse metadata
+        enhanced_story_data = story_data.copy()
+        enhanced_story_data.content_type = StoryType.TIMELAPSE_VIDEO
+        
+        # Add time-lapse specific metadata
+        timelapse_metadata = {
+            "timelapse_session_id": str(timelapse.id),
+            "plant_id": str(timelapse.plant_id),
+            "plant_nickname": timelapse.plant.nickname,
+            "tracking_duration_days": (timelapse.end_date - timelapse.start_date).days if timelapse.end_date else None,
+            "photo_count": len(timelapse.growth_photos),
+            "growth_milestones": []
+        }
+        
+        # Add growth milestones if available
+        if timelapse.growth_photos:
+            for photo in timelapse.growth_photos:
+                if photo.growth_analysis and photo.growth_analysis.get("milestones"):
+                    timelapse_metadata["growth_milestones"].extend(
+                        photo.growth_analysis["milestones"]
+                    )
+        
+        # Create the story with enhanced metadata
+        story = Story(
+            user_id=user_id,
+            content_type=enhanced_story_data.content_type,
+            media_url=enhanced_story_data.media_url,
+            caption=enhanced_story_data.caption or f"Growth journey of {timelapse.plant.nickname}",
+            duration=enhanced_story_data.duration,
+            file_size=enhanced_story_data.file_size,
+            privacy_level=enhanced_story_data.privacy_level,
+            expires_at=datetime.utcnow() + timedelta(hours=48),  # Longer expiry for time-lapse
+            plant_tags=enhanced_story_data.plant_tags,
+            location=enhanced_story_data.location,
+            metadata=timelapse_metadata
+        )
+        
+        session.add(story)
+        await session.commit()
+        await session.refresh(story)
+        
+        # Send enhanced notification for time-lapse stories
+        await self._notify_friends_of_timelapse_story(story, timelapse, session)
+        
+        return story
+    
+    async def create_seasonal_prediction_story(
+        self,
+        user_id: str,
+        plant_id: str,
+        prediction_data: Dict[str, Any],
+        story_data: StoryCreate,
+        session: AsyncSession
+    ) -> Optional[Story]:
+        """Create a story showcasing seasonal predictions."""
+        # Get the plant and latest prediction
+        plant_result = await session.execute(
+            select(UserPlant).where(
+                and_(
+                    UserPlant.id == plant_id,
+                    UserPlant.user_id == user_id
+                )
+            )
+        )
+        plant = plant_result.scalar_one_or_none()
+        
+        if not plant:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Plant not found"
+            )
+        
+        # Create story with seasonal prediction metadata
+        seasonal_metadata = {
+            "plant_id": str(plant.id),
+            "plant_nickname": plant.nickname,
+            "prediction_type": "seasonal_forecast",
+            "prediction_data": prediction_data,
+            "generated_at": datetime.utcnow().isoformat()
+        }
+        
+        story = Story(
+            user_id=user_id,
+            content_type=StoryType.SEASONAL_PREDICTION,
+            media_url=story_data.media_url,
+            caption=story_data.caption or f"Seasonal forecast for {plant.nickname}",
+            duration=story_data.duration,
+            file_size=story_data.file_size,
+            privacy_level=story_data.privacy_level,
+            expires_at=datetime.utcnow() + timedelta(hours=24),
+            plant_tags=f"{plant.species.common_names[0] if plant.species else 'plant'},seasonal,prediction",
+            location=story_data.location,
+            metadata=seasonal_metadata
+        )
+        
+        session.add(story)
+        await session.commit()
+        await session.refresh(story)
+        
+        # Send notification
+        await self._notify_friends_of_new_story(story, session)
+        
+        return story
+    
+    async def get_timelapse_stories_feed(
+        self,
+        user_id: str,
+        session: AsyncSession,
+        limit: int = 20
+    ) -> List[StoryRead]:
+        """Get feed of time-lapse stories from friends."""
+        # Get user's friends
+        friends_query = select(
+            func.case(
+                (Friendship.requester_id == user_id, Friendship.addressee_id),
+                else_=Friendship.requester_id
+            ).label("friend_id")
+        ).where(
+            and_(
+                or_(
+                    Friendship.requester_id == user_id,
+                    Friendship.addressee_id == user_id
+                ),
+                Friendship.status == FriendshipStatus.ACCEPTED
+            )
+        )
+        
+        friends_result = await session.execute(friends_query)
+        friend_ids = [row.friend_id for row in friends_result]
+        friend_ids.append(user_id)  # Include own stories
+        
+        # Get time-lapse stories
+        stories_query = (
+            select(Story, User)
+            .join(User, User.id == Story.user_id)
+            .where(
+                and_(
+                    Story.user_id.in_(friend_ids),
+                    Story.is_active == True,
+                    Story.expires_at > datetime.utcnow(),
+                    Story.content_type == StoryType.TIMELAPSE_VIDEO
+                )
+            )
+            .order_by(desc(Story.created_at))
+            .limit(limit)
+        )
+        
+        result = await session.execute(stories_query)
+        stories_users = result.all()
+        
+        # Convert to StoryRead format
+        story_reads = []
+        for story, user in stories_users:
+            has_viewed = await self._has_user_viewed_story(str(story.id), user_id, session)
+            view_count = await session.scalar(
+                select(func.count(StoryView.id)).where(StoryView.story_id == str(story.id))
+            ) or 0
+            
+            story_read = StoryRead(
+                id=str(story.id),
+                user_id=str(story.user_id),
+                content_type=story.content_type,
+                media_url=story.media_url,
+                caption=story.caption,
+                duration=story.duration,
+                file_size=story.file_size,
+                privacy_level=story.privacy_level,
+                created_at=story.created_at,
+                expires_at=story.expires_at,
+                plant_tags=story.plant_tags,
+                location=story.location,
+                user_username=user.username,
+                user_display_name=user.display_name,
+                user_avatar_url=user.avatar_url,
+                view_count=view_count,
+                has_viewed=has_viewed,
+                metadata=story.metadata
+            )
+            story_reads.append(story_read)
+        
+        return story_reads
+    
     async def _validate_story_content(self, story_data: StoryCreate):
         """Validate story content."""
         if story_data.content_type in [StoryType.IMAGE, StoryType.VIDEO]:
@@ -716,6 +923,55 @@ class StoryService:
             
             await self.connection_manager.send_personal_message(
                 story.user_id,
+                notification_data
+            )
+    
+    async def _notify_friends_of_timelapse_story(
+        self, 
+        story: Story, 
+        timelapse: TimelapseSession, 
+        session: AsyncSession
+    ):
+        """Send enhanced notifications for time-lapse stories."""
+        # Get friends
+        friends_query = select(
+            func.case(
+                (Friendship.requester_id == str(story.user_id), Friendship.addressee_id),
+                else_=Friendship.requester_id
+            ).label("friend_id")
+        ).where(
+            and_(
+                or_(
+                    Friendship.requester_id == str(story.user_id),
+                    Friendship.addressee_id == str(story.user_id)
+                ),
+                Friendship.status == FriendshipStatus.ACCEPTED
+            )
+        )
+        
+        result = await session.execute(friends_query)
+        friend_ids = [row.friend_id for row in result]
+        
+        # Get story owner info
+        owner = await session.get(User, story.user_id)
+        
+        if owner and friend_ids:
+            notification_data = {
+                "type": "new_timelapse_story",
+                "story_id": str(story.id),
+                "user_id": str(story.user_id),
+                "username": owner.username,
+                "display_name": owner.display_name,
+                "plant_nickname": timelapse.plant.nickname,
+                "tracking_duration_days": story.metadata.get("tracking_duration_days"),
+                "photo_count": story.metadata.get("photo_count"),
+                "growth_milestones": len(story.metadata.get("growth_milestones", [])),
+                "timestamp": story.created_at.isoformat()
+            }
+            
+            # Send to all friends
+            await self.connection_manager.broadcast_to_users(
+                friend_ids,
                 notification_data
             )
 

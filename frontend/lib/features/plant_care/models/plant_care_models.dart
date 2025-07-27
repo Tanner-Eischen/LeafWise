@@ -93,10 +93,14 @@ class PlantCareReminder {
       frequencyDays: json['frequencyDays'] as int,
       isActive: json['isActive'] as bool,
       notes: json['notes'] as String?,
-      lastCompletedDate: json['lastCompletedDate'] != null ? DateTime.parse(json['lastCompletedDate'] as String) : null,
+      lastCompletedDate: json['lastCompletedDate'] != null
+          ? DateTime.parse(json['lastCompletedDate'] as String)
+          : null,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
-      plant: json['plant'] != null ? UserPlant.fromJson(json['plant'] as Map<String, dynamic>) : null,
+      plant: json['plant'] != null
+          ? UserPlant.fromJson(json['plant'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -165,9 +169,15 @@ class UserPlant {
       customCareSchedule: json['customCareSchedule'] as Map<String, dynamic>?,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
-      species: json['species'] != null ? PlantSpecies.fromJson(json['species'] as Map<String, dynamic>) : null,
-      careLogs: (json['careLogs'] as List<dynamic>?)?.map((e) => PlantCareLog.fromJson(e as Map<String, dynamic>)).toList(),
-      reminders: (json['reminders'] as List<dynamic>?)?.map((e) => PlantCareReminder.fromJson(e as Map<String, dynamic>)).toList(),
+      species: json['species'] != null
+          ? PlantSpecies.fromJson(json['species'] as Map<String, dynamic>)
+          : null,
+      careLogs: (json['careLogs'] as List<dynamic>?)
+          ?.map((e) => PlantCareLog.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      reminders: (json['reminders'] as List<dynamic>?)
+          ?.map((e) => PlantCareReminder.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 
@@ -233,12 +243,15 @@ class PlantSpecies {
       family: json['family'] as String?,
       description: json['description'] as String?,
       imageUrl: json['imageUrl'] as String?,
-      alternativeNames: (json['alternativeNames'] as List<dynamic>?)?.cast<String>(),
+      alternativeNames: (json['alternativeNames'] as List<dynamic>?)
+          ?.cast<String>(),
       nativeRegions: (json['nativeRegions'] as List<dynamic>?)?.cast<String>(),
       maxHeight: json['maxHeight'] as String?,
       bloomTime: json['bloomTime'] as String?,
       plantType: json['plantType'] as String?,
-      careInfo: json['careInfo'] != null ? PlantCareInfo.fromJson(json['careInfo'] as Map<String, dynamic>) : null,
+      careInfo: json['careInfo'] != null
+          ? PlantCareInfo.fromJson(json['careInfo'] as Map<String, dynamic>)
+          : null,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
     );

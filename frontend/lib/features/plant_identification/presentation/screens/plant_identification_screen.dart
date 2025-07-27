@@ -6,7 +6,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:plant_social/features/plant_identification/providers/plant_identification_provider.dart';
 import 'package:plant_social/features/plant_identification/presentation/widgets/plant_identification_result.dart';
 import 'package:plant_social/features/plant_identification/presentation/widgets/plant_identification_loading.dart';
-import 'package:plant_social/core/theme/app_theme.dart';
 
 class PlantIdentificationScreen extends ConsumerStatefulWidget {
   const PlantIdentificationScreen({super.key});

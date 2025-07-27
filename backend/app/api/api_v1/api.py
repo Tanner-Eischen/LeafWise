@@ -5,8 +5,9 @@ from app.api.api_v1.endpoints import(
     auth, messages, stories, friends, users, websocket,
     plant_species, user_plants, plant_care_logs, plant_identification,
     plant_trades, plant_questions, achievements, nurseries, smart_community,
-    content_generation, discovery_feed, ml_enhanced_community, rag_infrastructure,
-    ml_plant_health, ml_trending_topics, analytics, plant_measurements)
+    content_generation, discovery_feed, ml_enhanced_community,
+    ml_plant_health, ml_trending_topics,
+    seasonal_ai, timelapse_management, growth_analytics, community_challenges)
 
 api_router = APIRouter()
 
@@ -38,11 +39,19 @@ api_router.include_router(ml_enhanced_community.router, prefix="/ml-community", 
 api_router.include_router(ml_plant_health.router, prefix="/ml-plant-health", tags=["ml-plant-health"])
 api_router.include_router(ml_trending_topics.router, prefix="/ml-trending", tags=["ml-trending-topics"])
 
-# RAG Infrastructure endpoints
-api_router.include_router(rag_infrastructure.router, prefix="/rag", tags=["rag-infrastructure"])
+# RAG Infrastructure endpoints - temporarily disabled due to FastAPI response model issues
+# api_router.include_router(rag_infrastructure.router, prefix="/rag", tags=["rag-infrastructure"])
 
-# Advanced Analytics endpoints
-api_router.include_router(analytics.router, prefix="/analytics", tags=["analytics"])
+# Advanced Analytics endpoints - temporarily disabled due to FastAPI response model issues
+# api_router.include_router(analytics.router, prefix="/analytics", tags=["analytics"])
 
-# Plant Measurement endpoints
-api_router.include_router(plant_measurements.router, prefix="/measurements", tags=["plant-measurements"])
+# Plant Measurement endpoints - temporarily disabled due to FastAPI response model issues
+# api_router.include_router(plant_measurements.router, prefix="/measurements", tags=["plant-measurements"])
+
+# Seasonal AI and Time-lapse endpoints
+api_router.include_router(seasonal_ai.router, prefix="/seasonal-ai", tags=["seasonal-ai"])
+api_router.include_router(timelapse_management.router, prefix="/timelapse", tags=["timelapse"])
+api_router.include_router(growth_analytics.router, prefix="/growth-analytics", tags=["growth-analytics"])
+
+# Community Challenge endpoints
+api_router.include_router(community_challenges.router, prefix="/challenges", tags=["community-challenges"])

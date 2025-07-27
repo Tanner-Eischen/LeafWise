@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:plant_social/features/plant_identification/presentation/screens/plant_identification_screen.dart';
 import 'package:plant_social/features/plant_care/presentation/screens/plant_care_dashboard_screen.dart';
 import 'package:plant_social/features/plant_community/presentation/screens/plant_community_screen.dart';
-import 'package:plant_social/core/theme/app_theme.dart';
 
 class PlantFeaturesScreen extends ConsumerStatefulWidget {
   const PlantFeaturesScreen({super.key});

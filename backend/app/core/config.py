@@ -82,6 +82,12 @@ class Settings(BaseSettings):
     # OpenAI settings (for future phases)
     OPENAI_API_KEY: Optional[str] = None
     
+    # Weather API settings
+    OPENWEATHERMAP_API_KEY: Optional[str] = None
+    WEATHERAPI_KEY: Optional[str] = None
+    WEATHER_CACHE_TTL: int = 3600  # 1 hour in seconds
+    CLIMATE_DATA_CACHE_TTL: int = 86400  # 24 hours in seconds
+    
     # Email settings (for future use)
     SMTP_TLS: bool = True
     SMTP_PORT: Optional[int] = None

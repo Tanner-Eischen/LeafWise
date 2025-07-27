@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:plant_social/features/plant_community/models/plant_community_models.dart';
 import 'package:plant_social/features/plant_community/providers/plant_community_provider.dart';
 import 'package:plant_social/features/plant_community/presentation/widgets/trade_card.dart';
-import 'package:plant_social/core/theme/app_theme.dart';
 import 'package:plant_social/core/widgets/custom_search_bar.dart';
 
 class PlantTradesScreen extends ConsumerStatefulWidget {
@@ -103,8 +102,8 @@ class _PlantTradesScreenState extends ConsumerState<PlantTradesScreen>
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _navigateToCreateTrade,
-        child: const Icon(Icons.add),
         tooltip: 'Create Trade',
+        child: const Icon(Icons.add),
       ),
     );
   }

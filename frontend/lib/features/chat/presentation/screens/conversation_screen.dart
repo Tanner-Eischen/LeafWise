@@ -264,7 +264,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
               decoration: BoxDecoration(
                 color: message.isFromCurrentUser
                     ? theme.colorScheme.primary
-                    : theme.colorScheme.surfaceVariant,
+                    : theme.colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(20).copyWith(
                   bottomLeft: message.isFromCurrentUser
                       ? const Radius.circular(20)
@@ -347,7 +347,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
                   borderSide: BorderSide.none,
                 ),
                 filled: true,
-                fillColor: theme.colorScheme.surfaceVariant.withOpacity(0.5),
+                fillColor: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 12,
@@ -723,7 +723,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Record Voice Note'),
-        content: Column(
+        content: const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
@@ -731,10 +731,10 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
               size: 60,
               color: Colors.red,
             ),
-            const SizedBox(height: 16),
-            const Text('Recording...'),
-            const SizedBox(height: 8),
-            const Text('00:15'),
+            SizedBox(height: 16),
+            Text('Recording...'),
+            SizedBox(height: 8),
+            Text('00:15'),
           ],
         ),
         actions: [

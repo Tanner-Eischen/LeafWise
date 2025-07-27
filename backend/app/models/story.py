@@ -47,10 +47,16 @@ class Story(Base):
     is_active = Column(Boolean, default=True)
     is_archived = Column(Boolean, default=False)
     
+    # Enhanced metadata for seasonal AI and time-lapse features
+    plant_tags = Column(String(500), nullable=True)  # Comma-separated plant tags
+    location = Column(String(200), nullable=True)  # Location information
+    story_metadata = Column(Text, nullable=True)  # JSON metadata for enhanced features
+    
     # Timestamps
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     expires_at = Column(DateTime, nullable=False)
     archived_at = Column(DateTime, nullable=True)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
     user = relationship("User", backref="stories")

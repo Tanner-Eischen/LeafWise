@@ -43,7 +43,7 @@ class StoriesBar extends ConsumerWidget {
               color: theme.colorScheme.surface,
               shape: BoxShape.circle,
               border: Border.all(
-                color: theme.colorScheme.outline.withOpacity(0.3),
+                color: theme.colorScheme.outline.withAlpha(77),
                 width: 2,
               ),
             ),
@@ -52,7 +52,7 @@ class StoriesBar extends ConsumerWidget {
                 Center(
                   child: CircleAvatar(
                     radius: 28,
-                    backgroundColor: theme.colorScheme.primary.withOpacity(0.1),
+                    backgroundColor: theme.colorScheme.primary.withAlpha(26),
                     child: Text(
                       user?.initials ?? 'U',
                       style: theme.textTheme.titleMedium?.copyWith(
@@ -162,7 +162,7 @@ class StoriesBar extends ConsumerWidget {
                   : null,
               border: !hasStory
                   ? Border.all(
-                      color: theme.colorScheme.outline.withOpacity(0.3),
+                      color: theme.colorScheme.outline.withAlpha(77),
                       width: 2,
                     )
                   : null,
@@ -181,7 +181,7 @@ class StoriesBar extends ConsumerWidget {
                 ),
                 child: CircleAvatar(
                   radius: hasStory ? 31 : 34,
-                  backgroundColor: avatarColor.withOpacity(0.2),
+                  backgroundColor: avatarColor.withAlpha(51),
                   child: Text(
                     name[0].toUpperCase(),
                     style: theme.textTheme.titleLarge?.copyWith(

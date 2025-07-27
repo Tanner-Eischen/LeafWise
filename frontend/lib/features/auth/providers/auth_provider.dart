@@ -1,16 +1,10 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:plant_social/core/constants/app_constants.dart';
 import 'package:plant_social/core/models/user.dart';
-import 'package:plant_social/core/exceptions/api_exception.dart';
 import 'package:plant_social/features/auth/models/auth_models.dart';
 import 'package:plant_social/features/auth/repositories/auth_repository.dart';
-
-part 'auth_provider.freezed.dart';
-
-// part 'auth_provider.g.dart'; // Commented out until code generation works
 
 class AuthState {
   final User? user;

@@ -27,6 +27,8 @@ from app.models.plant_species import PlantSpecies
 from app.models.rag_models import RAGInteraction, UserPreferenceEmbedding
 from app.services.rag_service import RAGService, UserContext, PlantData
 from app.services.embedding_service import EmbeddingService
+from app.services.seasonal_ai_service import SeasonalAIService
+from app.services.timelapse_service import TimelapseService
 
 logger = logging.getLogger(__name__)
 
@@ -79,6 +81,8 @@ class MLPlantHealthService:
     def __init__(self, rag_service: RAGService, embedding_service: EmbeddingService):
         self.rag_service = rag_service
         self.embedding_service = embedding_service
+        self.seasonal_ai_service = None  # Will be injected to avoid circular imports
+        self.timelapse_service = None  # Will be injected to avoid circular imports
         
         # ML Models for health prediction
         self.health_classifier = None

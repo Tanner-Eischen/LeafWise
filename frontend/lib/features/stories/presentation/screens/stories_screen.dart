@@ -113,8 +113,8 @@ class _StoriesScreenState extends ConsumerState<StoriesScreen>
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => context.push('/home/camera'),
-        child: const Icon(Icons.camera_alt),
         tooltip: 'Create Story',
+        child: const Icon(Icons.camera_alt),
       ),
     );
   }
@@ -320,7 +320,7 @@ class _StoriesScreenState extends ConsumerState<StoriesScreen>
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
                 color: story.isViewed
-                    ? theme.colorScheme.onSurface.withOpacity(0.6)
+                    ? theme.colorScheme.onSurface.withAlpha(153)
                     : theme.colorScheme.onSurface,
               ),
               textAlign: TextAlign.center,
@@ -358,10 +358,10 @@ class _StoriesScreenState extends ConsumerState<StoriesScreen>
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withOpacity(0.1),
+                    color: theme.colorScheme.primary.withAlpha(26),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: theme.colorScheme.primary.withOpacity(0.3),
+                      color: theme.colorScheme.primary.withAlpha(77),
                     ),
                   ),
                   child: Text(
@@ -398,8 +398,8 @@ class _StoriesScreenState extends ConsumerState<StoriesScreen>
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      theme.colorScheme.primary.withOpacity(0.7),
-                      theme.colorScheme.secondary.withOpacity(0.7),
+                      theme.colorScheme.primary.withAlpha(179),
+                      theme.colorScheme.secondary.withAlpha(179),
                     ],
                   ),
                 ),
@@ -416,13 +416,13 @@ class _StoriesScreenState extends ConsumerState<StoriesScreen>
             // Gradient overlay
             Positioned.fill(
               child: Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
                       Colors.transparent,
-                      Colors.black.withOpacity(0.7),
+                      Color.fromRGBO(0, 0, 0, 0.7),
                     ],
                   ),
                 ),
@@ -487,38 +487,38 @@ class _StoriesScreenState extends ConsumerState<StoriesScreen>
                   // Stats
                   Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.visibility,
-                        color: Colors.white.withOpacity(0.8),
+                        color: Color.fromRGBO(255, 255, 255, 0.8),
                         size: 12,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         '${story.viewCount}',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
+                        style: const TextStyle(
+                          color: Color.fromRGBO(255, 255, 255, 0.8),
                           fontSize: 10,
                         ),
                       ),
                       const SizedBox(width: 12),
-                      Icon(
+                      const Icon(
                         Icons.favorite,
-                        color: Colors.white.withOpacity(0.8),
+                        color: Color.fromRGBO(255, 255, 255, 0.8),
                         size: 12,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         '${story.likeCount}',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
+                        style: const TextStyle(
+                          color: Color.fromRGBO(255, 255, 255, 0.8),
                           fontSize: 10,
                         ),
                       ),
                       const Spacer(),
                       Text(
                         _formatTimestamp(story.timestamp),
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
+                        style: const TextStyle(
+                          color: Color.fromRGBO(255, 255, 255, 0.8),
                           fontSize: 10,
                         ),
                       ),
@@ -536,7 +536,7 @@ class _StoriesScreenState extends ConsumerState<StoriesScreen>
                 child: Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
+                    color: const Color.fromRGBO(0, 0, 0, 0.5),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
@@ -570,13 +570,13 @@ class _StoriesScreenState extends ConsumerState<StoriesScreen>
             Icon(
               icon,
               size: 80,
-              color: theme.colorScheme.onSurface.withOpacity(0.3),
+              color: theme.colorScheme.onSurface.withAlpha(77),
             ),
             const SizedBox(height: 16),
             Text(
               title,
               style: theme.textTheme.headlineSmall?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
+                color: theme.colorScheme.onSurface.withAlpha(179),
               ),
               textAlign: TextAlign.center,
             ),
@@ -584,7 +584,7 @@ class _StoriesScreenState extends ConsumerState<StoriesScreen>
             Text(
               subtitle,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.5),
+                color: theme.colorScheme.onSurface.withAlpha(128),
               ),
               textAlign: TextAlign.center,
             ),

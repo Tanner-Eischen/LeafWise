@@ -64,3 +64,16 @@ lightgbm==4.1.0
 scipy==1.11.4
 nltk==3.8.1
 textblob==0.17.1
+
+# Environmental data and weather APIs
+httpx==0.25.2
+aiohttp==3.9.1
+pytz==2023.3
+astral==3.2
+
+# Computer vision for time-lapse processing
+opencv-python==4.8.1.78
+opencv-contrib-python==4.8.1.78
+
+# Video processing for time-lapse generation
+ffmpeg-python==0.2.0

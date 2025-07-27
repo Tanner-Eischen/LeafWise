@@ -1,14 +1,11 @@
-/**
- * Reusable custom text field widgets for consistent form styling across the app
- * Provides various input types with validation and customization options
- */
+/// Reusable custom text field widgets for consistent form styling across the app
+/// Provides various input types with validation and customization options
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/**
- * Primary custom text field with validation support
- */
+/// Primary custom text field with validation support
 class CustomTextField extends StatefulWidget {
   final String? label;
   final String? hint;
@@ -145,7 +142,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
             const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         filled: widget.filled,
         fillColor:
-            widget.fillColor ?? colorScheme.surfaceVariant.withOpacity(0.3),
+            widget.fillColor ?? colorScheme.surfaceContainerHighest.withOpacity(0.3),
         labelStyle:
             widget.labelStyle ??
             theme.textTheme.bodyMedium?.copyWith(
@@ -192,9 +189,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
   }
 }
 
-/**
- * Search text field variant
- */
+/// Search text field variant
 class SearchTextField extends StatelessWidget {
   final String? hint;
   final TextEditingController? controller;
@@ -249,9 +244,7 @@ class SearchTextField extends StatelessWidget {
   }
 }
 
-/**
- * Multiline text field for longer content
- */
+/// Multiline text field for longer content
 class MultilineTextField extends StatelessWidget {
   final String? label;
   final String? hint;

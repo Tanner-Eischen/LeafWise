@@ -52,9 +52,8 @@ class ApiException implements Exception {
 
 class NetworkException extends ApiException {
   const NetworkException({
-    String message = 'Network error occurred',
+    super.message = 'Network error occurred',
   }) : super(
-          message: message,
           statusCode: 0,
           type: ApiExceptionType.network,
         );
@@ -62,9 +61,8 @@ class NetworkException extends ApiException {
 
 class TimeoutException extends ApiException {
   const TimeoutException({
-    String message = 'Request timeout',
+    super.message = 'Request timeout',
   }) : super(
-          message: message,
           statusCode: 408,
           type: ApiExceptionType.timeout,
         );
@@ -72,20 +70,17 @@ class TimeoutException extends ApiException {
 
 class ServerException extends ApiException {
   const ServerException({
-    String message = 'Server error occurred',
-    int statusCode = 500,
+    super.message = 'Server error occurred',
+    super.statusCode = 500,
   }) : super(
-          message: message,
-          statusCode: statusCode,
           type: ApiExceptionType.server,
         );
 }
 
 class UnauthorizedException extends ApiException {
   const UnauthorizedException({
-    String message = 'Authentication required',
+    super.message = 'Authentication required',
   }) : super(
-          message: message,
           statusCode: 401,
           type: ApiExceptionType.unauthorized,
         );
@@ -93,9 +88,8 @@ class UnauthorizedException extends ApiException {
 
 class ForbiddenException extends ApiException {
   const ForbiddenException({
-    String message = 'Access forbidden',
+    super.message = 'Access forbidden',
   }) : super(
-          message: message,
           statusCode: 403,
           type: ApiExceptionType.forbidden,
         );
@@ -103,9 +97,8 @@ class ForbiddenException extends ApiException {
 
 class NotFoundException extends ApiException {
   const NotFoundException({
-    String message = 'Resource not found',
+    super.message = 'Resource not found',
   }) : super(
-          message: message,
           statusCode: 404,
           type: ApiExceptionType.notFound,
         );
@@ -113,21 +106,18 @@ class NotFoundException extends ApiException {
 
 class ValidationException extends ApiException {
   const ValidationException({
-    String message = 'Validation failed',
-    Map<String, dynamic>? details,
+    super.message = 'Validation failed',
+    super.details,
   }) : super(
-          message: message,
           statusCode: 422,
           type: ApiExceptionType.validation,
-          details: details,
         );
 }
 
 class ConflictException extends ApiException {
   const ConflictException({
-    String message = 'Resource conflict',
+    super.message = 'Resource conflict',
   }) : super(
-          message: message,
           statusCode: 409,
           type: ApiExceptionType.conflict,
         );

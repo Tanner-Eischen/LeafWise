@@ -11,7 +11,7 @@ from app.services.analytics_service import AnalyticsService
 from app.services.ml_plant_health_service import MLPlantHealthService
 from app.services.ml_trending_topics_service import MLTrendingTopicsService
 from app.services.embedding_service import EmbeddingService
-from app.services.auth_service import get_current_user
+from app.services.auth_service import get_current_user_from_token as get_current_user
 from app.models.user import User
 
 router = APIRouter()

@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:plant_social/features/plant_community/models/plant_community_models.dart';
 import 'package:plant_social/features/plant_community/providers/plant_community_provider.dart';
 import 'package:plant_social/features/plant_community/presentation/widgets/question_card.dart';
-import 'package:plant_social/core/theme/app_theme.dart';
 import 'package:plant_social/core/widgets/custom_search_bar.dart';
 
 class PlantQuestionsScreen extends ConsumerStatefulWidget {
@@ -103,8 +102,8 @@ class _PlantQuestionsScreenState extends ConsumerState<PlantQuestionsScreen>
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _navigateToAskQuestion,
-        child: const Icon(Icons.add),
         tooltip: 'Ask a Question',
+        child: const Icon(Icons.add),
       ),
     );
   }

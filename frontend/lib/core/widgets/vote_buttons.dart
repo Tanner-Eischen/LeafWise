@@ -131,7 +131,7 @@ class VoteButtons extends StatelessWidget {
   _VoteDimensions _getDimensions() {
     switch (size) {
       case VoteButtonSize.small:
-        return _VoteDimensions(
+        return const _VoteDimensions(
           buttonSize: 28,
           iconSize: 16,
           fontSize: 12,
@@ -139,7 +139,7 @@ class VoteButtons extends StatelessWidget {
           borderRadius: 6,
         );
       case VoteButtonSize.medium:
-        return _VoteDimensions(
+        return const _VoteDimensions(
           buttonSize: 36,
           iconSize: 20,
           fontSize: 14,
@@ -147,7 +147,7 @@ class VoteButtons extends StatelessWidget {
           borderRadius: 8,
         );
       case VoteButtonSize.large:
-        return _VoteDimensions(
+        return const _VoteDimensions(
           buttonSize: 44,
           iconSize: 24,
           fontSize: 16,

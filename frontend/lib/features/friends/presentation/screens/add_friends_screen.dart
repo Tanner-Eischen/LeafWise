@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import '../../../../core/models/user.dart';
 
 /// Add friends screen for discovering and connecting with new users
 class AddFriendsScreen extends ConsumerStatefulWidget {

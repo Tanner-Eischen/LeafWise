@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:plant_social/features/plant_identification/models/plant_identification_models.dart';
-import 'package:plant_social/core/theme/app_theme.dart';
 
 class PlantIdentificationResult extends StatelessWidget {
   final PlantIdentification identification;

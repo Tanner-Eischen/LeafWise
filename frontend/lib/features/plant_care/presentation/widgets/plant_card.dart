@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:plant_social/features/plant_care/models/plant_care_models.dart';
-import 'package:plant_social/core/theme/app_theme.dart';
 
 class PlantCard extends StatelessWidget {
   final UserPlant plant;

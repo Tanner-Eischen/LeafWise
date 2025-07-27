@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'dart:math' as math;
 import 'dart:io';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:plant_social/features/camera/services/ar_data_service.dart';
 import 'package:plant_social/core/network/api_client.dart';
 
@@ -17,7 +18,7 @@ class PlantARFilters extends StatefulWidget {
   final Function(String reminderId)? onReminderCompleted; // Callback when reminder completed
 
   const PlantARFilters({
-    Key? key,
+    super.key,
     required this.cameraController,
     required this.onFilterSelected,
     this.currentFilter,
@@ -26,7 +27,7 @@ class PlantARFilters extends StatefulWidget {
     this.userLocation,
     this.onPlantSaved,
     this.onReminderCompleted,
-  }) : super(key: key);
+  });
 
   @override
   State<PlantARFilters> createState() => _PlantARFiltersState();
@@ -103,7 +104,14 @@ class _PlantARFiltersState extends State<PlantARFilters>
     );
 
     // Initialize AR data service
-    _arDataService = ARDataService(ApiClient());
+    _arDataService = ARDataService(ApiClient(const FlutterSecureStorage(
+      aOptions: AndroidOptions(
+        encryptedSharedPreferences: true,
+      ),
+      iOptions: IOSOptions(
+        accessibility: KeychainAccessibility.first_unlock_this_device,
+      ),
+    )));
     
     // Load initial data
     _loadInitialData();
@@ -784,7 +792,7 @@ class _PlantARFiltersState extends State<PlantARFilters>
       case 'care_reminder':
         return _buildCareReminderOverlay();
       case 'growth_timelapse':
-        return _buildGrowthTimeline();
+        return _buildGrowthTimelineOverlay();
       case 'seasonal_transformation':
         return _buildSeasonalTransformation();
       default:
@@ -1071,7 +1079,7 @@ class _PlantARFiltersState extends State<PlantARFilters>
                 icon: _getIconData(metric['icon'] ?? 'info'),
                 status: metric['status'] ?? 'good',
               );
-            }).toList(),
+            }),
             
             // Health summary panel with real data
             Positioned(
@@ -1229,7 +1237,7 @@ class _PlantARFiltersState extends State<PlantARFilters>
                   ),
                 ],
               ),
-            )).toList(),
+            )),
           ],
         ],
       ),
@@ -1306,7 +1314,7 @@ class _PlantARFiltersState extends State<PlantARFilters>
                           ),
                         ],
                       ),
-                    )).toList(),
+                    )),
                     if (tips.isNotEmpty) ...[
                       const SizedBox(height: 8),
                       const Divider(color: Colors.white70),
@@ -1325,7 +1333,7 @@ class _PlantARFiltersState extends State<PlantARFilters>
                             ),
                           ],
                         ),
-                      )).toList(),
+                      )),
                     ],
                   ],
                 ),
@@ -1603,6 +1611,370 @@ class _PlantARFiltersState extends State<PlantARFilters>
       ),
     );
   }
+  
+  Widget _buildGrowthTimelineOverlay() {
+    if (_isLoadingGrowth) {
+      return const Center(
+        child: CircularProgressIndicator(color: Colors.green),
+      );
+    }
+
+    final growthData = _growthTimeline;
+    if (growthData == null) {
+      return const Center(
+        child: Text(
+          'No growth timeline data available',
+          style: TextStyle(color: Colors.white),
+        ),
+      );
+    }
+
+    final timelineEntries = List<Map<String, dynamic>>.from(growthData['timeline'] ?? []);
+    final growthMetrics = Map<String, dynamic>.from(growthData['metrics'] ?? {});
+    
+    return AnimatedBuilder(
+      animation: _growthAnimationController,
+      builder: (context, child) {
+        return Stack(
+          children: [
+            // Growth timeline visualization
+            Positioned(
+              left: 20,
+              right: 20,
+              bottom: 120,
+              height: 200,
+              child: _buildTimelineVisualization(timelineEntries),
+            ),
+            
+            // Growth metrics panel
+            Positioned(
+              top: 80,
+              left: 20,
+              right: 20,
+              child: _buildGrowthMetricsPanel(growthMetrics),
+            ),
+            
+            // Timeline controls
+            Positioned(
+              bottom: 60,
+              left: 0,
+              right: 0,
+              child: _buildTimelineControls(),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  
+  Widget _buildTimelineVisualization(List<Map<String, dynamic>> timelineEntries) {
+    if (timelineEntries.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.7),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: const Center(
+          child: Text(
+            'No timeline data available yet',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      );
+    }
+    
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.7),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.green.withOpacity(0.5), width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Growth Timeline',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Expanded(
+            child: Row(
+              children: [
+                // Timeline dates column
+                SizedBox(
+                  width: 60,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: timelineEntries.map((entry) {
+                      final date = entry['date'] as DateTime;
+                      return Text(
+                        '${date.month}/${date.day}',
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 10,
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+                
+                // Timeline visualization
+                Expanded(
+                  child: Stack(
+                    children: [
+                      // Growth line
+                      Positioned.fill(
+                        child: CustomPaint(
+                          painter: GrowthTimelinePainter(
+                            timelineEntries: timelineEntries,
+                            progress: _growthAnimationController.value,
+                          ),
+                        ),
+                      ),
+                      
+                      // Timeline points
+                      ...timelineEntries.asMap().entries.map((entry) {
+                        final index = entry.key;
+                        final item = entry.value;
+                        final heightPercent = index / (timelineEntries.length - 1);
+                        
+                        return Positioned(
+                          left: 0,
+                          right: 0,
+                          top: 150 * heightPercent,
+                          height: 20,
+                          child: Opacity(
+                            opacity: _growthAnimationController.value > (index / timelineEntries.length) ? 1.0 : 0.0,
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 10,
+                                  height: 10,
+                                  decoration: BoxDecoration(
+                                    color: Colors.green,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: Colors.white, width: 1),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    item['note'] ?? 'Growth recorded',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildGrowthMetricsPanel(Map<String, dynamic> metrics) {
+    final height = metrics['height'] ?? 0.0;
+    final width = metrics['width'] ?? 0.0;
+    final growthRate = metrics['growthRate'] ?? 0.0;
+    final healthScore = metrics['healthScore'] ?? 0.0;
+    
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.8),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.green, width: 1),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.trending_up, color: Colors.green, size: 20),
+              const SizedBox(width: 8),
+              const Text(
+                'Growth Analytics',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '${(healthScore * 100).round()}% Health',
+                  style: const TextStyle(
+                    color: Colors.green,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildGrowthMetricItem('Height', '$height cm', Icons.height),
+              _buildGrowthMetricItem('Width', '$width cm', Icons.width_normal),
+              _buildGrowthMetricItem('Growth', '${growthRate.toStringAsFixed(1)} cm/week', Icons.trending_up),
+            ],
+          ),
+          const SizedBox(height: 12),
+          if (metrics.containsKey('recommendations')) ...[
+            const Divider(color: Colors.white24),
+            const SizedBox(height: 8),
+            const Row(
+              children: [
+                Icon(Icons.tips_and_updates, color: Colors.amber, size: 16),
+                SizedBox(width: 8),
+                Text(
+                  'Growth Tips:',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              metrics['recommendations'] as String,
+              style: const TextStyle(color: Colors.white70, fontSize: 11),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildGrowthMetricItem(String label, String value, IconData icon) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, color: Colors.green, size: 16),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+          ),
+        ),
+        Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white70,
+            fontSize: 10,
+          ),
+        ),
+      ],
+    );
+  }
+  
+  Widget _buildTimelineControls() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ElevatedButton.icon(
+          onPressed: () {
+            // Reset animation
+            _growthAnimationController.reset();
+            _growthAnimationController.forward();
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.green,
+            foregroundColor: Colors.white,
+          ),
+          icon: const Icon(Icons.replay, size: 16),
+          label: const Text('Replay Growth'),
+        ),
+        const SizedBox(width: 16),
+        ElevatedButton.icon(
+          onPressed: () {
+            // Generate timelapse video
+            _generateTimelapseVideo();
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue,
+            foregroundColor: Colors.white,
+          ),
+          icon: const Icon(Icons.movie, size: 16),
+          label: const Text('Generate Video'),
+        ),
+      ],
+    );
+  }
+  
+  Future<void> _generateTimelapseVideo() async {
+    if (widget.selectedPlantId == null) return;
+    
+    setState(() {
+      _statusMessage = 'Generating timelapse video...';
+    });
+    
+    try {
+      await _arDataService.generateTimelapseVideo(widget.selectedPlantId!);
+      
+      setState(() {
+        _statusMessage = 'Video generated successfully!';
+      });
+      
+      // Show success feedback
+      _showSuccessFeedback('Timelapse video created! Check your gallery.');
+      
+      // Clear status message
+      Future.delayed(const Duration(seconds: 3), () {
+        if (mounted) {
+          setState(() {
+            _statusMessage = null;
+          });
+        }
+      });
+      
+    } catch (e) {
+      setState(() {
+        _statusMessage = 'Failed to generate video';
+      });
+      
+      // Clear error message
+      Future.delayed(const Duration(seconds: 3), () {
+        if (mounted) {
+          setState(() {
+            _statusMessage = null;
+          });
+        }
+      });
+    }
+  }
 
   Widget _buildFilterSelector() {
     final filters = [
@@ -1767,7 +2139,7 @@ class _PlantARFiltersState extends State<PlantARFilters>
         children: [
           Row(
             children: [
-              Icon(Icons.tune, color: Colors.white),
+              const Icon(Icons.tune, color: Colors.white),
               const SizedBox(width: 8),
               Text(
                 'AR Filters & Controls',
@@ -2136,7 +2508,7 @@ class ScanningOverlayPainter extends CustomPainter {
       ..strokeWidth = 3.0
       ..style = PaintingStyle.stroke;
     
-    final bracketSize = 30.0;
+    const bracketSize = 30.0;
     final margin = size.width * 0.15;
     
     // Top-left bracket
@@ -2226,5 +2598,121 @@ class ScanningOverlayPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant ScanningOverlayPainter oldDelegate) {
     return progress != oldDelegate.progress || plantType != oldDelegate.plantType;
+  }
+}
+
+/// Custom painter for growth timeline visualization
+class GrowthTimelinePainter extends CustomPainter {
+  final List<Map<String, dynamic>> timelineEntries;
+  final double progress;
+  
+  GrowthTimelinePainter({
+    required this.timelineEntries,
+    required this.progress,
+  });
+  
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (timelineEntries.isEmpty) return;
+    
+    // Setup paints
+    final linePaint = Paint()
+      ..color = Colors.green
+      ..strokeWidth = 2.0
+      ..style = PaintingStyle.stroke;
+    
+    final fillPaint = Paint()
+      ..color = Colors.green.withOpacity(0.2)
+      ..style = PaintingStyle.fill;
+    
+    // Calculate points for the growth line
+    final points = <Offset>[];
+    final heights = timelineEntries.map((e) => e['height'] as double? ?? 0.0).toList();
+    
+    // Find min and max heights for scaling
+    final maxHeight = heights.reduce((a, b) => a > b ? a : b);
+    final minHeight = heights.reduce((a, b) => a < b ? a : b);
+    final heightRange = maxHeight - minHeight;
+    
+    // Calculate points based on timeline entries
+    for (int i = 0; i < timelineEntries.length; i++) {
+      final xPos = size.width * (i / (timelineEntries.length - 1));
+      
+      // Normalize height to fit in the available space
+      final normalizedHeight = heightRange > 0 
+          ? (heights[i] - minHeight) / heightRange 
+          : 0.5;
+      
+      // Invert Y coordinate (0 is top in Flutter)
+      final yPos = size.height - (normalizedHeight * size.height);
+      
+      points.add(Offset(xPos, yPos));
+    }
+    
+    // Draw the growth line with animation
+    final path = Path();
+    
+    if (points.isNotEmpty) {
+      path.moveTo(points.first.dx, points.first.dy);
+      
+      // Calculate how many points to include based on animation progress
+      final pointsToInclude = (points.length * progress).ceil();
+      final visiblePoints = points.take(pointsToInclude).toList();
+      
+      for (int i = 1; i < visiblePoints.length; i++) {
+        // Use quadratic bezier curves for smoother lines
+        if (i < visiblePoints.length - 1) {
+          final controlPoint = Offset(
+            (visiblePoints[i].dx + visiblePoints[i + 1].dx) / 2,
+            visiblePoints[i].dy,
+          );
+          path.quadraticBezierTo(
+            visiblePoints[i].dx, visiblePoints[i].dy,
+            controlPoint.dx, controlPoint.dy,
+          );
+        } else {
+          path.lineTo(visiblePoints[i].dx, visiblePoints[i].dy);
+        }
+      }
+      
+      // Complete the path for filling
+      if (visiblePoints.isNotEmpty) {
+        path.lineTo(visiblePoints.last.dx, size.height);
+        path.lineTo(points.first.dx, size.height);
+        path.close();
+        
+        // Draw filled area first
+        canvas.drawPath(path, fillPaint);
+        
+        // Draw the line on top
+        canvas.drawPath(
+          Path()..moveTo(points.first.dx, points.first.dy)
+            ..addPath(path, Offset.zero),
+          linePaint,
+        );
+      }
+    }
+    
+    // Draw data points
+    final pointPaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill;
+    
+    final pointStrokePaint = Paint()
+      ..color = Colors.green
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+    
+    for (int i = 0; i < points.length * progress; i++) {
+      if (i >= points.length) break;
+      canvas.drawCircle(points[i], 4, pointPaint);
+      canvas.drawCircle(points[i], 4, pointStrokePaint);
+    }
+  }
+  
+  @override
+  bool shouldRepaint(covariant GrowthTimelinePainter oldDelegate) {
+    return progress != oldDelegate.progress || 
+           timelineEntries.length != oldDelegate.timelineEntries.length;
   }
 } 

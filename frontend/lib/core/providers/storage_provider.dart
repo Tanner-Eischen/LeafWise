@@ -1,29 +1,22 @@
-/**
- * Core storage provider for dependency injection
- * Provides centralized access to storage service throughout the app
- */
+/// Core storage provider for dependency injection
+/// Provides centralized access to storage service throughout the app
+library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/storage_service.dart';
 
-/**
- * Provider for storage service - re-exported for convenience
- */
+/// Provider for storage service - re-exported for convenience
 final storageServiceProvider = Provider<StorageService>((ref) {
   return StorageService();
 });
 
-/**
- * Provider for user preferences state
- */
+/// Provider for user preferences state
 final userPreferencesProvider = StateNotifierProvider<UserPreferencesNotifier, UserPreferences>((ref) {
   final storageService = ref.watch(storageServiceProvider);
   return UserPreferencesNotifier(storageService);
 });
 
-/**
- * User preferences state model
- */
+/// User preferences state model
 class UserPreferences {
   final bool isDarkMode;
   final String language;
@@ -52,9 +45,7 @@ class UserPreferences {
   }
 }
 
-/**
- * User preferences state notifier
- */
+/// User preferences state notifier
 class UserPreferencesNotifier extends StateNotifier<UserPreferences> {
   final StorageService _storageService;
 
@@ -62,9 +53,7 @@ class UserPreferencesNotifier extends StateNotifier<UserPreferences> {
     _loadPreferences();
   }
 
-  /**
-   * Load preferences from storage
-   */
+  /// Load preferences from storage
   Future<void> _loadPreferences() async {
     final isDarkMode = await _storageService.getBool('isDarkMode');
     final language = await _storageService.getString('language') ?? 'en';
@@ -79,33 +68,25 @@ class UserPreferencesNotifier extends StateNotifier<UserPreferences> {
     );
   }
 
-  /**
-   * Update dark mode preference
-   */
+  /// Update dark mode preference
   Future<void> setDarkMode(bool isDarkMode) async {
     await _storageService.setBool('isDarkMode', isDarkMode);
     state = state.copyWith(isDarkMode: isDarkMode);
   }
 
-  /**
-   * Update language preference
-   */
+  /// Update language preference
   Future<void> setLanguage(String language) async {
     await _storageService.setString('language', language);
     state = state.copyWith(language: language);
   }
 
-  /**
-   * Update notifications preference
-   */
+  /// Update notifications preference
   Future<void> setNotificationsEnabled(bool enabled) async {
     await _storageService.setBool('notificationsEnabled', enabled);
     state = state.copyWith(notificationsEnabled: enabled);
   }
 
-  /**
-   * Update location preference
-   */
+  /// Update location preference
   Future<void> setLocationEnabled(bool enabled) async {
     await _storageService.setBool('locationEnabled', enabled);
     state = state.copyWith(locationEnabled: enabled);

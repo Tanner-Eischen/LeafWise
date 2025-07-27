@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:plant_social/features/plant_community/models/plant_community_models.dart';
-import 'package:plant_social/core/theme/app_theme.dart';
 import 'package:plant_social/core/utils/date_utils.dart' as AppDateUtils;
 import 'package:plant_social/core/widgets/user_avatar.dart';
 import 'package:plant_social/core/widgets/vote_buttons.dart';
@@ -180,7 +179,7 @@ class QuestionCard extends StatelessWidget {
   Widget _buildImagePreview() {
     if (question.imageUrl == null) return const SizedBox.shrink();
     
-    return Container(
+    return SizedBox(
       height: 80,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8),

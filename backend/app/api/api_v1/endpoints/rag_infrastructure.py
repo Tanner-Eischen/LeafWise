@@ -5,6 +5,7 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Query, Response, status
+from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel, Field, ConfigDict
 
@@ -135,8 +136,9 @@ vector_service = VectorDatabaseService(embedding_service)
 rag_pipeline = RAGContentPipeline(embedding_service, vector_service)
 
 
-@router.post("/initialize-knowledge-base", response_model=IndexingResultResponse)
-async def initialize_knowledge_base(
+# Temporarily commented out due to FastAPI response model issue
+# @router.post("/initialize-knowledge-base", response_model=IndexingResultResponse)
+async def initialize_knowledge_base_disabled(
     request: KnowledgeBaseInitRequest,
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),

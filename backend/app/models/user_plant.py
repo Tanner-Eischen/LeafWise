@@ -42,5 +42,10 @@ class UserPlant(Base):
     photos = relationship("PlantPhoto", back_populates="plant")
     milestones = relationship("PlantMilestone", back_populates="plant")
     
+    # Seasonal AI and Time-lapse relationships
+    seasonal_predictions = relationship("SeasonalPrediction", back_populates="plant", cascade="all, delete-orphan")
+    timelapse_sessions = relationship("TimelapseSession", back_populates="plant", cascade="all, delete-orphan")
+    growth_analytics = relationship("GrowthAnalytics", back_populates="plant", cascade="all, delete-orphan")
+    
     def __repr__(self) -> str:
         return f"<UserPlant(id={self.id}, nickname='{self.nickname}', user_id={self.user_id})>"

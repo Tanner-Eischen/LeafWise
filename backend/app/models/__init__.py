@@ -24,6 +24,17 @@ from app.models.rag_models import (
     PlantKnowledgeBase,
     SemanticSearchCache
 )
+from app.models.seasonal_ai import (
+    SeasonalPrediction,
+    EnvironmentalDataCache,
+    SeasonalTransition
+)
+from app.models.timelapse import (
+    TimelapseSession,
+    GrowthPhoto,
+    GrowthMilestone,
+    GrowthAnalytics
+)
 
 __all__ = [
     "User",
@@ -54,5 +65,12 @@ __all__ = [
     "UserPreferenceEmbedding",
     "RAGInteraction",
     "PlantKnowledgeBase",
-    "SemanticSearchCache"
+    "SemanticSearchCache",
+    "SeasonalPrediction",
+    "EnvironmentalDataCache",
+    "SeasonalTransition",
+    "TimelapseSession",
+    "GrowthPhoto",
+    "GrowthMilestone",
+    "GrowthAnalytics"
 ]

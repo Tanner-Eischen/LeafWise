@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/models/user.dart';
 import '../../../auth/providers/auth_provider.dart';
 
 /// Profile screen displaying user information and settings
@@ -13,7 +12,7 @@ class ProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final authState = ref.watch(authProvider);
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
@@ -75,7 +74,12 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildBody(BuildContext context, ThemeData theme, AuthState authState, WidgetRef ref) {
+  Widget _buildBody(
+    BuildContext context,
+    ThemeData theme,
+    AuthState authState,
+    WidgetRef ref,
+  ) {
     if (authState.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -101,13 +105,18 @@ class ProfileScreen extends ConsumerWidget {
     return _buildProfileContent(context, theme, authState);
   }
 
-  Widget _buildProfileContent(BuildContext context, ThemeData theme, AuthState state) {
+  Widget _buildProfileContent(
+    BuildContext context,
+    ThemeData theme,
+    AuthState state,
+  ) {
     // Mock user data for demonstration
     final mockUser = MockUser(
       id: state.user?.id ?? 'user1',
       name: state.user?.displayName ?? 'Plant Lover',
       email: state.user?.email ?? 'plantlover@example.com',
-      bio: 'Passionate about plants and sustainable living 🌱\nSharing my green journey with fellow plant enthusiasts!',
+      bio:
+          'Passionate about plants and sustainable living 🌱\nSharing my green journey with fellow plant enthusiasts!',
       location: 'San Francisco, CA',
       joinDate: DateTime(2023, 1, 15),
       followersCount: 1247,
@@ -123,19 +132,19 @@ class ProfileScreen extends ConsumerWidget {
           // Profile header
           _buildProfileHeader(context, theme, mockUser),
           const SizedBox(height: 24),
-          
+
           // Stats section
           _buildStatsSection(theme, mockUser),
           const SizedBox(height: 24),
-          
+
           // Bio section
           _buildBioSection(theme, mockUser),
           const SizedBox(height: 24),
-          
+
           // Quick actions
           _buildQuickActions(context, theme),
           const SizedBox(height: 24),
-          
+
           // Recent activity
           _buildRecentActivity(theme),
         ],
@@ -143,7 +152,11 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildProfileHeader(BuildContext context, ThemeData theme, MockUser user) {
+  Widget _buildProfileHeader(
+    BuildContext context,
+    ThemeData theme,
+    MockUser user,
+  ) {
     return Column(
       children: [
         // Profile picture
@@ -192,7 +205,7 @@ class ProfileScreen extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: 16),
-        
+
         // Name and verification
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -204,15 +217,11 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(width: 8),
-            Icon(
-              Icons.verified,
-              color: theme.colorScheme.primary,
-              size: 20,
-            ),
+            Icon(Icons.verified, color: theme.colorScheme.primary, size: 20),
           ],
         ),
         const SizedBox(height: 4),
-        
+
         // Email
         Text(
           user.email,
@@ -221,7 +230,7 @@ class ProfileScreen extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 8),
-        
+
         // Location and join date
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -268,9 +277,17 @@ class ProfileScreen extends ConsumerWidget {
             _buildStatDivider(theme),
             _buildStatItem(theme, 'Plants', user.plantsCount.toString()),
             _buildStatDivider(theme),
-            _buildStatItem(theme, 'Followers', _formatCount(user.followersCount)),
+            _buildStatItem(
+              theme,
+              'Followers',
+              _formatCount(user.followersCount),
+            ),
             _buildStatDivider(theme),
-            _buildStatItem(theme, 'Following', _formatCount(user.followingCount)),
+            _buildStatItem(
+              theme,
+              'Following',
+              _formatCount(user.followingCount),
+            ),
           ],
         ),
       ),
@@ -315,10 +332,7 @@ class ProfileScreen extends ConsumerWidget {
           children: [
             Row(
               children: [
-                Icon(
-                  Icons.info_outline,
-                  color: theme.colorScheme.primary,
-                ),
+                Icon(Icons.info_outline, color: theme.colorScheme.primary),
                 const SizedBox(width: 8),
                 Text(
                   'About',
@@ -329,10 +343,7 @@ class ProfileScreen extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 12),
-            Text(
-              user.bio,
-              style: theme.textTheme.bodyMedium,
-            ),
+            Text(user.bio, style: theme.textTheme.bodyMedium),
           ],
         ),
       ),
@@ -409,11 +420,7 @@ class ProfileScreen extends ConsumerWidget {
               color: theme.colorScheme.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(
-              icon,
-              color: theme.colorScheme.primary,
-              size: 24,
-            ),
+            child: Icon(icon, color: theme.colorScheme.primary, size: 24),
           ),
           const SizedBox(height: 8),
           Text(
@@ -477,10 +484,7 @@ class ProfileScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    activity.$1,
-                    style: theme.textTheme.bodyMedium,
-                  ),
+                  Text(activity.$1, style: theme.textTheme.bodyMedium),
                   Text(
                     activity.$2,
                     style: theme.textTheme.bodySmall?.copyWith(
@@ -516,11 +520,8 @@ class ProfileScreen extends ConsumerWidget {
   void _showComingSoon(BuildContext context, String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-                          content: Text('$feature functionality activated!'),
-        action: SnackBarAction(
-          label: 'OK',
-          onPressed: () {},
-        ),
+        content: Text('$feature functionality activated!'),
+        action: SnackBarAction(label: 'OK', onPressed: () {}),
       ),
     );
   }
@@ -544,9 +545,12 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildProfileInsightsSheet(BuildContext context, ScrollController scrollController) {
+  Widget _buildProfileInsightsSheet(
+    BuildContext context,
+    ScrollController scrollController,
+  ) {
     final theme = Theme.of(context);
-    
+
     // Mock analytics data - would come from backend API calls
     final mockAnalyticsData = {
       'profile_health_score': 0.87,
@@ -564,19 +568,24 @@ class ProfileScreen extends ConsumerWidget {
         'predictions': {
           'next_week_engagement': 0.86,
           'content_success_rate': 0.82,
-        }
+        },
       },
       'rag_insights': {
         'total_queries': 147,
         'success_rate': 96,
         'avg_response_time': 234,
-        'recent_topics': ['Plant Care', 'Disease Treatment', 'Fertilizers', 'Watering'],
+        'recent_topics': [
+          'Plant Care',
+          'Disease Treatment',
+          'Fertilizers',
+          'Watering',
+        ],
         'response_quality': 0.93,
         'knowledge_coverage': {
           'Plant Care': 92.0,
           'Disease Treatment': 78.0,
           'Nutrition': 85.0,
-        }
+        },
       },
       'community_data': {
         'avg_similarity_score': 0.73,
@@ -587,7 +596,7 @@ class ProfileScreen extends ConsumerWidget {
           {'interest': 'Plant Photography', 'percentage': 54},
         ],
         'influence_score': 2.8,
-      }
+      },
     };
 
     return Container(
@@ -607,7 +616,7 @@ class ProfileScreen extends ConsumerWidget {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          
+
           // Header
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -629,9 +638,9 @@ class ProfileScreen extends ConsumerWidget {
               ],
             ),
           ),
-          
+
           const Divider(),
-          
+
           // Content
           Expanded(
             child: SingleChildScrollView(
@@ -643,23 +652,32 @@ class ProfileScreen extends ConsumerWidget {
                   // Profile Health Overview
                   _buildProfileHealthOverview(theme, mockAnalyticsData),
                   const SizedBox(height: 20),
-                  
+
                   // ML Health Analytics
-                  _buildMLHealthAnalytics(theme, mockAnalyticsData['ml_health_data'] as Map<String, dynamic>),
+                  _buildMLHealthAnalytics(
+                    theme,
+                    mockAnalyticsData['ml_health_data'] as Map<String, dynamic>,
+                  ),
                   const SizedBox(height: 20),
-                  
+
                   // RAG Knowledge Insights
-                  _buildRAGKnowledgeInsights(theme, mockAnalyticsData['rag_insights'] as Map<String, dynamic>),
+                  _buildRAGKnowledgeInsights(
+                    theme,
+                    mockAnalyticsData['rag_insights'] as Map<String, dynamic>,
+                  ),
                   const SizedBox(height: 20),
-                  
+
                   // Community Analytics
-                  _buildCommunityAnalytics(theme, mockAnalyticsData['community_data'] as Map<String, dynamic>),
+                  _buildCommunityAnalytics(
+                    theme,
+                    mockAnalyticsData['community_data'] as Map<String, dynamic>,
+                  ),
                   const SizedBox(height: 20),
-                  
+
                   // Behavior Patterns
                   _buildBehaviorPatterns(theme),
                   const SizedBox(height: 20),
-                  
+
                   // Recommendations
                   _buildRecommendations(theme),
                 ],
@@ -671,10 +689,13 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildProfileHealthOverview(ThemeData theme, Map<String, dynamic> data) {
+  Widget _buildProfileHealthOverview(
+    ThemeData theme,
+    Map<String, dynamic> data,
+  ) {
     final healthScore = data['profile_health_score'] ?? 0.87;
     final engagementScore = data['engagement_score'] ?? 0.82;
-    
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -694,7 +715,7 @@ class ProfileScreen extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 16),
-            
+
             Row(
               children: [
                 Expanded(
@@ -707,10 +728,7 @@ class ProfileScreen extends ConsumerWidget {
                           color: Colors.green,
                         ),
                       ),
-                      Text(
-                        'Profile Health',
-                        style: theme.textTheme.bodySmall,
-                      ),
+                      Text('Profile Health', style: theme.textTheme.bodySmall),
                     ],
                   ),
                 ),
@@ -725,10 +743,7 @@ class ProfileScreen extends ConsumerWidget {
                           color: theme.primaryColor,
                         ),
                       ),
-                      Text(
-                        'Engagement',
-                        style: theme.textTheme.bodySmall,
-                      ),
+                      Text('Engagement', style: theme.textTheme.bodySmall),
                     ],
                   ),
                 ),
@@ -760,14 +775,18 @@ class ProfileScreen extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 16),
-            
+
             Text(
               'Behavioral Factors',
-              style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
             ),
             const SizedBox(height: 8),
-            
-            ...(data['feature_scores'] as Map<String, dynamic>).entries.map((entry) {
+
+            ...(data['feature_scores'] as Map<String, dynamic>).entries.map((
+              entry,
+            ) {
               final score = entry.value as double;
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4),
@@ -786,26 +805,35 @@ class ProfileScreen extends ConsumerWidget {
                         value: score,
                         backgroundColor: Colors.grey[200],
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          score >= 0.8 ? Colors.green : score >= 0.6 ? Colors.orange : Colors.red,
+                          score >= 0.8
+                              ? Colors.green
+                              : score >= 0.6
+                              ? Colors.orange
+                              : Colors.red,
                         ),
                       ),
                     ),
                     const SizedBox(width: 8),
                     Text(
                       '${(score * 100).toInt()}%',
-                      style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w500),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ],
                 ),
               );
-            }).toList(),
+            }),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildRAGKnowledgeInsights(ThemeData theme, Map<String, dynamic> data) {
+  Widget _buildRAGKnowledgeInsights(
+    ThemeData theme,
+    Map<String, dynamic> data,
+  ) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -825,30 +853,57 @@ class ProfileScreen extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 16),
-            
+
             Row(
               children: [
-                Expanded(child: _buildInsightMetric(theme, 'Queries', '${data['total_queries']}')),
-                Expanded(child: _buildInsightMetric(theme, 'Success Rate', '${data['success_rate']}%')),
-                Expanded(child: _buildInsightMetric(theme, 'Quality', '${(data['response_quality'] * 100).toInt()}%')),
+                Expanded(
+                  child: _buildInsightMetric(
+                    theme,
+                    'Queries',
+                    '${data['total_queries']}',
+                  ),
+                ),
+                Expanded(
+                  child: _buildInsightMetric(
+                    theme,
+                    'Success Rate',
+                    '${data['success_rate']}%',
+                  ),
+                ),
+                Expanded(
+                  child: _buildInsightMetric(
+                    theme,
+                    'Quality',
+                    '${(data['response_quality'] * 100).toInt()}%',
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 12),
-            
+
             Text(
               'Recent Query Topics',
-              style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
             ),
             const SizedBox(height: 8),
-            
+
             Wrap(
               spacing: 8,
               runSpacing: 4,
-              children: (data['recent_topics'] as List<dynamic>).map<Widget>((topic) {
+              children: (data['recent_topics'] as List<dynamic>).map<Widget>((
+                topic,
+              ) {
                 return Chip(
-                  label: Text(topic.toString(), style: theme.textTheme.bodySmall),
+                  label: Text(
+                    topic.toString(),
+                    style: theme.textTheme.bodySmall,
+                  ),
                   backgroundColor: theme.primaryColor.withValues(alpha: 0.1),
-                  side: BorderSide(color: theme.primaryColor.withValues(alpha: 0.3)),
+                  side: BorderSide(
+                    color: theme.primaryColor.withValues(alpha: 0.3),
+                  ),
                 );
               }).toList(),
             ),
@@ -878,7 +933,7 @@ class ProfileScreen extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 16),
-            
+
             Row(
               children: [
                 Expanded(
@@ -887,7 +942,9 @@ class ProfileScreen extends ConsumerWidget {
                     children: [
                       Text(
                         'Community Match Score',
-                        style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: Colors.grey[600],
+                        ),
                       ),
                       Text(
                         '${(data['avg_similarity_score'] * 100).toInt()}%',
@@ -902,19 +959,26 @@ class ProfileScreen extends ConsumerWidget {
                 Column(
                   children: [
                     Text('Similar Users', style: theme.textTheme.bodySmall),
-                    Text('${data['total_matches']}', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                    Text(
+                      '${data['total_matches']}',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ],
                 ),
               ],
             ),
             const SizedBox(height: 12),
-            
+
             Text(
               'Top Shared Interests',
-              style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
             ),
             const SizedBox(height: 8),
-            
+
             ...(data['top_interests'] as List<dynamic>).map<Widget>((interest) {
               final interestData = interest as Map<String, dynamic>;
               return Chip(
@@ -923,9 +987,11 @@ class ProfileScreen extends ConsumerWidget {
                   style: theme.textTheme.bodySmall,
                 ),
                 backgroundColor: theme.primaryColor.withValues(alpha: 0.1),
-                side: BorderSide(color: theme.primaryColor.withValues(alpha: 0.3)),
+                side: BorderSide(
+                  color: theme.primaryColor.withValues(alpha: 0.3),
+                ),
               );
-            }).toList(),
+            }),
           ],
         ),
       ),
@@ -952,13 +1018,15 @@ class ProfileScreen extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 16),
-            
+
             Text(
               'Peak Activity Times',
-              style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
             ),
             const SizedBox(height: 8),
-            
+
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -1024,17 +1092,33 @@ class ProfileScreen extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 16),
-            
-            _buildRecommendationItem(theme, 'Increase morning engagement', 'Your activity is highest in evenings. Try morning interactions to boost consistency.'),
-            _buildRecommendationItem(theme, 'Explore fertilizer topics', 'Based on your interests, you might enjoy learning about organic fertilizers.'),
-            _buildRecommendationItem(theme, 'Connect with similar users', 'We found 8 users with 85%+ similar interests. Consider following them!'),
+
+            _buildRecommendationItem(
+              theme,
+              'Increase morning engagement',
+              'Your activity is highest in evenings. Try morning interactions to boost consistency.',
+            ),
+            _buildRecommendationItem(
+              theme,
+              'Explore fertilizer topics',
+              'Based on your interests, you might enjoy learning about organic fertilizers.',
+            ),
+            _buildRecommendationItem(
+              theme,
+              'Connect with similar users',
+              'We found 8 users with 85%+ similar interests. Consider following them!',
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildRecommendationItem(ThemeData theme, String title, String description) {
+  Widget _buildRecommendationItem(
+    ThemeData theme,
+    String title,
+    String description,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -1103,9 +1187,10 @@ class ProfileScreen extends ConsumerWidget {
   }
 
   String _formatFeatureName(String key) {
-    return key.split('_').map((word) => 
-      word[0].toUpperCase() + word.substring(1)
-    ).join(' ');
+    return key
+        .split('_')
+        .map((word) => word[0].toUpperCase() + word.substring(1))
+        .join(' ');
   }
 
   void _showShareProfile(BuildContext context) {
@@ -1127,13 +1212,10 @@ class ProfileScreen extends ConsumerWidget {
             const SizedBox(height: 16),
             const Text(
               'Share Profile',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
-                  _buildSharingInterface(context, theme),
+            _buildSharingInterface(context, Theme.of(context)),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => Navigator.pop(context),
@@ -1171,8 +1253,18 @@ class ProfileScreen extends ConsumerWidget {
 
   String _formatJoinDate(DateTime date) {
     final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return '${months[date.month - 1]} ${date.year}';
   }
@@ -1248,7 +1340,13 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildShareOption(BuildContext context, String title, IconData icon, String subtitle, VoidCallback onTap) {
+  Widget _buildShareOption(
+    BuildContext context,
+    String title,
+    IconData icon,
+    String subtitle,
+    VoidCallback onTap,
+  ) {
     final theme = Theme.of(context);
     return GestureDetector(
       onTap: onTap,
@@ -1327,12 +1425,9 @@ class ProfileScreen extends ConsumerWidget {
 
   void _shareViaLink(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Profile link copied to clipboard!'),
-        action: SnackBarAction(
-          label: 'Share',
-          onPressed: null,
-        ),
+      SnackBar(
+        content: const Text('Profile link copied to clipboard!'),
+        action: SnackBarAction(label: 'Share', onPressed: () {}),
       ),
     );
   }
@@ -1356,10 +1451,26 @@ class ProfileScreen extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildSocialShareButton('Instagram', Icons.camera_alt, Colors.purple),
-                _buildSocialShareButton('Facebook', Icons.facebook, Colors.blue),
-                _buildSocialShareButton('Twitter', Icons.alternate_email, Colors.lightBlue),
-                _buildSocialShareButton('TikTok', Icons.music_note, Colors.black),
+                _buildSocialShareButton(
+                  'Instagram',
+                  Icons.camera_alt,
+                  Colors.purple,
+                ),
+                _buildSocialShareButton(
+                  'Facebook',
+                  Icons.facebook,
+                  Colors.blue,
+                ),
+                _buildSocialShareButton(
+                  'Twitter',
+                  Icons.alternate_email,
+                  Colors.lightBlue,
+                ),
+                _buildSocialShareButton(
+                  'TikTok',
+                  Icons.music_note,
+                  Colors.black,
+                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -1390,11 +1501,18 @@ class ProfileScreen extends ConsumerWidget {
 
   void _sharePlantCard(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Creating shareable plant collection card...'),
+      SnackBar(
+        content: const Text('Creating shareable plant collection card...'),
         action: SnackBarAction(
           label: 'Preview',
-          onPressed: null,
+          onPressed: () {
+            // Handle preview action
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Preview functionality coming soon!'),
+              ),
+            );
+          },
         ),
       ),
     );

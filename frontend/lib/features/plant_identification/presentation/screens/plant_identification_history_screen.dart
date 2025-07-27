@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:plant_social/features/plant_identification/models/plant_identification_models.dart';
 import 'package:plant_social/features/plant_identification/providers/plant_identification_provider.dart';
-import 'package:plant_social/core/theme/app_theme.dart';
 import 'package:plant_social/core/widgets/loading_widget.dart';
 import 'package:plant_social/core/widgets/error_widget.dart';
 
@@ -155,7 +154,7 @@ class _PlantIdentificationHistoryScreenState
                   color: Colors.grey[200],
                   child: identification.imageUrl != null
                       ? Image.network(
-                          identification.imageUrl!,
+                          identification.imageUrl,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return Icon(
@@ -348,27 +347,26 @@ class _PlantIdentificationHistoryScreenState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Image
-                    if (identification.imageUrl != null)
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: AspectRatio(
-                          aspectRatio: 16 / 9,
-                          child: Image.network(
-                            identification.imageUrl!,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                color: Colors.grey[200],
-                                child: Icon(
-                                  Icons.eco,
-                                  size: 60,
-                                  color: Colors.grey[400],
-                                ),
-                              );
-                            },
-                          ),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: AspectRatio(
+                        aspectRatio: 16 / 9,
+                        child: Image.network(
+                          identification.imageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              color: Colors.grey[200],
+                              child: Icon(
+                                Icons.eco,
+                                size: 60,
+                                color: Colors.grey[400],
+                              ),
+                            );
+                          },
                         ),
                       ),
+                    ),
                     const SizedBox(height: 20),
 
                     // Confidence
@@ -386,31 +384,31 @@ class _PlantIdentificationHistoryScreenState
                     ),
 
                     // Care info
-                    if (identification.careInfo != null) ...[
-                      const SizedBox(height: 16),
-                      Text(
-                        'Care Information',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                    ...[
+                    const SizedBox(height: 16),
+                    Text(
+                      'Care Information',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
                       ),
-                      const SizedBox(height: 12),
-                      _buildDetailSection(
-                        'Light',
-                        identification.careInfo!.lightRequirement,
-                        Icons.wb_sunny,
-                      ),
-                      _buildDetailSection(
-                        'Water',
-                        identification.careInfo!.waterFrequency,
-                        Icons.water_drop,
-                      ),
-                      _buildDetailSection(
-                        'Care Level',
-                        identification.careInfo!.careLevel,
-                        Icons.trending_up,
-                      ),
-                    ],
+                    ),
+                    const SizedBox(height: 12),
+                    _buildDetailSection(
+                      'Light',
+                      identification.careInfo.lightRequirement,
+                      Icons.wb_sunny,
+                    ),
+                    _buildDetailSection(
+                      'Water',
+                      identification.careInfo.waterFrequency,
+                      Icons.water_drop,
+                    ),
+                    _buildDetailSection(
+                      'Care Level',
+                      identification.careInfo.careLevel,
+                      Icons.trending_up,
+                    ),
+                  ],
 
                     const SizedBox(height: 100),
                   ],

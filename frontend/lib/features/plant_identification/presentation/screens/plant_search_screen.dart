@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:plant_social/features/plant_identification/models/plant_identification_models.dart';
 import 'package:plant_social/features/plant_identification/providers/plant_identification_provider.dart';
 import 'package:plant_social/features/plant_identification/presentation/screens/plant_species_detail_screen.dart';
-import 'package:plant_social/core/theme/app_theme.dart';
 import 'package:plant_social/core/widgets/loading_widget.dart';
 import 'package:plant_social/core/widgets/error_widget.dart';
 
@@ -344,7 +343,7 @@ class _PlantSearchScreenState extends ConsumerState<PlantSearchScreen> {
                   color: Colors.grey[200],
                   child: species.imageUrl != null
                       ? Image.network(
-                          species.imageUrl!,
+                          species.imageUrl,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return Icon(

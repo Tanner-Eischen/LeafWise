@@ -1,13 +1,10 @@
-/**
- * Reusable loading widget for consistent loading states across the app
- * Provides customizable loading indicators with optional text
- */
+/// Reusable loading widget for consistent loading states across the app
+/// Provides customizable loading indicators with optional text
+library;
 
 import 'package:flutter/material.dart';
 
-/**
- * Standard loading widget with circular progress indicator
- */
+/// Standard loading widget with circular progress indicator
 class LoadingWidget extends StatelessWidget {
   final String? message;
   final double? size;
@@ -54,9 +51,7 @@ class LoadingWidget extends StatelessWidget {
   }
 }
 
-/**
- * Small inline loading widget for buttons or small spaces
- */
+/// Small inline loading widget for buttons or small spaces
 class SmallLoadingWidget extends StatelessWidget {
   final Color? color;
   final double size;
@@ -80,9 +75,7 @@ class SmallLoadingWidget extends StatelessWidget {
   }
 }
 
-/**
- * Shimmer loading effect for content placeholders
- */
+/// Shimmer loading effect for content placeholders
 class ShimmerLoading extends StatefulWidget {
   final Widget child;
   final bool isLoading;

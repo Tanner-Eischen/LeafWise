@@ -167,7 +167,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
                   builder: (context, child) {
                     return LinearProgressIndicator(
                       value: _progressController.value,
-                      backgroundColor: Colors.white.withOpacity(0.3),
+                      backgroundColor: const Color.fromRGBO(255, 255, 255, 0.3),
                       valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
                     );
                   },
@@ -253,7 +253,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.5),
+              color: const Color.fromRGBO(0, 0, 0, 0.5),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
@@ -283,7 +283,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
               child: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.5),
+                  color: const Color.fromRGBO(0, 0, 0, 0.5),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
@@ -317,7 +317,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
               child: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.5),
+                  color: const Color.fromRGBO(0, 0, 0, 0.5),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Row(
@@ -347,7 +347,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.5),
+                color: const Color.fromRGBO(0, 0, 0, 0.5),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(

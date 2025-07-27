@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:plant_social/features/plant_community/presentation/screens/plant_questions_screen.dart';
 import 'package:plant_social/features/plant_community/presentation/screens/plant_trades_screen.dart';
-import 'package:plant_social/core/theme/app_theme.dart';
 
 class PlantCommunityScreen extends ConsumerStatefulWidget {
   const PlantCommunityScreen({super.key});
@@ -88,11 +87,11 @@ class _PlantCommunityScreenState extends ConsumerState<PlantCommunityScreen>
     
     return FloatingActionButton(
       onPressed: _onFabPressed,
+      tooltip: _currentIndex == 0 ? 'Ask Question' : 'Create Trade',
+      backgroundColor: theme.primaryColor,
       child: Icon(
         _currentIndex == 0 ? Icons.add_comment : Icons.add_business,
       ),
-      tooltip: _currentIndex == 0 ? 'Ask Question' : 'Create Trade',
-      backgroundColor: theme.primaryColor,
     );
   }
 
@@ -167,10 +166,10 @@ class _PlantCommunityBottomNavScreenState extends ConsumerState<PlantCommunityBo
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _onFabPressed,
+        tooltip: _currentIndex == 0 ? 'Ask Question' : 'Create Trade',
         child: Icon(
           _currentIndex == 0 ? Icons.add_comment : Icons.add_business,
         ),
-        tooltip: _currentIndex == 0 ? 'Ask Question' : 'Create Trade',
       ),
     );
   }

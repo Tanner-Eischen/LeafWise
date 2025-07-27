@@ -155,11 +155,11 @@ class _StoryCreationScreenState extends ConsumerState<StoryCreationScreen> {
             margin: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              boxShadow: [
+              boxShadow: const [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
+                  color: Color.fromRGBO(0, 0, 0, 0.3),
                   blurRadius: 10,
-                  offset: const Offset(0, 5),
+                  offset: Offset(0, 5),
                 ),
               ],
             ),
@@ -214,21 +214,21 @@ class _StoryCreationScreenState extends ConsumerState<StoryCreationScreen> {
                 maxLines: 3,
                 decoration: InputDecoration(
                   hintText: 'Add a caption to your story...',
-                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
+                  hintStyle: const TextStyle(color: Color.fromRGBO(255, 255, 255, 0.6)),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+                    borderSide: const BorderSide(color: Color.fromRGBO(255, 255, 255, 0.3)),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+                    borderSide: const BorderSide(color: Color.fromRGBO(255, 255, 255, 0.3)),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(color: theme.colorScheme.primary),
                   ),
                   filled: true,
-                  fillColor: Colors.white.withOpacity(0.1),
+                  fillColor: const Color.fromRGBO(255, 255, 255, 0.1),
                 ),
               ),
               
@@ -309,13 +309,13 @@ class _StoryCreationScreenState extends ConsumerState<StoryCreationScreen> {
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         decoration: BoxDecoration(
           color: isSelected 
-              ? Theme.of(context).colorScheme.primary.withOpacity(0.2)
-              : Colors.white.withOpacity(0.1),
+              ? Theme.of(context).colorScheme.primary.withAlpha(51)
+              : const Color.fromRGBO(255, 255, 255, 0.1),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: isSelected 
                 ? Theme.of(context).colorScheme.primary
-                : Colors.white.withOpacity(0.3),
+                : const Color.fromRGBO(255, 255, 255, 0.3),
           ),
         ),
         child: Row(
@@ -356,7 +356,7 @@ class _StoryCreationScreenState extends ConsumerState<StoryCreationScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
+              color: const Color.fromRGBO(255, 255, 255, 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(

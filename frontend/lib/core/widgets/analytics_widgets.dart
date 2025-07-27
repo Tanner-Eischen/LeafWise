@@ -264,7 +264,7 @@ class AnalyticsWidgets {
               ],
             ),
           );
-        }).toList(),
+        }),
       ],
     );
   }
@@ -282,7 +282,7 @@ class AnalyticsWidgets {
         ),
         child: Row(
           children: [
-            Icon(Icons.check_circle, color: Colors.green, size: 20),
+            const Icon(Icons.check_circle, color: Colors.green, size: 20),
             const SizedBox(width: 8),
             Text(
               'No risk factors detected',
@@ -311,7 +311,7 @@ class AnalyticsWidgets {
             padding: const EdgeInsets.symmetric(vertical: 2),
             child: Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.warning,
                   color: Colors.orange,
                   size: 16,
@@ -326,7 +326,7 @@ class AnalyticsWidgets {
               ],
             ),
           );
-        }).toList(),
+        }),
       ],
     );
   }
@@ -410,7 +410,7 @@ class AnalyticsWidgets {
               ],
             ),
           );
-        }).toList(),
+        }),
       ],
     );
   }

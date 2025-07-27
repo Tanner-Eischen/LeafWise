@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/models/user.dart';
 import '../../../auth/providers/auth_provider.dart';
 
 /// Profile edit screen for updating user information
@@ -47,7 +46,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
     final authState = ref.read(authProvider);
     
     // Initialize with mock data for demonstration
-    _nameController.text = authState?.user?.displayName ?? 'Plant Lover';
+    _nameController.text = authState.user?.displayName ?? 'Plant Lover';
     _bioController.text = 'Passionate about plants and sustainable living 🌱\nSharing my green journey with fellow plant enthusiasts!';
     _locationController.text = 'San Francisco, CA';
     _websiteController.text = 'https://myplantblog.com';
@@ -277,7 +276,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
           keyboardType: TextInputType.url,
           validator: (value) {
             if (value != null && value.isNotEmpty) {
-              final urlPattern = r'^https?:\/\/.+';
+              const urlPattern = r'^https?:\/\/.+';
               if (!RegExp(urlPattern).hasMatch(value)) {
                 return 'Please enter a valid URL starting with http:// or https://';
               }

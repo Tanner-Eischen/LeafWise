@@ -392,6 +392,33 @@ class ARDataService {
       ],
     };
   }
+  
+  /// Generate timelapse video from plant growth images
+  Future<Map<String, dynamic>> generateTimelapseVideo(String plantId) async {
+    try {
+      final response = await _apiClient.post(
+        '/timelapse/generate',
+        data: {
+          'plant_id': plantId,
+          'format': 'mp4',
+          'duration_seconds': 15,
+          'include_metadata': true,
+          'quality': 'high',
+        },
+      );
+      
+      return {
+        'success': true,
+        'video_url': response.data['video_url'],
+        'thumbnail_url': response.data['thumbnail_url'],
+        'duration_seconds': response.data['duration_seconds'],
+        'frame_count': response.data['frame_count'],
+        'message': 'Timelapse video generated successfully',
+      };
+    } catch (e) {
+      throw Exception('Failed to generate timelapse video: $e');
+    }
+  }
 
   // Helper methods
   String _getCurrentSeason() {

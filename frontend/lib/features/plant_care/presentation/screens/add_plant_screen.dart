@@ -4,9 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:plant_social/features/plant_care/models/plant_care_models.dart';
 import 'package:plant_social/features/plant_care/providers/plant_care_provider.dart';
-import 'package:plant_social/features/plant_identification/models/plant_identification_models.dart';
-import 'package:plant_social/features/plant_identification/providers/plant_identification_provider.dart';
-import 'package:plant_social/core/theme/app_theme.dart';
 import 'package:plant_social/core/widgets/custom_button.dart';
 import 'package:plant_social/core/widgets/custom_text_field.dart';
 

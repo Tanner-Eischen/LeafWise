@@ -72,6 +72,10 @@ class User(SQLAlchemyBaseUserTableUUID, Base):
     rag_interactions = relationship("RAGInteraction", back_populates="user")
     knowledge_contributions = relationship("PlantKnowledgeBase", back_populates="author")
     
+    # Seasonal AI and Time-lapse relationships
+    timelapse_sessions = relationship("TimelapseSession", back_populates="user")
+    growth_analytics = relationship("GrowthAnalytics", back_populates="user")
+    
     def __repr__(self) -> str:
         """String representation of the user."""
         return f"<User(id={self.id}, username={self.username}, email={self.email})>"
