@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1038118829524",
+    "project_id": "leafwise-cf8e5",
+    "storage_bucket": "leafwise-cf8e5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1038118829524:android:82b7ae0821482907ab2a41",
+        "android_client_info": {
+          "package_name": "com.anonymus.LeafWise"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBFFQKKVxSjVDKkcTjX7zWTKQu6GgFX0I0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
