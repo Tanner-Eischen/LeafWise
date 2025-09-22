@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:plant_social/core/constants/app_constants.dart';
-import 'package:plant_social/core/network/interceptors/auth_interceptor.dart';
-import 'package:plant_social/core/network/interceptors/logging_interceptor.dart';
-import 'package:plant_social/core/network/interceptors/error_interceptor.dart';
+import 'package:leafwise/core/constants/app_constants.dart';
+import 'package:leafwise/core/network/interceptors/auth_interceptor.dart';
+import 'package:leafwise/core/network/interceptors/logging_interceptor.dart';
+import 'package:leafwise/core/network/interceptors/error_interceptor.dart';
 
 class ApiClient {
   late final Dio _dio;
@@ -148,10 +148,7 @@ class ApiClient {
   }) async {
     try {
       final formData = FormData.fromMap({
-        'file': await MultipartFile.fromFile(
-          filePath,
-          filename: fileName,
-        ),
+        'file': await MultipartFile.fromFile(filePath, filename: fileName),
         if (data != null) ...data,
       });
 
@@ -160,11 +157,7 @@ class ApiClient {
         data: formData,
         onSendProgress: onSendProgress,
         cancelToken: cancelToken,
-        options: Options(
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        ),
+        options: Options(headers: {'Content-Type': 'multipart/form-data'}),
       );
     } catch (e) {
       rethrow;
@@ -196,9 +189,7 @@ class ApiClient {
 // Provider for ApiClient
 final apiClientProvider = Provider<ApiClient>((ref) {
   const storage = FlutterSecureStorage(
-    aOptions: AndroidOptions(
-      encryptedSharedPreferences: true,
-    ),
+    aOptions: AndroidOptions(encryptedSharedPreferences: true),
     iOptions: IOSOptions(
       accessibility: KeychainAccessibility.first_unlock_this_device,
     ),

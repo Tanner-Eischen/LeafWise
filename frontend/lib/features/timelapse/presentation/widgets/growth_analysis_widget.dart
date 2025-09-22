@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:plant_social/features/timelapse/models/timelapse_models.dart';
-import 'package:plant_social/features/timelapse/providers/timelapse_provider.dart';
-import 'package:plant_social/core/widgets/loading_widget.dart';
-import 'package:plant_social/core/widgets/error_widget.dart';
+import 'package:leafwise/features/timelapse/models/timelapse_models.dart';
+import 'package:leafwise/features/timelapse/providers/timelapse_provider.dart';
+import 'package:leafwise/core/widgets/loading_widget.dart';
+import 'package:leafwise/core/widgets/error_widget.dart';
 
 class GrowthAnalysisWidget extends ConsumerWidget {
   final String sessionId;
@@ -12,7 +12,9 @@ class GrowthAnalysisWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final growthAnalysisAsync = ref.watch(sessionGrowthAnalysisProvider(sessionId));
+    final growthAnalysisAsync = ref.watch(
+      sessionGrowthAnalysisProvider(sessionId),
+    );
 
     return growthAnalysisAsync.when(
       data: (growthAnalysis) => _buildAnalysisCard(context, growthAnalysis),
@@ -33,12 +35,13 @@ class GrowthAnalysisWidget extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Growth Analysis',
-              style: theme.textTheme.titleLarge,
-            ),
+            Text('Growth Analysis', style: theme.textTheme.titleLarge),
             const SizedBox(height: 16),
-            _buildMetrics(context, analysis.plantMeasurements, analysis.growthChanges),
+            _buildMetrics(
+              context,
+              analysis.plantMeasurements,
+              analysis.growthChanges,
+            ),
             const SizedBox(height: 16),
             _buildAnomalyFlags(context, analysis.anomalyFlags),
           ],
@@ -47,22 +50,30 @@ class GrowthAnalysisWidget extends ConsumerWidget {
     );
   }
 
-  Widget _buildMetrics(BuildContext context, PlantMeasurements measurements, GrowthChanges changes) {
+  Widget _buildMetrics(
+    BuildContext context,
+    PlantMeasurements measurements,
+    GrowthChanges changes,
+  ) {
     final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Latest Measurements', style: theme.textTheme.titleMedium),
         const SizedBox(height: 8),
-        Text('Height: ${measurements.height.toStringAsFixed(1)} ${measurements.unit ?? 'cm'} (+${changes.heightChange.toStringAsFixed(1)})'),
-        Text('Width: ${measurements.width.toStringAsFixed(1)} ${measurements.unit ?? 'cm'} (+${changes.widthChange.toStringAsFixed(1)})'),
-        Text('Leaf Count: ${measurements.leafCount} (+${changes.leafCountChange})'),
+        Text(
+          'Height: ${measurements.height.toStringAsFixed(1)} ${measurements.unit ?? 'cm'} (+${changes.heightChange.toStringAsFixed(1)})',
+        ),
+        Text(
+          'Width: ${measurements.width.toStringAsFixed(1)} ${measurements.unit ?? 'cm'} (+${changes.widthChange.toStringAsFixed(1)})',
+        ),
+        Text(
+          'Leaf Count: ${measurements.leafCount} (+${changes.leafCountChange})',
+        ),
         Text('Growth Rate: ${changes.growthRate.toStringAsFixed(2)} cm/week'),
       ],
     );
   }
-
-
 
   Widget _buildAnomalyFlags(BuildContext context, List<AnomalyFlag> flags) {
     final theme = Theme.of(context);
@@ -74,7 +85,9 @@ class GrowthAnalysisWidget extends ConsumerWidget {
         if (flags.isEmpty)
           const Text('No anomalies detected.')
         else
-          ...flags.map((flag) => Text('${flag.anomalyType}: ${flag.description}')),
+          ...flags.map(
+            (flag) => Text('${flag.anomalyType}: ${flag.description}'),
+          ),
       ],
     );
   }

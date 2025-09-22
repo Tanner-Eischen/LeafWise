@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:camera/camera.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:go_router/go_router.dart';
-import 'package:plant_social/features/camera/widgets/plant_ar_filters.dart';
+import 'package:leafwise/features/camera/widgets/plant_ar_filters.dart';
 
 /// Camera screen for capturing photos and videos with AR plant features
 /// Implements camera functionality with AR overlays connected to real backend data

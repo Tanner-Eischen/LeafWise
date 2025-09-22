@@ -2,10 +2,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:plant_social/features/plant_care/models/plant_care_models.dart';
-import 'package:plant_social/features/plant_care/providers/plant_care_provider.dart';
-import 'package:plant_social/core/widgets/custom_button.dart';
-import 'package:plant_social/core/widgets/custom_text_field.dart';
+import 'package:leafwise/features/plant_care/models/plant_care_models.dart';
+import 'package:leafwise/features/plant_care/providers/plant_care_provider.dart';
+import 'package:leafwise/core/widgets/custom_button.dart';
+import 'package:leafwise/core/widgets/custom_text_field.dart';
 
 class AddPlantScreen extends ConsumerStatefulWidget {
   final PlantSpecies? preselectedSpecies;
@@ -27,7 +27,7 @@ class _AddPlantScreenState extends ConsumerState<AddPlantScreen> {
   final _locationController = TextEditingController();
   final _notesController = TextEditingController();
   final _searchController = TextEditingController();
-  
+
   PlantSpecies? _selectedSpecies;
   File? _selectedImage;
   DateTime _acquiredDate = DateTime.now();
@@ -61,10 +61,7 @@ class _AddPlantScreenState extends ConsumerState<AddPlantScreen> {
     final plantCareState = ref.watch(plantCareProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add New Plant'),
-        elevation: 0,
-      ),
+      appBar: AppBar(title: const Text('Add New Plant'), elevation: 0),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -129,10 +126,7 @@ class _AddPlantScreenState extends ConsumerState<AddPlantScreen> {
               child: _selectedImage != null
                   ? ClipRRect(
                       borderRadius: BorderRadius.circular(14),
-                      child: Image.file(
-                        _selectedImage!,
-                        fit: BoxFit.cover,
-                      ),
+                      child: Image.file(_selectedImage!, fit: BoxFit.cover),
                     )
                   : Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -215,17 +209,11 @@ class _AddPlantScreenState extends ConsumerState<AddPlantScreen> {
             decoration: BoxDecoration(
               color: theme.primaryColor.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: theme.primaryColor.withOpacity(0.3),
-              ),
+              border: Border.all(color: theme.primaryColor.withOpacity(0.3)),
             ),
             child: Row(
               children: [
-                Icon(
-                  Icons.check_circle,
-                  color: theme.primaryColor,
-                  size: 20,
-                ),
+                Icon(Icons.check_circle, color: theme.primaryColor, size: 20),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Column(
@@ -297,10 +285,7 @@ class _AddPlantScreenState extends ConsumerState<AddPlantScreen> {
         const SizedBox(height: 16),
         ListTile(
           contentPadding: EdgeInsets.zero,
-          leading: Icon(
-            Icons.calendar_today,
-            color: theme.primaryColor,
-          ),
+          leading: Icon(Icons.calendar_today, color: theme.primaryColor),
           title: const Text('Date Acquired'),
           subtitle: Text(
             '${_acquiredDate.day}/${_acquiredDate.month}/${_acquiredDate.year}',
@@ -390,7 +375,7 @@ class _AddPlantScreenState extends ConsumerState<AddPlantScreen> {
 
     try {
       final results = await ref.read(plantSpeciesSearchProvider(query).future);
-      
+
       setState(() {
         _searchResults = results;
         _isSearching = false;

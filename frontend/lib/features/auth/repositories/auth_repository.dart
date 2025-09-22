@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:plant_social/core/models/user.dart';
-import 'package:plant_social/core/network/api_client.dart';
-import 'package:plant_social/features/auth/models/auth_models.dart';
+import 'package:leafwise/core/models/user.dart';
+import 'package:leafwise/core/network/api_client.dart';
+import 'package:leafwise/features/auth/models/auth_models.dart';
 
 abstract class AuthRepository {
   Future<AuthResponse> login(LoginRequest request);
@@ -11,7 +11,10 @@ abstract class AuthRepository {
   Future<User> getCurrentUser();
   Future<MessageResponse> forgotPassword(String email);
   Future<MessageResponse> resetPassword(String token, String newPassword);
-  Future<MessageResponse> changePassword(String currentPassword, String newPassword);
+  Future<MessageResponse> changePassword(
+    String currentPassword,
+    String newPassword,
+  );
 }
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -26,7 +29,7 @@ class AuthRepositoryImpl implements AuthRepository {
         '/auth/login',
         data: request.toJson(),
       );
-      
+
       return AuthResponse.fromJson(response.data);
     } catch (e) {
       rethrow;
@@ -40,7 +43,7 @@ class AuthRepositoryImpl implements AuthRepository {
         '/auth/register',
         data: request.toJson(),
       );
-      
+
       return AuthResponse.fromJson(response.data);
     } catch (e) {
       rethrow;
@@ -64,7 +67,7 @@ class AuthRepositoryImpl implements AuthRepository {
         '/auth/refresh',
         data: request.toJson(),
       );
-      
+
       return AuthResponse.fromJson(response.data);
     } catch (e) {
       rethrow;
@@ -89,7 +92,7 @@ class AuthRepositoryImpl implements AuthRepository {
         '/auth/forgot-password',
         data: request.toJson(),
       );
-      
+
       return MessageResponse.fromJson(response.data);
     } catch (e) {
       rethrow;
@@ -97,7 +100,10 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<MessageResponse> resetPassword(String token, String newPassword) async {
+  Future<MessageResponse> resetPassword(
+    String token,
+    String newPassword,
+  ) async {
     try {
       final request = ResetPasswordRequest(
         token: token,
@@ -108,7 +114,7 @@ class AuthRepositoryImpl implements AuthRepository {
         '/auth/reset-password',
         data: request.toJson(),
       );
-      
+
       return MessageResponse.fromJson(response.data);
     } catch (e) {
       rethrow;
@@ -116,7 +122,10 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<MessageResponse> changePassword(String currentPassword, String newPassword) async {
+  Future<MessageResponse> changePassword(
+    String currentPassword,
+    String newPassword,
+  ) async {
     try {
       final request = ChangePasswordRequest(
         currentPassword: currentPassword,
@@ -127,7 +136,7 @@ class AuthRepositoryImpl implements AuthRepository {
         '/auth/change-password',
         data: request.toJson(),
       );
-      
+
       return MessageResponse.fromJson(response.data);
     } catch (e) {
       rethrow;

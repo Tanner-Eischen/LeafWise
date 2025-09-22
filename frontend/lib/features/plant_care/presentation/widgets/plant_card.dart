@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:plant_social/features/plant_care/models/plant_care_models.dart';
+import 'package:leafwise/features/plant_care/models/plant_care_models.dart';
 
 class PlantCard extends StatelessWidget {
   final UserPlant plant;
@@ -16,12 +16,10 @@ class PlantCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Card(
       elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: onTap,
@@ -170,9 +168,13 @@ class PlantCard extends StatelessWidget {
         .length;
 
     final upcomingCount = activeReminders
-        .where((reminder) => 
-            reminder.nextDueDate.isAfter(DateTime.now()) &&
-            reminder.nextDueDate.isBefore(DateTime.now().add(const Duration(days: 3))))
+        .where(
+          (reminder) =>
+              reminder.nextDueDate.isAfter(DateTime.now()) &&
+              reminder.nextDueDate.isBefore(
+                DateTime.now().add(const Duration(days: 3)),
+              ),
+        )
         .length;
 
     return Container(
@@ -196,11 +198,7 @@ class PlantCard extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    Icons.warning,
-                    size: 12,
-                    color: Colors.red[700],
-                  ),
+                  Icon(Icons.warning, size: 12, color: Colors.red[700]),
                   const SizedBox(width: 2),
                   Text(
                     overdueCount.toString(),
@@ -225,11 +223,7 @@ class PlantCard extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    Icons.schedule,
-                    size: 12,
-                    color: Colors.orange[700],
-                  ),
+                  Icon(Icons.schedule, size: 12, color: Colors.orange[700]),
                   const SizedBox(width: 2),
                   Text(
                     upcomingCount.toString(),

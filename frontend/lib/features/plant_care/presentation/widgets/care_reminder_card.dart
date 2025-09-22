@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:plant_social/features/plant_care/models/plant_care_models.dart';
+import 'package:leafwise/features/plant_care/models/plant_care_models.dart';
 
 class CareReminderCard extends StatelessWidget {
   final PlantCareReminder reminder;
@@ -19,8 +19,11 @@ class CareReminderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isOverdue = reminder.nextDueDate.isBefore(DateTime.now());
-    final isUpcoming = reminder.nextDueDate.isAfter(DateTime.now()) &&
-        reminder.nextDueDate.isBefore(DateTime.now().add(const Duration(days: 1)));
+    final isUpcoming =
+        reminder.nextDueDate.isAfter(DateTime.now()) &&
+        reminder.nextDueDate.isBefore(
+          DateTime.now().add(const Duration(days: 1)),
+        );
 
     return Card(
       elevation: isOverdue ? 6 : 2,
@@ -31,8 +34,8 @@ class CareReminderCard extends StatelessWidget {
           color: isOverdue
               ? Colors.red.withOpacity(0.3)
               : isUpcoming
-                  ? Colors.orange.withOpacity(0.3)
-                  : Colors.transparent,
+              ? Colors.orange.withOpacity(0.3)
+              : Colors.transparent,
           width: isOverdue || isUpcoming ? 1 : 0,
         ),
       ),
@@ -130,11 +133,7 @@ class CareReminderCard extends StatelessWidget {
                     // Due date and frequency
                     Row(
                       children: [
-                        Icon(
-                          Icons.schedule,
-                          size: 14,
-                          color: Colors.grey[500],
-                        ),
+                        Icon(Icons.schedule, size: 14, color: Colors.grey[500]),
                         const SizedBox(width: 4),
                         Text(
                           _getFormattedDueDate(),
@@ -142,19 +141,15 @@ class CareReminderCard extends StatelessWidget {
                             color: isOverdue
                                 ? Colors.red[600]
                                 : isUpcoming
-                                    ? Colors.orange[600]
-                                    : Colors.grey[600],
+                                ? Colors.orange[600]
+                                : Colors.grey[600],
                             fontWeight: isOverdue || isUpcoming
                                 ? FontWeight.w600
                                 : FontWeight.normal,
                           ),
                         ),
                         const SizedBox(width: 16),
-                        Icon(
-                          Icons.repeat,
-                          size: 14,
-                          color: Colors.grey[500],
-                        ),
+                        Icon(Icons.repeat, size: 14, color: Colors.grey[500]),
                         const SizedBox(width: 4),
                         Text(
                           _getFrequencyText(),
@@ -166,7 +161,8 @@ class CareReminderCard extends StatelessWidget {
                     ),
 
                     // Notes if available
-                    if (reminder.notes != null && reminder.notes!.isNotEmpty) ...[
+                    if (reminder.notes != null &&
+                        reminder.notes!.isNotEmpty) ...[
                       const SizedBox(height: 8),
                       Text(
                         reminder.notes!,
@@ -198,10 +194,7 @@ class CareReminderCard extends StatelessWidget {
                   if (onSnooze != null && (isOverdue || isUpcoming))
                     IconButton(
                       onPressed: onSnooze,
-                      icon: Icon(
-                        Icons.snooze,
-                        color: Colors.orange[600],
-                      ),
+                      icon: Icon(Icons.snooze, color: Colors.orange[600]),
                       tooltip: 'Snooze reminder',
                     ),
                 ],
@@ -278,11 +271,15 @@ class CareReminderCard extends StatelessWidget {
       case 'cleaning':
         return 'Cleaning';
       default:
-        return careType.replaceAll('_', ' ').split(' ').map((word) {
-          return word.isNotEmpty
-              ? word[0].toUpperCase() + word.substring(1).toLowerCase()
-              : word;
-        }).join(' ');
+        return careType
+            .replaceAll('_', ' ')
+            .split(' ')
+            .map((word) {
+              return word.isNotEmpty
+                  ? word[0].toUpperCase() + word.substring(1).toLowerCase()
+                  : word;
+            })
+            .join(' ');
     }
   }
 

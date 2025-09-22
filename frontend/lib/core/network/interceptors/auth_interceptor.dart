@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:plant_social/core/constants/app_constants.dart';
+import 'package:leafwise/core/constants/app_constants.dart';
 
 class AuthInterceptor extends Interceptor {
   final FlutterSecureStorage _storage;
@@ -14,32 +14,31 @@ class AuthInterceptor extends Interceptor {
   ) async {
     // Get access token from secure storage
     final accessToken = await _storage.read(key: AppConstants.accessTokenKey);
-    
+
     if (accessToken != null && accessToken.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $accessToken';
     }
-    
+
     handler.next(options);
   }
 
   @override
-  void onError(
-    DioException err,
-    ErrorInterceptorHandler handler,
-  ) async {
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
     // Handle 401 Unauthorized errors
     if (err.response?.statusCode == 401) {
       // Try to refresh token
       final refreshed = await _refreshToken();
-      
+
       if (refreshed) {
         // Retry the original request
         final requestOptions = err.requestOptions;
-        final accessToken = await _storage.read(key: AppConstants.accessTokenKey);
-        
+        final accessToken = await _storage.read(
+          key: AppConstants.accessTokenKey,
+        );
+
         if (accessToken != null) {
           requestOptions.headers['Authorization'] = 'Bearer $accessToken';
-          
+
           try {
             final dio = Dio();
             final response = await dio.fetch(requestOptions);
@@ -50,18 +49,20 @@ class AuthInterceptor extends Interceptor {
           }
         }
       }
-      
+
       // If refresh failed or no refresh token, clear tokens and redirect to login
       await _clearTokens();
     }
-    
+
     handler.next(err);
   }
 
   Future<bool> _refreshToken() async {
     try {
-      final refreshToken = await _storage.read(key: AppConstants.refreshTokenKey);
-      
+      final refreshToken = await _storage.read(
+        key: AppConstants.refreshTokenKey,
+      );
+
       if (refreshToken == null || refreshToken.isEmpty) {
         return false;
       }
@@ -78,11 +79,17 @@ class AuthInterceptor extends Interceptor {
         final newRefreshToken = data['refresh_token'];
 
         if (newAccessToken != null) {
-          await _storage.write(key: AppConstants.accessTokenKey, value: newAccessToken);
+          await _storage.write(
+            key: AppConstants.accessTokenKey,
+            value: newAccessToken,
+          );
         }
-        
+
         if (newRefreshToken != null) {
-          await _storage.write(key: AppConstants.refreshTokenKey, value: newRefreshToken);
+          await _storage.write(
+            key: AppConstants.refreshTokenKey,
+            value: newRefreshToken,
+          );
         }
 
         return true;
@@ -91,7 +98,7 @@ class AuthInterceptor extends Interceptor {
       // Refresh failed
       print('Token refresh failed: $e');
     }
-    
+
     return false;
   }
 

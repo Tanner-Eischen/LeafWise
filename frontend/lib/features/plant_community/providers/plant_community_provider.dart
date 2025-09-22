@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:plant_social/features/plant_community/models/plant_community_models.dart';
-import 'package:plant_social/features/plant_community/services/plant_community_service.dart';
-import 'package:plant_social/core/providers/api_provider.dart';
-import 'package:plant_social/core/providers/storage_provider.dart';
+import 'package:leafwise/features/plant_community/models/plant_community_models.dart';
+import 'package:leafwise/features/plant_community/services/plant_community_service.dart';
+import 'package:leafwise/core/providers/api_provider.dart';
+import 'package:leafwise/core/providers/storage_provider.dart';
 
 // Service provider
 final plantCommunityServiceProvider = Provider<PlantCommunityService>((ref) {
@@ -62,10 +62,7 @@ class PlantCommunityNotifier extends StateNotifier<PlantCommunityState> {
         currentQuestionPage: state.currentQuestionPage + 1,
       );
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
@@ -85,8 +82,11 @@ class PlantCommunityNotifier extends StateNotifier<PlantCommunityState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final question = await _service.createQuestion(request, imageFile: imageFile);
-      
+      final question = await _service.createQuestion(
+        request,
+        imageFile: imageFile,
+      );
+
       // Add to the beginning of the list
       state = state.copyWith(
         isLoading: false,
@@ -95,10 +95,7 @@ class PlantCommunityNotifier extends StateNotifier<PlantCommunityState> {
 
       return question;
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
       return null;
     }
   }
@@ -114,7 +111,7 @@ class PlantCommunityNotifier extends StateNotifier<PlantCommunityState> {
         request,
         imageFile: imageFile,
       );
-      
+
       // Update in the list
       final updatedQuestions = state.questions.map((q) {
         return q.id == questionId ? updatedQuestion : q;
@@ -131,7 +128,7 @@ class PlantCommunityNotifier extends StateNotifier<PlantCommunityState> {
   Future<bool> deleteQuestion(String questionId) async {
     try {
       await _service.deleteQuestion(questionId);
-      
+
       // Remove from the list
       final updatedQuestions = state.questions
           .where((q) => q.id != questionId)
@@ -148,7 +145,7 @@ class PlantCommunityNotifier extends StateNotifier<PlantCommunityState> {
   Future<void> voteQuestion(String questionId, String voteType) async {
     try {
       final updatedQuestion = await _service.voteQuestion(questionId, voteType);
-      
+
       // Update in the list
       final updatedQuestions = state.questions.map((q) {
         return q.id == questionId ? updatedQuestion : q;
@@ -163,7 +160,7 @@ class PlantCommunityNotifier extends StateNotifier<PlantCommunityState> {
   Future<void> bookmarkQuestion(String questionId) async {
     try {
       final updatedQuestion = await _service.bookmarkQuestion(questionId);
-      
+
       // Update in the list
       final updatedQuestions = state.questions.map((q) {
         return q.id == questionId ? updatedQuestion : q;
@@ -184,7 +181,7 @@ class PlantCommunityNotifier extends StateNotifier<PlantCommunityState> {
         questionId,
         acceptedAnswerId,
       );
-      
+
       // Update in the list
       final updatedQuestions = state.questions.map((q) {
         return q.id == questionId ? updatedQuestion : q;
@@ -220,7 +217,7 @@ class PlantCommunityNotifier extends StateNotifier<PlantCommunityState> {
         request,
         imageFile: imageFile,
       );
-      
+
       // Update question answer count
       final updatedQuestions = state.questions.map((q) {
         if (q.id == questionId) {
@@ -257,7 +254,7 @@ class PlantCommunityNotifier extends StateNotifier<PlantCommunityState> {
   Future<bool> deleteAnswer(String answerId, String questionId) async {
     try {
       await _service.deleteAnswer(answerId);
-      
+
       // Update question answer count
       final updatedQuestions = state.questions.map((q) {
         if (q.id == questionId) {
@@ -317,9 +314,7 @@ class PlantCommunityNotifier extends StateNotifier<PlantCommunityState> {
         sortBy: sortBy,
       );
 
-      final updatedTrades = refresh
-          ? trades
-          : [...state.trades, ...trades];
+      final updatedTrades = refresh ? trades : [...state.trades, ...trades];
 
       state = state.copyWith(
         isLoading: false,
@@ -328,10 +323,7 @@ class PlantCommunityNotifier extends StateNotifier<PlantCommunityState> {
         currentTradePage: state.currentTradePage + 1,
       );
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
@@ -352,7 +344,7 @@ class PlantCommunityNotifier extends StateNotifier<PlantCommunityState> {
 
     try {
       final trade = await _service.createTrade(request, imageFiles: imageFiles);
-      
+
       // Add to the beginning of the list
       state = state.copyWith(
         isLoading: false,
@@ -361,10 +353,7 @@ class PlantCommunityNotifier extends StateNotifier<PlantCommunityState> {
 
       return trade;
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
       return null;
     }
   }
@@ -380,7 +369,7 @@ class PlantCommunityNotifier extends StateNotifier<PlantCommunityState> {
         request,
         imageFiles: imageFiles,
       );
-      
+
       // Update in the list
       final updatedTrades = state.trades.map((t) {
         return t.id == tradeId ? updatedTrade : t;
@@ -397,11 +386,9 @@ class PlantCommunityNotifier extends StateNotifier<PlantCommunityState> {
   Future<bool> deleteTrade(String tradeId) async {
     try {
       await _service.deleteTrade(tradeId);
-      
+
       // Remove from the list
-      final updatedTrades = state.trades
-          .where((t) => t.id != tradeId)
-          .toList();
+      final updatedTrades = state.trades.where((t) => t.id != tradeId).toList();
 
       state = state.copyWith(trades: updatedTrades);
       return true;
@@ -414,7 +401,7 @@ class PlantCommunityNotifier extends StateNotifier<PlantCommunityState> {
   Future<void> bookmarkTrade(String tradeId) async {
     try {
       final updatedTrade = await _service.bookmarkTrade(tradeId);
-      
+
       // Update in the list
       final updatedTrades = state.trades.map((t) {
         return t.id == tradeId ? updatedTrade : t;
@@ -429,7 +416,7 @@ class PlantCommunityNotifier extends StateNotifier<PlantCommunityState> {
   Future<void> expressInterest(String tradeId) async {
     try {
       final updatedTrade = await _service.expressInterest(tradeId);
-      
+
       // Update in the list
       final updatedTrades = state.trades.map((t) {
         return t.id == tradeId ? updatedTrade : t;
@@ -444,7 +431,7 @@ class PlantCommunityNotifier extends StateNotifier<PlantCommunityState> {
   Future<void> updateTradeStatus(String tradeId, String status) async {
     try {
       final updatedTrade = await _service.updateTradeStatus(tradeId, status);
-      
+
       // Update in the list
       final updatedTrades = state.trades.map((t) {
         return t.id == tradeId ? updatedTrade : t;
@@ -470,9 +457,9 @@ class PlantCommunityNotifier extends StateNotifier<PlantCommunityState> {
 // Main provider
 final plantCommunityProvider =
     StateNotifierProvider<PlantCommunityNotifier, PlantCommunityState>((ref) {
-  final service = ref.watch(plantCommunityServiceProvider);
-  return PlantCommunityNotifier(service);
-});
+      final service = ref.watch(plantCommunityServiceProvider);
+      return PlantCommunityNotifier(service);
+    });
 
 // Individual providers for specific use cases
 final questionsProvider = Provider<List<PlantQuestion>>((ref) {
@@ -483,39 +470,57 @@ final tradesProvider = Provider<List<PlantTrade>>((ref) {
   return ref.watch(plantCommunityProvider).trades;
 });
 
-final questionProvider = FutureProvider.family<PlantQuestion?, String>((ref, questionId) async {
+final questionProvider = FutureProvider.family<PlantQuestion?, String>((
+  ref,
+  questionId,
+) async {
   final notifier = ref.read(plantCommunityProvider.notifier);
   return await notifier.getQuestion(questionId);
 });
 
-final tradeProvider = FutureProvider.family<PlantTrade?, String>((ref, tradeId) async {
+final tradeProvider = FutureProvider.family<PlantTrade?, String>((
+  ref,
+  tradeId,
+) async {
   final notifier = ref.read(plantCommunityProvider.notifier);
   return await notifier.getTrade(tradeId);
 });
 
-final answersProvider = FutureProvider.family<List<PlantAnswer>?, String>((ref, questionId) async {
+final answersProvider = FutureProvider.family<List<PlantAnswer>?, String>((
+  ref,
+  questionId,
+) async {
   final notifier = ref.read(plantCommunityProvider.notifier);
   return await notifier.getAnswers(questionId);
 });
 
 // User content providers
-final userQuestionsProvider = FutureProvider.family<List<PlantQuestion>, String>((ref, userId) async {
-  final service = ref.watch(plantCommunityServiceProvider);
-  return await service.getUserQuestions(userId);
-});
+final userQuestionsProvider =
+    FutureProvider.family<List<PlantQuestion>, String>((ref, userId) async {
+      final service = ref.watch(plantCommunityServiceProvider);
+      return await service.getUserQuestions(userId);
+    });
 
-final userAnswersProvider = FutureProvider.family<List<PlantAnswer>, String>((ref, userId) async {
+final userAnswersProvider = FutureProvider.family<List<PlantAnswer>, String>((
+  ref,
+  userId,
+) async {
   final service = ref.watch(plantCommunityServiceProvider);
   return await service.getUserAnswers(userId);
 });
 
-final userTradesProvider = FutureProvider.family<List<PlantTrade>, String>((ref, userId) async {
+final userTradesProvider = FutureProvider.family<List<PlantTrade>, String>((
+  ref,
+  userId,
+) async {
   final service = ref.watch(plantCommunityServiceProvider);
   return await service.getUserTrades(userId);
 });
 
 // Bookmark providers
-final bookmarkedQuestionsProvider = FutureProvider<List<PlantQuestion>>((ref) async {
+final bookmarkedQuestionsProvider = FutureProvider<List<PlantQuestion>>((
+  ref,
+) async {
   final service = ref.watch(plantCommunityServiceProvider);
   return await service.getBookmarkedQuestions();
 });

@@ -6,10 +6,10 @@ library;
 
 import 'dart:async';
 import 'dart:math' as math;
-import 'package:plant_social/core/network/api_client.dart';
-import 'package:plant_social/features/camera/models/ar_seasonal_models.dart';
-import 'package:plant_social/features/seasonal_ai/models/seasonal_ai_models.dart';
-import 'package:plant_social/features/timelapse/models/timelapse_models.dart';
+import 'package:leafwise/core/network/api_client.dart';
+import 'package:leafwise/features/camera/models/ar_seasonal_models.dart';
+import 'package:leafwise/features/seasonal_ai/models/seasonal_ai_models.dart';
+import 'package:leafwise/features/timelapse/models/timelapse_models.dart';
 
 class ARSeasonalService {
   final ApiClient _apiClient;
@@ -427,22 +427,22 @@ class ARSeasonalService {
     for (int i = 1; i <= 3; i++) {
       final projectionDate = now.add(Duration(days: 30 * i));
       final height = 12.0 + (i * 3.0);
+      final width = 8.0 + (i * 2.0);
       stages.add(
         GrowthStageVisualization(
-          stageId:
-              'projection_${projection.projectionDate.millisecondsSinceEpoch}',
+          stageId: 'projection_${projectionDate.millisecondsSinceEpoch}',
           name: 'Growth Stage ${stages.length}',
-          projectedDate: projection.projectionDate,
+          projectedDate: projectionDate,
           plantModel: ARPlantModel(
-            height: projection.estimatedHeight,
-            width: projection.estimatedWidth,
-            leafCount: (projection.estimatedHeight * 2).round(),
+            height: height,
+            width: width,
+            leafCount: (height * 2).round(),
             leafColor: '#4CAF50',
             stemColor: '#8BC34A',
           ),
-          description:
-              'Projected growth at ${_formatDate(projection.projectedDate)}',
-          probability: projection.confidenceLevel,
+          description: 'Projected growth at ${_formatDate(projectionDate)}',
+          probability:
+              0.8 - (i * 0.1), // Decreasing confidence for future projections
         ),
       );
     }

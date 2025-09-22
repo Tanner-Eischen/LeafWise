@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:plant_social/features/plant_identification/presentation/screens/plant_identification_screen.dart';
-import 'package:plant_social/features/plant_care/presentation/screens/plant_care_dashboard_screen.dart';
-import 'package:plant_social/features/plant_community/presentation/screens/plant_community_screen.dart';
+import 'package:leafwise/features/plant_identification/presentation/screens/plant_identification_screen.dart';
+import 'package:leafwise/features/plant_care/presentation/screens/plant_care_dashboard_screen.dart';
+import 'package:leafwise/features/plant_community/presentation/screens/plant_community_screen.dart';
 
 class PlantFeaturesScreen extends ConsumerStatefulWidget {
   const PlantFeaturesScreen({super.key});
 
   @override
-  ConsumerState<PlantFeaturesScreen> createState() => _PlantFeaturesScreenState();
+  ConsumerState<PlantFeaturesScreen> createState() =>
+      _PlantFeaturesScreenState();
 }
 
 class _PlantFeaturesScreenState extends ConsumerState<PlantFeaturesScreen> {
   int _currentIndex = 0;
-  
+
   final List<Widget> _screens = const [
     PlantIdentificationScreen(),
     PlantCareDashboardScreen(),
@@ -23,12 +24,9 @@ class _PlantFeaturesScreenState extends ConsumerState<PlantFeaturesScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
+      body: IndexedStack(index: _currentIndex, children: _screens),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
@@ -66,7 +64,7 @@ class PlantFeaturesGridScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Plant Features'),
@@ -94,7 +92,7 @@ class PlantFeaturesGridScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 24),
-            
+
             Expanded(
               child: GridView.count(
                 crossAxisCount: 2,
@@ -137,9 +135,9 @@ class PlantFeaturesGridScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Quick actions
             Row(
               children: [
@@ -181,12 +179,10 @@ class PlantFeaturesGridScreen extends ConsumerWidget {
     required VoidCallback onTap,
   }) {
     final theme = Theme.of(context);
-    
+
     return Card(
       elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
@@ -197,10 +193,7 @@ class PlantFeaturesGridScreen extends ConsumerWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                color.withOpacity(0.1),
-                color.withOpacity(0.05),
-              ],
+              colors: [color.withOpacity(0.1), color.withOpacity(0.05)],
             ),
           ),
           child: Column(
@@ -212,11 +205,7 @@ class PlantFeaturesGridScreen extends ConsumerWidget {
                   color: color.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(
-                  icon,
-                  size: 28,
-                  color: color,
-                ),
+                child: Icon(icon, size: 28, color: color),
               ),
               const Spacer(),
               Text(
@@ -252,9 +241,7 @@ class PlantFeaturesGridScreen extends ConsumerWidget {
   void _navigateToPlantCare(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const PlantCareDashboardScreen(),
-      ),
+      MaterialPageRoute(builder: (context) => const PlantCareDashboardScreen()),
     );
   }
 

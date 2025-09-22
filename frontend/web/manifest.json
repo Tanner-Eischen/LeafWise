@@ -1,6 +1,6 @@
 {
-    "name": "plant_social",
-    "short_name": "plant_social",
+    "name": "leafwise",
+    "short_name": "leafwise",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

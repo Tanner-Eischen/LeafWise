@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:plant_social/features/plant_care/models/plant_care_models.dart';
-import 'package:plant_social/features/plant_identification/providers/plant_identification_provider.dart';
-import 'package:plant_social/core/widgets/loading_widget.dart';
-import 'package:plant_social/core/widgets/error_widget.dart';
+import 'package:leafwise/features/plant_care/models/plant_care_models.dart';
+import 'package:leafwise/features/plant_identification/providers/plant_identification_provider.dart';
+import 'package:leafwise/core/widgets/loading_widget.dart';
+import 'package:leafwise/core/widgets/error_widget.dart';
 
 class PlantSpeciesDetailScreen extends ConsumerStatefulWidget {
   final String speciesId;
@@ -30,7 +30,9 @@ class _PlantSpeciesDetailScreenState
 
   @override
   Widget build(BuildContext context) {
-    final speciesDetailAsync = ref.watch(plantSpeciesProvider(widget.speciesId));
+    final speciesDetailAsync = ref.watch(
+      plantSpeciesProvider(widget.speciesId),
+    );
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -66,8 +68,8 @@ class _PlantSpeciesDetailScreenState
         child: CustomErrorWidget(
           message: error,
           onRetry: () {
-              ref.invalidate(plantSpeciesProvider(widget.speciesId));
-            },
+            ref.invalidate(plantSpeciesProvider(widget.speciesId));
+          },
         ),
       ),
     );
@@ -200,13 +202,18 @@ class _PlantSpeciesDetailScreenState
                 ],
 
                 // Alternative names
-                if (species.alternativeNames != null && species.alternativeNames!.isNotEmpty) ...[
-                  _buildAlternativeNamesSection(species.alternativeNames!, theme),
+                if (species.alternativeNames != null &&
+                    species.alternativeNames!.isNotEmpty) ...[
+                  _buildAlternativeNamesSection(
+                    species.alternativeNames!,
+                    theme,
+                  ),
                   const SizedBox(height: 24),
                 ],
 
                 // Native regions
-                if (species.nativeRegions != null && species.nativeRegions!.isNotEmpty) ...[
+                if (species.nativeRegions != null &&
+                    species.nativeRegions!.isNotEmpty) ...[
                   _buildNativeRegionsSection(species.nativeRegions!, theme),
                   const SizedBox(height: 24),
                 ],
@@ -221,17 +228,18 @@ class _PlantSpeciesDetailScreenState
     );
   }
 
-  Widget _buildSection(String title, String content, IconData icon, ThemeData theme) {
+  Widget _buildSection(
+    String title,
+    String content,
+    IconData icon,
+    ThemeData theme,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Icon(
-              icon,
-              size: 24,
-              color: theme.primaryColor,
-            ),
+            Icon(icon, size: 24, color: theme.primaryColor),
             const SizedBox(width: 8),
             Text(
               title,
@@ -242,10 +250,7 @@ class _PlantSpeciesDetailScreenState
           ],
         ),
         const SizedBox(height: 12),
-        Text(
-          content,
-          style: theme.textTheme.bodyLarge,
-        ),
+        Text(content, style: theme.textTheme.bodyLarge),
       ],
     );
   }
@@ -256,11 +261,7 @@ class _PlantSpeciesDetailScreenState
       children: [
         Row(
           children: [
-            Icon(
-              Icons.spa,
-              size: 24,
-              color: theme.primaryColor,
-            ),
+            Icon(Icons.spa, size: 24, color: theme.primaryColor),
             const SizedBox(width: 8),
             Text(
               'Care Information',
@@ -306,17 +307,11 @@ class _PlantSpeciesDetailScreenState
           decoration: BoxDecoration(
             color: theme.primaryColor.withOpacity(0.05),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: theme.primaryColor.withOpacity(0.2),
-            ),
+            border: Border.all(color: theme.primaryColor.withOpacity(0.2)),
           ),
           child: Row(
             children: [
-              Icon(
-                item.icon,
-                size: 20,
-                color: theme.primaryColor,
-              ),
+              Icon(item.icon, size: 20, color: theme.primaryColor),
               const SizedBox(width: 8),
               Expanded(
                 child: Column(
@@ -354,11 +349,7 @@ class _PlantSpeciesDetailScreenState
       children: [
         Row(
           children: [
-            Icon(
-              Icons.label,
-              size: 24,
-              color: theme.primaryColor,
-            ),
+            Icon(Icons.label, size: 24, color: theme.primaryColor),
             const SizedBox(width: 8),
             Text(
               'Also known as',
@@ -374,10 +365,7 @@ class _PlantSpeciesDetailScreenState
           runSpacing: 8,
           children: names.map((name) {
             return Chip(
-              label: Text(
-                name,
-                style: theme.textTheme.bodyMedium,
-              ),
+              label: Text(name, style: theme.textTheme.bodyMedium),
               backgroundColor: theme.primaryColor.withOpacity(0.1),
               side: BorderSide.none,
             );
@@ -393,11 +381,7 @@ class _PlantSpeciesDetailScreenState
       children: [
         Row(
           children: [
-            Icon(
-              Icons.public,
-              size: 24,
-              color: theme.primaryColor,
-            ),
+            Icon(Icons.public, size: 24, color: theme.primaryColor),
             const SizedBox(width: 8),
             Text(
               'Native Regions',
@@ -417,9 +401,7 @@ class _PlantSpeciesDetailScreenState
               decoration: BoxDecoration(
                 color: Colors.green.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: Colors.green.withOpacity(0.3),
-                ),
+                border: Border.all(color: Colors.green.withOpacity(0.3)),
               ),
               child: Text(
                 region,
@@ -437,25 +419,28 @@ class _PlantSpeciesDetailScreenState
 
   Widget _buildGrowthCharacteristics(PlantSpecies species, ThemeData theme) {
     final characteristics = <String>[];
-    
+
     characteristics.add('Scientific Name: ${species.scientificName}');
-    
+
     if (species.family != null) {
       characteristics.add('Family: ${species.family}');
     }
-    
-    if (species.alternativeNames != null && species.alternativeNames!.isNotEmpty) {
-      characteristics.add('Alternative Names: ${species.alternativeNames!.join(', ')}');
+
+    if (species.alternativeNames != null &&
+        species.alternativeNames!.isNotEmpty) {
+      characteristics.add(
+        'Alternative Names: ${species.alternativeNames!.join(', ')}',
+      );
     }
-    
+
     if (species.maxHeight != null) {
       characteristics.add('Max Height: ${species.maxHeight}');
     }
-    
+
     if (species.bloomTime != null) {
       characteristics.add('Bloom Time: ${species.bloomTime}');
     }
-    
+
     if (species.plantType != null) {
       characteristics.add('Plant Type: ${species.plantType}');
     }
@@ -467,11 +452,7 @@ class _PlantSpeciesDetailScreenState
       children: [
         Row(
           children: [
-            Icon(
-              Icons.nature,
-              size: 24,
-              color: theme.primaryColor,
-            ),
+            Icon(Icons.nature, size: 24, color: theme.primaryColor),
             const SizedBox(width: 8),
             Text(
               'Growth Characteristics',
@@ -494,10 +475,7 @@ class _PlantSpeciesDetailScreenState
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text(
-                    characteristic,
-                    style: theme.textTheme.bodyLarge,
-                  ),
+                  child: Text(characteristic, style: theme.textTheme.bodyLarge),
                 ),
               ],
             ),

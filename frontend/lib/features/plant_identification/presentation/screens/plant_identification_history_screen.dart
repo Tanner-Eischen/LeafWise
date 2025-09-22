@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:plant_social/features/plant_identification/models/plant_identification_models.dart';
-import 'package:plant_social/features/plant_identification/providers/plant_identification_provider.dart';
-import 'package:plant_social/core/widgets/loading_widget.dart';
-import 'package:plant_social/core/widgets/error_widget.dart';
+import 'package:leafwise/features/plant_identification/models/plant_identification_models.dart';
+import 'package:leafwise/features/plant_identification/providers/plant_identification_provider.dart';
+import 'package:leafwise/core/widgets/loading_widget.dart';
+import 'package:leafwise/core/widgets/error_widget.dart';
 
 class PlantIdentificationHistoryScreen extends ConsumerStatefulWidget {
   const PlantIdentificationHistoryScreen({super.key});
@@ -20,7 +20,9 @@ class _PlantIdentificationHistoryScreenState
     super.initState();
     // Load history when screen opens
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(plantIdentificationProvider.notifier).loadIdentificationHistory();
+      ref
+          .read(plantIdentificationProvider.notifier)
+          .loadIdentificationHistory();
     });
   }
 
@@ -39,7 +41,9 @@ class _PlantIdentificationHistoryScreenState
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {
-              ref.read(plantIdentificationProvider.notifier).loadIdentificationHistory();
+              ref
+                  .read(plantIdentificationProvider.notifier)
+                  .loadIdentificationHistory();
             },
           ),
         ],
@@ -58,7 +62,9 @@ class _PlantIdentificationHistoryScreenState
         child: CustomErrorWidget(
           message: state.error!,
           onRetry: () {
-            ref.read(plantIdentificationProvider.notifier).loadIdentificationHistory();
+            ref
+                .read(plantIdentificationProvider.notifier)
+                .loadIdentificationHistory();
           },
         ),
       );
@@ -70,7 +76,9 @@ class _PlantIdentificationHistoryScreenState
 
     return RefreshIndicator(
       onRefresh: () async {
-        await ref.read(plantIdentificationProvider.notifier).loadIdentificationHistory();
+        await ref
+            .read(plantIdentificationProvider.notifier)
+            .loadIdentificationHistory();
       },
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
@@ -88,11 +96,7 @@ class _PlantIdentificationHistoryScreenState
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.eco,
-            size: 80,
-            color: Colors.grey[400],
-          ),
+          Icon(Icons.eco, size: 80, color: Colors.grey[400]),
           const SizedBox(height: 16),
           Text(
             'No identifications yet',
@@ -118,10 +122,7 @@ class _PlantIdentificationHistoryScreenState
             style: ElevatedButton.styleFrom(
               backgroundColor: theme.primaryColor,
               foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 24,
-                vertical: 12,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             ),
           ),
         ],
@@ -129,13 +130,14 @@ class _PlantIdentificationHistoryScreenState
     );
   }
 
-  Widget _buildHistoryItem(PlantIdentification identification, ThemeData theme) {
+  Widget _buildHistoryItem(
+    PlantIdentification identification,
+    ThemeData theme,
+  ) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () {
@@ -164,11 +166,7 @@ class _PlantIdentificationHistoryScreenState
                             );
                           },
                         )
-                      : Icon(
-                          Icons.eco,
-                          color: Colors.grey[400],
-                          size: 30,
-                        ),
+                      : Icon(Icons.eco, color: Colors.grey[400], size: 30),
                 ),
               ),
               const SizedBox(width: 16),
@@ -214,10 +212,7 @@ class _PlantIdentificationHistoryScreenState
               ),
 
               // Arrow icon
-              Icon(
-                Icons.chevron_right,
-                color: Colors.grey[400],
-              ),
+              Icon(Icons.chevron_right, color: Colors.grey[400]),
             ],
           ),
         ),
@@ -316,17 +311,17 @@ class _PlantIdentificationHistoryScreenState
                       children: [
                         Text(
                           identification.commonName,
-                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.headlineSmall
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           identification.scientificName,
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            fontStyle: FontStyle.italic,
-                            color: Colors.grey[600],
-                          ),
+                          style: Theme.of(context).textTheme.bodyLarge
+                              ?.copyWith(
+                                fontStyle: FontStyle.italic,
+                                color: Colors.grey[600],
+                              ),
                         ),
                       ],
                     ),
@@ -385,30 +380,29 @@ class _PlantIdentificationHistoryScreenState
 
                     // Care info
                     ...[
-                    const SizedBox(height: 16),
-                    Text(
-                      'Care Information',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+                      const SizedBox(height: 16),
+                      Text(
+                        'Care Information',
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    _buildDetailSection(
-                      'Light',
-                      identification.careInfo.lightRequirement,
-                      Icons.wb_sunny,
-                    ),
-                    _buildDetailSection(
-                      'Water',
-                      identification.careInfo.waterFrequency,
-                      Icons.water_drop,
-                    ),
-                    _buildDetailSection(
-                      'Care Level',
-                      identification.careInfo.careLevel,
-                      Icons.trending_up,
-                    ),
-                  ],
+                      const SizedBox(height: 12),
+                      _buildDetailSection(
+                        'Light',
+                        identification.careInfo.lightRequirement,
+                        Icons.wb_sunny,
+                      ),
+                      _buildDetailSection(
+                        'Water',
+                        identification.careInfo.waterFrequency,
+                        Icons.water_drop,
+                      ),
+                      _buildDetailSection(
+                        'Care Level',
+                        identification.careInfo.careLevel,
+                        Icons.trending_up,
+                      ),
+                    ],
 
                     const SizedBox(height: 100),
                   ],
@@ -426,23 +420,16 @@ class _PlantIdentificationHistoryScreenState
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         children: [
-          Icon(
-            icon,
-            size: 20,
-            color: Theme.of(context).primaryColor,
-          ),
+          Icon(icon, size: 20, color: Theme.of(context).primaryColor),
           const SizedBox(width: 12),
           Text(
             '$label: ',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w500,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
           ),
           Expanded(
-            child: Text(
-              value,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
+            child: Text(value, style: Theme.of(context).textTheme.bodyMedium),
           ),
         ],
       ),

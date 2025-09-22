@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:plant_social/core/models/user.dart';
+import 'package:leafwise/core/models/user.dart';
 
 part 'message.freezed.dart';
 part 'message.g.dart';
@@ -15,13 +15,7 @@ enum MessageType {
   plant_care_tip, // Phase 2
 }
 
-enum MessageStatus {
-  sending,
-  sent,
-  delivered,
-  read,
-  failed,
-}
+enum MessageStatus { sending, sent, delivered, read, failed }
 
 @freezed
 class Message with _$Message {
@@ -41,16 +35,17 @@ class Message with _$Message {
     DateTime? editedAt,
     required DateTime createdAt,
     DateTime? updatedAt,
-    
+
     // Sender info (populated from join)
     User? sender,
-    
+
     // Plant-specific fields for Phase 2
     String? plantId,
     Map<String, dynamic>? plantData,
   }) = _Message;
 
-  factory Message.fromJson(Map<String, dynamic> json) => _$MessageFromJson(json);
+  factory Message.fromJson(Map<String, dynamic> json) =>
+      _$MessageFromJson(json);
 }
 
 @freezed
@@ -67,12 +62,13 @@ class Conversation with _$Conversation {
     DateTime? lastReadAt,
     required DateTime createdAt,
     DateTime? updatedAt,
-    
+
     // Other user info (populated from join)
     User? otherUser,
   }) = _Conversation;
 
-  factory Conversation.fromJson(Map<String, dynamic> json) => _$ConversationFromJson(json);
+  factory Conversation.fromJson(Map<String, dynamic> json) =>
+      _$ConversationFromJson(json);
 }
 
 @freezed
@@ -89,7 +85,8 @@ class SendMessageRequest with _$SendMessageRequest {
     Map<String, dynamic>? plantData,
   }) = _SendMessageRequest;
 
-  factory SendMessageRequest.fromJson(Map<String, dynamic> json) => _$SendMessageRequestFromJson(json);
+  factory SendMessageRequest.fromJson(Map<String, dynamic> json) =>
+      _$SendMessageRequestFromJson(json);
 }
 
 @freezed
@@ -100,10 +97,11 @@ class MessageReaction with _$MessageReaction {
     required String userId,
     required String emoji,
     required DateTime createdAt,
-    
+
     // User info (populated from join)
     User? user,
   }) = _MessageReaction;
 
-  factory MessageReaction.fromJson(Map<String, dynamic> json) => _$MessageReactionFromJson(json);
+  factory MessageReaction.fromJson(Map<String, dynamic> json) =>
+      _$MessageReactionFromJson(json);
 }

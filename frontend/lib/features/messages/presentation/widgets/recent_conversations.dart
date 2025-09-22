@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:plant_social/core/router/app_router.dart';
+import 'package:leafwise/core/router/app_router.dart';
 
 class RecentConversations extends ConsumerWidget {
   const RecentConversations({super.key});
@@ -53,7 +53,9 @@ class RecentConversations extends ConsumerWidget {
   }
 
   List<Widget> _buildSampleConversations(
-      BuildContext context, ThemeData theme) {
+    BuildContext context,
+    ThemeData theme,
+  ) {
     final conversations = _getSampleConversations();
 
     return conversations.take(3).map((conversation) {
@@ -78,8 +80,8 @@ class RecentConversations extends ConsumerWidget {
           children: [
             CircleAvatar(
               radius: 24,
-              backgroundColor:
-                  (conversation['avatarColor'] as Color).withOpacity(0.2),
+              backgroundColor: (conversation['avatarColor'] as Color)
+                  .withOpacity(0.2),
               child: Text(
                 conversation['name'][0].toUpperCase(),
                 style: theme.textTheme.titleMedium?.copyWith(

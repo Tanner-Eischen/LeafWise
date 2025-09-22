@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:plant_social/features/plant_community/models/plant_community_models.dart';
-import 'package:plant_social/features/plant_community/providers/plant_community_provider.dart';
-import 'package:plant_social/features/plant_community/presentation/widgets/trade_card.dart';
-import 'package:plant_social/core/widgets/custom_search_bar.dart';
+import 'package:leafwise/features/plant_community/models/plant_community_models.dart';
+import 'package:leafwise/features/plant_community/providers/plant_community_provider.dart';
+import 'package:leafwise/features/plant_community/presentation/widgets/trade_card.dart';
+import 'package:leafwise/core/widgets/custom_search_bar.dart';
 
 class PlantTradesScreen extends ConsumerStatefulWidget {
   const PlantTradesScreen({super.key});
@@ -16,7 +16,7 @@ class _PlantTradesScreenState extends ConsumerState<PlantTradesScreen>
     with SingleTickerProviderStateMixin {
   final _scrollController = ScrollController();
   final _searchController = TextEditingController();
-  
+
   String? _selectedTradeType;
   String? _selectedSort = SortOption.newest;
   bool _showFilters = false;
@@ -25,7 +25,7 @@ class _PlantTradesScreenState extends ConsumerState<PlantTradesScreen>
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    
+
     // Load initial trades
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(plantCommunityProvider.notifier).loadTrades(refresh: true);
@@ -44,13 +44,15 @@ class _PlantTradesScreenState extends ConsumerState<PlantTradesScreen>
         _scrollController.position.maxScrollExtent - 200) {
       final state = ref.read(plantCommunityProvider);
       if (!state.isLoading && state.hasMoreTrades) {
-        ref.read(plantCommunityProvider.notifier).loadTrades(
-          tradeType: _selectedTradeType,
-          search: _searchController.text.trim().isEmpty
-              ? null
-              : _searchController.text.trim(),
-          sortBy: _selectedSort,
-        );
+        ref
+            .read(plantCommunityProvider.notifier)
+            .loadTrades(
+              tradeType: _selectedTradeType,
+              search: _searchController.text.trim().isEmpty
+                  ? null
+                  : _searchController.text.trim(),
+              sortBy: _selectedSort,
+            );
       }
     }
   }
@@ -95,9 +97,7 @@ class _PlantTradesScreenState extends ConsumerState<PlantTradesScreen>
           if (_showFilters) _buildFilters(theme),
 
           // Trades list
-          Expanded(
-            child: _buildTradesList(trades, state),
-          ),
+          Expanded(child: _buildTradesList(trades, state)),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -113,9 +113,7 @@ class _PlantTradesScreenState extends ConsumerState<PlantTradesScreen>
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.grey[50],
-        border: Border(
-          bottom: BorderSide(color: Colors.grey[200]!),
-        ),
+        border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,7 +139,7 @@ class _PlantTradesScreenState extends ConsumerState<PlantTradesScreen>
                     () => _selectTradeType(null),
                   );
                 }
-                
+
                 final tradeType = TradeType.all[index - 1];
                 return _buildTradeTypeChip(
                   TradeType.getDisplayName(tradeType),
@@ -190,7 +188,7 @@ class _PlantTradesScreenState extends ConsumerState<PlantTradesScreen>
     VoidCallback onTap,
   ) {
     final theme = Theme.of(context);
-    
+
     return Padding(
       padding: const EdgeInsets.only(right: 8),
       child: FilterChip(
@@ -208,14 +206,9 @@ class _PlantTradesScreenState extends ConsumerState<PlantTradesScreen>
     );
   }
 
-  Widget _buildTradesList(
-    List<PlantTrade> trades,
-    PlantCommunityState state,
-  ) {
+  Widget _buildTradesList(List<PlantTrade> trades, PlantCommunityState state) {
     if (state.isLoading && trades.isEmpty) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     if (state.error != null && trades.isEmpty) {
@@ -223,25 +216,16 @@ class _PlantTradesScreenState extends ConsumerState<PlantTradesScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.grey[400],
-            ),
+            Icon(Icons.error_outline, size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
             Text(
               'Failed to load trades',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 18, color: Colors.grey[600]),
             ),
             const SizedBox(height: 8),
             Text(
               state.error!,
-              style: TextStyle(
-                color: Colors.grey[500],
-              ),
+              style: TextStyle(color: Colors.grey[500]),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
@@ -259,25 +243,16 @@ class _PlantTradesScreenState extends ConsumerState<PlantTradesScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.swap_horiz,
-              size: 64,
-              color: Colors.grey[400],
-            ),
+            Icon(Icons.swap_horiz, size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
             Text(
               'No trades available',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 18, color: Colors.grey[600]),
             ),
             const SizedBox(height: 8),
             Text(
               'Be the first to create a trade!',
-              style: TextStyle(
-                color: Colors.grey[500],
-              ),
+              style: TextStyle(color: Colors.grey[500]),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
@@ -299,9 +274,7 @@ class _PlantTradesScreenState extends ConsumerState<PlantTradesScreen>
           if (index >= trades.length) {
             return const Padding(
               padding: EdgeInsets.all(16),
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
+              child: Center(child: CircularProgressIndicator()),
             );
           }
 
@@ -340,14 +313,16 @@ class _PlantTradesScreenState extends ConsumerState<PlantTradesScreen>
   }
 
   Future<void> _refreshTrades() async {
-    await ref.read(plantCommunityProvider.notifier).loadTrades(
-      refresh: true,
-      tradeType: _selectedTradeType,
-      search: _searchController.text.trim().isEmpty
-          ? null
-          : _searchController.text.trim(),
-      sortBy: _selectedSort,
-    );
+    await ref
+        .read(plantCommunityProvider.notifier)
+        .loadTrades(
+          refresh: true,
+          tradeType: _selectedTradeType,
+          search: _searchController.text.trim().isEmpty
+              ? null
+              : _searchController.text.trim(),
+          sortBy: _selectedSort,
+        );
   }
 
   void _bookmarkTrade(String tradeId) {
@@ -359,10 +334,7 @@ class _PlantTradesScreenState extends ConsumerState<PlantTradesScreen>
   }
 
   void _navigateToCreateTrade() {
-    Navigator.pushNamed(
-      context,
-      '/create-trade',
-    ).then((result) {
+    Navigator.pushNamed(context, '/create-trade').then((result) {
       if (result == true) {
         _refreshTrades();
       }
@@ -370,10 +342,6 @@ class _PlantTradesScreenState extends ConsumerState<PlantTradesScreen>
   }
 
   void _navigateToTradeDetail(PlantTrade trade) {
-    Navigator.pushNamed(
-      context,
-      '/trade-detail',
-      arguments: trade.id,
-    );
+    Navigator.pushNamed(context, '/trade-detail', arguments: trade.id);
   }
 }

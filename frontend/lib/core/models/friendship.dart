@@ -1,15 +1,10 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:plant_social/core/models/user.dart';
+import 'package:leafwise/core/models/user.dart';
 
 part 'friendship.freezed.dart';
 part 'friendship.g.dart';
 
-enum FriendshipStatus {
-  pending,
-  accepted,
-  blocked,
-  declined,
-}
+enum FriendshipStatus { pending, accepted, blocked, declined }
 
 @freezed
 class Friendship with _$Friendship {
@@ -24,13 +19,14 @@ class Friendship with _$Friendship {
     DateTime? declinedAt,
     required DateTime createdAt,
     DateTime? updatedAt,
-    
+
     // User info (populated from join)
     User? requester,
     User? addressee,
   }) = _Friendship;
 
-  factory Friendship.fromJson(Map<String, dynamic> json) => _$FriendshipFromJson(json);
+  factory Friendship.fromJson(Map<String, dynamic> json) =>
+      _$FriendshipFromJson(json);
 }
 
 @freezed
@@ -42,13 +38,14 @@ class FriendRequest with _$FriendRequest {
     String? message,
     @Default(FriendshipStatus.pending) FriendshipStatus status,
     required DateTime createdAt,
-    
+
     // User info (populated from join)
     User? fromUser,
     User? toUser,
   }) = _FriendRequest;
 
-  factory FriendRequest.fromJson(Map<String, dynamic> json) => _$FriendRequestFromJson(json);
+  factory FriendRequest.fromJson(Map<String, dynamic> json) =>
+      _$FriendRequestFromJson(json);
 }
 
 @freezed
@@ -58,7 +55,8 @@ class SendFriendRequestRequest with _$SendFriendRequestRequest {
     String? message,
   }) = _SendFriendRequestRequest;
 
-  factory SendFriendRequestRequest.fromJson(Map<String, dynamic> json) => _$SendFriendRequestRequestFromJson(json);
+  factory SendFriendRequestRequest.fromJson(Map<String, dynamic> json) =>
+      _$SendFriendRequestRequestFromJson(json);
 }
 
 @freezed
@@ -68,7 +66,8 @@ class FriendshipResponse with _$FriendshipResponse {
     required FriendshipStatus status,
   }) = _FriendshipResponse;
 
-  factory FriendshipResponse.fromJson(Map<String, dynamic> json) => _$FriendshipResponseFromJson(json);
+  factory FriendshipResponse.fromJson(Map<String, dynamic> json) =>
+      _$FriendshipResponseFromJson(json);
 }
 
 @freezed
@@ -80,7 +79,8 @@ class FriendsList with _$FriendsList {
     String? nextCursor,
   }) = _FriendsList;
 
-  factory FriendsList.fromJson(Map<String, dynamic> json) => _$FriendsListFromJson(json);
+  factory FriendsList.fromJson(Map<String, dynamic> json) =>
+      _$FriendsListFromJson(json);
 }
 
 @freezed
@@ -92,7 +92,8 @@ class FriendRequestsList with _$FriendRequestsList {
     String? nextCursor,
   }) = _FriendRequestsList;
 
-  factory FriendRequestsList.fromJson(Map<String, dynamic> json) => _$FriendRequestsListFromJson(json);
+  factory FriendRequestsList.fromJson(Map<String, dynamic> json) =>
+      _$FriendRequestsListFromJson(json);
 }
 
 @freezed
@@ -102,5 +103,6 @@ class MutualFriends with _$MutualFriends {
     @Default(0) int count,
   }) = _MutualFriends;
 
-  factory MutualFriends.fromJson(Map<String, dynamic> json) => _$MutualFriendsFromJson(json);
+  factory MutualFriends.fromJson(Map<String, dynamic> json) =>
+      _$MutualFriendsFromJson(json);
 }

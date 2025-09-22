@@ -48,6 +48,31 @@ app.*.map.json
 .env
 /backend/venv/*
 
+# Testing
+test/
+tests/
+*_test.dart
+test_*.dart
+integration_test/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+flutter_test/
+test_driver/
+coverage/
+.coverage
+*.lcov
+
+# Analysis and debugging
+analysis_results.txt
+*.tmp
+*.temp
+
+# Cache and temporary files
+.cache/
+tmp/
+temp/
+
 # Vibe Tools
 .vibe-tools/
 .vibe-tools.env

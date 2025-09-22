@@ -7,25 +7,10 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:plant_social/features/camera/models/ar_seasonal_models.dart';
-import 'package:plant_social/features/camera/services/ar_seasonal_service.dart';
-import 'package:plant_social/features/seasonal_ai/models/seasonal_ai_models.dart';
-import 'package:plant_social/core/network/api_client.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
-/// Provider for AR seasonal service
-final arSeasonalServiceProvider = Provider<ARSeasonalService>((ref) {
-  return ARSeasonalService(
-    ApiClient(
-      const FlutterSecureStorage(
-        aOptions: AndroidOptions(encryptedSharedPreferences: true),
-        iOptions: IOSOptions(
-          accessibility: KeychainAccessibility.first_unlock_this_device,
-        ),
-      ),
-    ),
-  );
-});
+import 'package:leafwise/features/camera/models/ar_seasonal_models.dart';
+import 'package:leafwise/features/camera/services/ar_seasonal_service.dart';
+import 'package:leafwise/features/seasonal_ai/models/seasonal_ai_models.dart';
+import 'package:leafwise/features/camera/providers/ar_providers.dart';
 
 /// Provider for AR seasonal overlay state
 final arSeasonalOverlayProvider =
@@ -428,7 +413,7 @@ class _ARSeasonalOverlayState extends ConsumerState<ARSeasonalOverlayWidget>
             color: Colors.black54,
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Row(
+          child: const Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               SizedBox(

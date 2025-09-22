@@ -8,9 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:async';
 import 'dart:math' as math;
-import 'package:plant_social/features/camera/models/ar_seasonal_models.dart';
-import 'package:plant_social/features/camera/services/ar_seasonal_service.dart';
-import 'package:plant_social/features/timelapse/models/timelapse_models.dart';
+import 'package:leafwise/features/camera/models/ar_seasonal_models.dart';
+import 'package:leafwise/features/camera/services/ar_seasonal_service.dart';
+import 'package:leafwise/features/timelapse/models/timelapse_models.dart';
+import 'package:leafwise/features/camera/providers/ar_providers.dart';
 
 /// Provider for AR time-lapse preview state
 final arTimelapsePreviewProvider =
@@ -250,7 +251,7 @@ class _ARTimelapsePreviewState extends ConsumerState<ARTimelapsePreviewWidget>
         builder: (context, child) {
           return FadeTransition(
             opacity: _fadeController,
-            child: Container(
+            child: SizedBox(
               width: 120,
               height: 160,
               child: CustomPaint(
@@ -561,12 +562,12 @@ class _ARTimelapsePreviewState extends ConsumerState<ARTimelapsePreviewWidget>
       left: 20,
       right: 20,
       child: Container(
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
+        padding: const EdgeInsets.all(16),
+        decoration: const BoxDecoration(
           color: Colors.black54,
           borderRadius: BorderRadius.all(Radius.circular(12)),
         ),
-        child: Row(
+        child: const Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(

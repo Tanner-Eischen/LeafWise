@@ -7,9 +7,10 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:math' as math;
-import 'package:plant_social/features/camera/models/ar_seasonal_models.dart';
-import 'package:plant_social/features/camera/services/ar_seasonal_service.dart';
-import 'package:plant_social/features/seasonal_ai/models/seasonal_ai_models.dart';
+import 'package:leafwise/features/camera/models/ar_seasonal_models.dart';
+import 'package:leafwise/features/camera/services/ar_seasonal_service.dart';
+import 'package:leafwise/features/camera/providers/ar_providers.dart';
+import 'package:leafwise/features/seasonal_ai/models/seasonal_ai_models.dart';
 
 /// Provider for AR growth projection state
 final arGrowthProjectionProvider =
@@ -199,7 +200,7 @@ class _ARGrowthProjectionState extends ConsumerState<ARGrowthProjectionWidget>
 
     return Transform.scale(
       scale: scale,
-      child: Container(
+      child: SizedBox(
         width: 100,
         height: 150,
         child: CustomPaint(
@@ -461,12 +462,12 @@ class _ARGrowthProjectionState extends ConsumerState<ARGrowthProjectionWidget>
       left: 20,
       right: 20,
       child: Container(
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
+        padding: const EdgeInsets.all(16),
+        decoration: const BoxDecoration(
           color: Colors.black54,
           borderRadius: BorderRadius.all(Radius.circular(12)),
         ),
-        child: Row(
+        child: const Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
@@ -580,7 +581,7 @@ class PlantModelPainter extends CustomPainter {
     // Draw stem
     paint.color = _parseColor(model.stemColor).withOpacity(0.8);
     final stemHeight = (model.height / 20) * size.height * animationValue;
-    final stemWidth = 4.0;
+    const stemWidth = 4.0;
 
     canvas.drawRRect(
       RRect.fromRectAndRadius(
@@ -629,7 +630,7 @@ class PlantModelPainter extends CustomPainter {
 
   void _drawLeaf(Canvas canvas, Offset center, Paint paint, double angle) {
     final leafPath = Path();
-    final leafSize = 8.0;
+    const leafSize = 8.0;
 
     leafPath.moveTo(center.dx, center.dy);
     leafPath.quadraticBezierTo(

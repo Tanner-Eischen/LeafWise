@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:plant_social/features/timelapse/presentation/widgets/growth_analysis_widget.dart';
+import 'package:leafwise/features/timelapse/presentation/widgets/growth_analysis_widget.dart';
 
 class TimelapseSessionDetailScreen extends ConsumerWidget {
   final String sessionId;
@@ -14,9 +14,7 @@ class TimelapseSessionDetailScreen extends ConsumerWidget {
     // final sessionAsync = ref.watch(timelapseSessionProvider(sessionId));
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Session Details'),
-      ),
+      appBar: AppBar(title: const Text('Session Details')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

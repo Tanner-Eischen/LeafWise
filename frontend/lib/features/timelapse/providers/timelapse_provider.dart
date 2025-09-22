@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:plant_social/core/services/api_service.dart';
-import 'package:plant_social/features/timelapse/models/timelapse_models.dart';
-import 'package:plant_social/features/timelapse/models/timelapse_models_extended.dart';
-import 'package:plant_social/features/timelapse/models/timelapse_state.dart';
-import 'package:plant_social/features/timelapse/services/timelapse_service.dart';
+import 'package:leafwise/core/services/api_service.dart';
+import 'package:leafwise/features/timelapse/models/timelapse_models.dart';
+import 'package:leafwise/features/timelapse/models/timelapse_models_extended.dart';
+import 'package:leafwise/features/timelapse/models/timelapse_state.dart';
+import 'package:leafwise/features/timelapse/services/timelapse_service.dart';
 
 // Service provider
 final timelapseServiceProvider = Provider<TimelapseService>((ref) {
@@ -12,10 +12,11 @@ final timelapseServiceProvider = Provider<TimelapseService>((ref) {
 });
 
 // Main state provider
-final timelapseProvider = StateNotifierProvider<TimelapseNotifier, TimelapseState>((ref) {
-  final service = ref.watch(timelapseServiceProvider);
-  return TimelapseNotifier(service);
-});
+final timelapseProvider =
+    StateNotifierProvider<TimelapseNotifier, TimelapseState>((ref) {
+      final service = ref.watch(timelapseServiceProvider);
+      return TimelapseNotifier(service);
+    });
 
 // Individual providers for specific use cases
 final timelapseSessions = Provider<List<TimelapseSession>>((ref) {
@@ -35,83 +36,108 @@ final growthMilestonesProvider = Provider<List<GrowthMilestone>>((ref) {
 });
 
 // Individual session provider
-final timelapseSessionProvider = FutureProvider.family<TimelapseSession, String>((ref, sessionId) async {
-  final service = ref.watch(timelapseServiceProvider);
-  return service.getSession(sessionId);
-});
+final timelapseSessionProvider =
+    FutureProvider.family<TimelapseSession, String>((ref, sessionId) async {
+      final service = ref.watch(timelapseServiceProvider);
+      return service.getSession(sessionId);
+    });
 
 // Sessions for specific plant
-final plantTimelapseSessionsProvider = FutureProvider.family<List<TimelapseSession>, String>((ref, plantId) async {
-  final service = ref.watch(timelapseServiceProvider);
-  return service.getSessions(plantId: plantId);
-});
+final plantTimelapseSessionsProvider =
+    FutureProvider.family<List<TimelapseSession>, String>((ref, plantId) async {
+      final service = ref.watch(timelapseServiceProvider);
+      return service.getSessions(plantId: plantId);
+    });
 
 // Photos for session
-final sessionPhotosProvider = FutureProvider.family<List<Map<String, dynamic>>, SessionPhotosParams>((ref, params) async {
-  final service = ref.watch(timelapseServiceProvider);
-  return service.getPhotos(
-    sessionId: params.sessionId,
-    startDate: params.startDate,
-    endDate: params.endDate,
-    limit: params.limit,
-  );
-});
+final sessionPhotosProvider =
+    FutureProvider.family<List<Map<String, dynamic>>, SessionPhotosParams>((
+      ref,
+      params,
+    ) async {
+      final service = ref.watch(timelapseServiceProvider);
+      return service.getPhotos(
+        sessionId: params.sessionId,
+        startDate: params.startDate,
+        endDate: params.endDate,
+        limit: params.limit,
+      );
+    });
 
 // Growth analysis for session
-final sessionGrowthAnalysisProvider = FutureProvider.family<GrowthAnalysis, String>((ref, sessionId) async {
-  final service = ref.watch(timelapseServiceProvider);
-  return service.getGrowthAnalysis(sessionId);
-});
+final sessionGrowthAnalysisProvider =
+    FutureProvider.family<GrowthAnalysis, String>((ref, sessionId) async {
+      final service = ref.watch(timelapseServiceProvider);
+      return service.getGrowthAnalysis(sessionId);
+    });
 
 // Growth analytics for session
-final sessionGrowthAnalyticsProvider = FutureProvider.family<GrowthAnalytics, GrowthAnalyticsParams>((ref, params) async {
-  final service = ref.watch(timelapseServiceProvider);
-  return service.getGrowthAnalytics(
-    sessionId: params.sessionId,
-    startDate: params.startDate,
-    endDate: params.endDate,
-  );
-});
+final sessionGrowthAnalyticsProvider =
+    FutureProvider.family<GrowthAnalytics, GrowthAnalyticsParams>((
+      ref,
+      params,
+    ) async {
+      final service = ref.watch(timelapseServiceProvider);
+      return service.getGrowthAnalytics(
+        sessionId: params.sessionId,
+        startDate: params.startDate,
+        endDate: params.endDate,
+      );
+    });
 
 // Milestones for session
-final sessionMilestonesProvider = FutureProvider.family<List<GrowthMilestone>, String>((ref, sessionId) async {
-  final service = ref.watch(timelapseServiceProvider);
-  return service.getMilestones(sessionId);
-});
+final sessionMilestonesProvider =
+    FutureProvider.family<List<GrowthMilestone>, String>((
+      ref,
+      sessionId,
+    ) async {
+      final service = ref.watch(timelapseServiceProvider);
+      return service.getMilestones(sessionId);
+    });
 
 // Video for session
-final sessionVideoProvider = FutureProvider.family<TimelapseVideo?, String>((ref, sessionId) async {
+final sessionVideoProvider = FutureProvider.family<TimelapseVideo?, String>((
+  ref,
+  sessionId,
+) async {
   final service = ref.watch(timelapseServiceProvider);
   return service.getVideo(sessionId);
 });
 
 // Video status for session
-final sessionVideoStatusProvider = FutureProvider.family<Map<String, dynamic>, String>((ref, sessionId) async {
-  final service = ref.watch(timelapseServiceProvider);
-  return service.getVideoStatus(sessionId);
-});
+final sessionVideoStatusProvider =
+    FutureProvider.family<Map<String, dynamic>, String>((ref, sessionId) async {
+      final service = ref.watch(timelapseServiceProvider);
+      return service.getVideoStatus(sessionId);
+    });
 
 // Photo schedule for session
-final sessionPhotoScheduleProvider = FutureProvider.family<PhotoSchedule?, String>((ref, sessionId) async {
-  final service = ref.watch(timelapseServiceProvider);
-  return service.getPhotoSchedule(sessionId);
-});
+final sessionPhotoScheduleProvider =
+    FutureProvider.family<PhotoSchedule?, String>((ref, sessionId) async {
+      final service = ref.watch(timelapseServiceProvider);
+      return service.getPhotoSchedule(sessionId);
+    });
 
 // Growth comparison provider
-final growthComparisonProvider = FutureProvider.family<List<GrowthComparison>, GrowthComparisonParams>((ref, params) async {
-  final service = ref.watch(timelapseServiceProvider);
-  return service.compareGrowth(
-    sessionIds: params.sessionIds,
-    startDate: params.startDate,
-    endDate: params.endDate,
-  );
-});
+final growthComparisonProvider =
+    FutureProvider.family<List<GrowthComparison>, GrowthComparisonParams>((
+      ref,
+      params,
+    ) async {
+      final service = ref.watch(timelapseServiceProvider);
+      return service.compareGrowth(
+        sessionIds: params.sessionIds,
+        startDate: params.startDate,
+        endDate: params.endDate,
+      );
+    });
 
 // Recent sessions provider
-final recentSessionsProvider = FutureProvider.family<List<Map<String, dynamic>>, int>((ref, limit) async {
-  final service = ref.watch(timelapseServiceProvider);
-  return service.getRecentSessions(limit: limit);
-});
+final recentSessionsProvider =
+    FutureProvider.family<List<Map<String, dynamic>>, int>((ref, limit) async {
+      final service = ref.watch(timelapseServiceProvider);
+      return service.getRecentSessions(limit: limit);
+    });
 
 class TimelapseNotifier extends StateNotifier<TimelapseState> {
   final TimelapseService _service;
@@ -131,15 +157,9 @@ class TimelapseNotifier extends StateNotifier<TimelapseState> {
         status: status,
         limit: limit,
       );
-      state = state.copyWith(
-        sessions: sessions,
-        isLoadingSessions: false,
-      );
+      state = state.copyWith(sessions: sessions, isLoadingSessions: false);
     } catch (e) {
-      state = state.copyWith(
-        isLoadingSessions: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoadingSessions: false, error: e.toString());
     }
   }
 
@@ -163,10 +183,7 @@ class TimelapseNotifier extends StateNotifier<TimelapseState> {
         isCreating: false,
       );
     } catch (e) {
-      state = state.copyWith(
-        isCreating: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isCreating: false, error: e.toString());
       rethrow;
     }
   }
@@ -175,15 +192,9 @@ class TimelapseNotifier extends StateNotifier<TimelapseState> {
     state = state.copyWith(isLoadingSession: true, error: null);
     try {
       final session = await _service.getSession(sessionId);
-      state = state.copyWith(
-        activeSession: session,
-        isLoadingSession: false,
-      );
+      state = state.copyWith(activeSession: session, isLoadingSession: false);
     } catch (e) {
-      state = state.copyWith(
-        isLoadingSession: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoadingSession: false, error: e.toString());
     }
   }
 
@@ -197,17 +208,16 @@ class TimelapseNotifier extends StateNotifier<TimelapseState> {
       final updatedSessions = state.sessions.map((session) {
         return session.sessionId == sessionId ? updatedSession : session;
       }).toList();
-      
+
       state = state.copyWith(
         sessions: updatedSessions,
-        activeSession: state.activeSession?.sessionId == sessionId ? updatedSession : state.activeSession,
+        activeSession: state.activeSession?.sessionId == sessionId
+            ? updatedSession
+            : state.activeSession,
         isUpdating: false,
       );
     } catch (e) {
-      state = state.copyWith(
-        isUpdating: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isUpdating: false, error: e.toString());
       rethrow;
     }
   }
@@ -216,18 +226,19 @@ class TimelapseNotifier extends StateNotifier<TimelapseState> {
     state = state.copyWith(isDeleting: true, error: null);
     try {
       await _service.deleteSession(sessionId);
-      final updatedSessions = state.sessions.where((session) => session.sessionId != sessionId).toList();
-      
+      final updatedSessions = state.sessions
+          .where((session) => session.sessionId != sessionId)
+          .toList();
+
       state = state.copyWith(
         sessions: updatedSessions,
-        activeSession: state.activeSession?.sessionId == sessionId ? null : state.activeSession,
+        activeSession: state.activeSession?.sessionId == sessionId
+            ? null
+            : state.activeSession,
         isDeleting: false,
       );
     } catch (e) {
-      state = state.copyWith(
-        isDeleting: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isDeleting: false, error: e.toString());
       rethrow;
     }
   }
@@ -249,7 +260,7 @@ class TimelapseNotifier extends StateNotifier<TimelapseState> {
         measurements: measurements,
         metadata: metadata,
       );
-      
+
       // Add photo to session photos list if we have it loaded
       final updatedPhotos = [...state.sessionPhotos, photoData];
       state = state.copyWith(
@@ -257,10 +268,7 @@ class TimelapseNotifier extends StateNotifier<TimelapseState> {
         isUploadingPhoto: false,
       );
     } catch (e) {
-      state = state.copyWith(
-        isUploadingPhoto: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isUploadingPhoto: false, error: e.toString());
       rethrow;
     }
   }
@@ -279,15 +287,9 @@ class TimelapseNotifier extends StateNotifier<TimelapseState> {
         endDate: endDate,
         limit: limit,
       );
-      state = state.copyWith(
-        sessionPhotos: photos,
-        isLoadingPhotos: false,
-      );
+      state = state.copyWith(sessionPhotos: photos, isLoadingPhotos: false);
     } catch (e) {
-      state = state.copyWith(
-        isLoadingPhotos: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoadingPhotos: false, error: e.toString());
     }
   }
 
@@ -295,17 +297,13 @@ class TimelapseNotifier extends StateNotifier<TimelapseState> {
     state = state.copyWith(isDeleting: true, error: null);
     try {
       await _service.deletePhoto(sessionId, photoId);
-      final updatedPhotos = state.sessionPhotos.where((photo) => photo['id'] != photoId).toList();
-      
-      state = state.copyWith(
-        sessionPhotos: updatedPhotos,
-        isDeleting: false,
-      );
+      final updatedPhotos = state.sessionPhotos
+          .where((photo) => photo['id'] != photoId)
+          .toList();
+
+      state = state.copyWith(sessionPhotos: updatedPhotos, isDeleting: false);
     } catch (e) {
-      state = state.copyWith(
-        isDeleting: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isDeleting: false, error: e.toString());
       rethrow;
     }
   }
@@ -326,10 +324,7 @@ class TimelapseNotifier extends StateNotifier<TimelapseState> {
         isGeneratingVideo: false,
       );
     } catch (e) {
-      state = state.copyWith(
-        isGeneratingVideo: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isGeneratingVideo: false, error: e.toString());
       rethrow;
     }
   }
@@ -347,15 +342,9 @@ class TimelapseNotifier extends StateNotifier<TimelapseState> {
     state = state.copyWith(isLoadingVideo: true, error: null);
     try {
       final video = await _service.getVideo(sessionId);
-      state = state.copyWith(
-        sessionVideo: video,
-        isLoadingVideo: false,
-      );
+      state = state.copyWith(sessionVideo: video, isLoadingVideo: false);
     } catch (e) {
-      state = state.copyWith(
-        isLoadingVideo: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoadingVideo: false, error: e.toString());
     }
   }
 
@@ -369,10 +358,7 @@ class TimelapseNotifier extends StateNotifier<TimelapseState> {
         isLoadingAnalysis: false,
       );
     } catch (e) {
-      state = state.copyWith(
-        isLoadingAnalysis: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoadingAnalysis: false, error: e.toString());
     }
   }
 
@@ -380,15 +366,9 @@ class TimelapseNotifier extends StateNotifier<TimelapseState> {
     state = state.copyWith(isAnalyzing: true, error: null);
     try {
       final analysis = await _service.triggerGrowthAnalysis(sessionId);
-      state = state.copyWith(
-        growthAnalysis: analysis,
-        isAnalyzing: false,
-      );
+      state = state.copyWith(growthAnalysis: analysis, isAnalyzing: false);
     } catch (e) {
-      state = state.copyWith(
-        isAnalyzing: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isAnalyzing: false, error: e.toString());
       rethrow;
     }
   }
@@ -411,10 +391,7 @@ class TimelapseNotifier extends StateNotifier<TimelapseState> {
         isLoadingAnalytics: false,
       );
     } catch (e) {
-      state = state.copyWith(
-        isLoadingAnalytics: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoadingAnalytics: false, error: e.toString());
     }
   }
 
@@ -428,10 +405,7 @@ class TimelapseNotifier extends StateNotifier<TimelapseState> {
         isLoadingMilestones: false,
       );
     } catch (e) {
-      state = state.copyWith(
-        isLoadingMilestones: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoadingMilestones: false, error: e.toString());
     }
   }
 
@@ -456,10 +430,7 @@ class TimelapseNotifier extends StateNotifier<TimelapseState> {
         isCreating: false,
       );
     } catch (e) {
-      state = state.copyWith(
-        isCreating: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isCreating: false, error: e.toString());
       rethrow;
     }
   }
@@ -477,18 +448,17 @@ class TimelapseNotifier extends StateNotifier<TimelapseState> {
         updates,
       );
       final updatedMilestones = state.growthMilestones.map((milestone) {
-        return milestone.milestoneId == milestoneId ? updatedMilestone : milestone;
+        return milestone.milestoneId == milestoneId
+            ? updatedMilestone
+            : milestone;
       }).toList();
-      
+
       state = state.copyWith(
         growthMilestones: updatedMilestones,
         isUpdating: false,
       );
     } catch (e) {
-      state = state.copyWith(
-        isUpdating: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isUpdating: false, error: e.toString());
       rethrow;
     }
   }
@@ -510,15 +480,9 @@ class TimelapseNotifier extends StateNotifier<TimelapseState> {
         endTime: endTime,
         settings: settings,
       );
-      state = state.copyWith(
-        photoSchedule: schedule,
-        isCreating: false,
-      );
+      state = state.copyWith(photoSchedule: schedule, isCreating: false);
     } catch (e) {
-      state = state.copyWith(
-        isCreating: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isCreating: false, error: e.toString());
       rethrow;
     }
   }
@@ -527,15 +491,9 @@ class TimelapseNotifier extends StateNotifier<TimelapseState> {
     state = state.copyWith(isLoadingSchedule: true, error: null);
     try {
       final schedule = await _service.getPhotoSchedule(sessionId);
-      state = state.copyWith(
-        photoSchedule: schedule,
-        isLoadingSchedule: false,
-      );
+      state = state.copyWith(photoSchedule: schedule, isLoadingSchedule: false);
     } catch (e) {
-      state = state.copyWith(
-        isLoadingSchedule: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoadingSchedule: false, error: e.toString());
     }
   }
 
@@ -549,15 +507,9 @@ class TimelapseNotifier extends StateNotifier<TimelapseState> {
         sessionId,
         updates,
       );
-      state = state.copyWith(
-        photoSchedule: updatedSchedule,
-        isUpdating: false,
-      );
+      state = state.copyWith(photoSchedule: updatedSchedule, isUpdating: false);
     } catch (e) {
-      state = state.copyWith(
-        isUpdating: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isUpdating: false, error: e.toString());
       rethrow;
     }
   }
@@ -566,15 +518,9 @@ class TimelapseNotifier extends StateNotifier<TimelapseState> {
     state = state.copyWith(isDeleting: true, error: null);
     try {
       await _service.deletePhotoSchedule(sessionId);
-      state = state.copyWith(
-        photoSchedule: null,
-        isDeleting: false,
-      );
+      state = state.copyWith(photoSchedule: null, isDeleting: false);
     } catch (e) {
-      state = state.copyWith(
-        isDeleting: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isDeleting: false, error: e.toString());
       rethrow;
     }
   }

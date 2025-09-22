@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:plant_social/features/plant_community/models/plant_community_models.dart';
-import 'package:plant_social/core/utils/date_utils.dart' as app_date_utils;
-import 'package:plant_social/core/widgets/user_avatar.dart';
+import 'package:leafwise/features/plant_community/models/plant_community_models.dart';
+import 'package:leafwise/core/utils/date_utils.dart' as app_date_utils;
+import 'package:leafwise/core/widgets/user_avatar.dart';
 
 class TradeCard extends StatelessWidget {
   final PlantTrade trade;
@@ -22,13 +22,11 @@ class TradeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
@@ -179,11 +177,7 @@ class TradeCard extends StatelessWidget {
           // Plant name
           Row(
             children: [
-              Icon(
-                Icons.local_florist,
-                size: 16,
-                color: Colors.green[600],
-              ),
+              Icon(Icons.local_florist, size: 16, color: Colors.green[600]),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
@@ -196,8 +190,9 @@ class TradeCard extends StatelessWidget {
               ),
             ],
           ),
-          
-          if (trade.speciesScientificName != null && trade.speciesScientificName!.isNotEmpty) ...[
+
+          if (trade.speciesScientificName != null &&
+              trade.speciesScientificName!.isNotEmpty) ...[
             const SizedBox(height: 4),
             Text(
               trade.speciesScientificName!,
@@ -209,15 +204,12 @@ class TradeCard extends StatelessWidget {
           ],
 
           // What they want (for trade/swap)
-          if (trade.tradeType != TradeType.giveAway && trade.description.isNotEmpty) ...[
+          if (trade.tradeType != TradeType.giveAway &&
+              trade.description.isNotEmpty) ...[
             const SizedBox(height: 8),
             Row(
               children: [
-                Icon(
-                  Icons.swap_horiz,
-                  size: 16,
-                  color: Colors.blue[600],
-                ),
+                Icon(Icons.swap_horiz, size: 16, color: Colors.blue[600]),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
@@ -236,11 +228,7 @@ class TradeCard extends StatelessWidget {
             const SizedBox(height: 8),
             Row(
               children: [
-                Icon(
-                  Icons.attach_money,
-                  size: 16,
-                  color: Colors.orange[600],
-                ),
+                Icon(Icons.attach_money, size: 16, color: Colors.orange[600]),
                 const SizedBox(width: 6),
                 Text(
                   '\$${trade.price}',
@@ -259,8 +247,10 @@ class TradeCard extends StatelessWidget {
 
   Widget _buildImagePreview() {
     final imageCount = trade.imageUrls.length;
-    final displayCount = showFullContent ? imageCount : (imageCount > 3 ? 3 : imageCount);
-    
+    final displayCount = showFullContent
+        ? imageCount
+        : (imageCount > 3 ? 3 : imageCount);
+
     return SizedBox(
       height: 100,
       child: ListView.builder(
@@ -269,7 +259,7 @@ class TradeCard extends StatelessWidget {
         itemBuilder: (context, index) {
           final isLast = index == displayCount - 1;
           final hasMore = !showFullContent && imageCount > 3;
-          
+
           return Container(
             margin: EdgeInsets.only(right: isLast ? 0 : 8),
             child: Stack(
@@ -294,7 +284,7 @@ class TradeCard extends StatelessWidget {
                     },
                   ),
                 ),
-                
+
                 // Show count overlay on last image if there are more
                 if (isLast && hasMore)
                   Positioned.fill(
@@ -327,11 +317,7 @@ class TradeCard extends StatelessWidget {
       children: [
         // Location
         if (trade.location.isNotEmpty) ...[
-          Icon(
-            Icons.location_on_outlined,
-            size: 16,
-            color: Colors.grey[600],
-          ),
+          Icon(Icons.location_on_outlined, size: 16, color: Colors.grey[600]),
           const SizedBox(width: 4),
           Expanded(
             child: Text(
@@ -350,11 +336,7 @@ class TradeCard extends StatelessWidget {
           const SizedBox(width: 12),
           Row(
             children: [
-              Icon(
-                Icons.favorite_outline,
-                size: 16,
-                color: Colors.grey[600],
-              ),
+              Icon(Icons.favorite_outline, size: 16, color: Colors.grey[600]),
               const SizedBox(width: 4),
               Text(
                 '${trade.interestedCount}',
@@ -383,10 +365,7 @@ class TradeCard extends StatelessWidget {
                       ? Colors.red
                       : Colors.grey[600],
                 ),
-                constraints: const BoxConstraints(
-                  minWidth: 32,
-                  minHeight: 32,
-                ),
+                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                 padding: EdgeInsets.zero,
               ),
 
@@ -394,18 +373,13 @@ class TradeCard extends StatelessWidget {
             IconButton(
               onPressed: onBookmark,
               icon: Icon(
-                trade.isBookmarked
-                    ? Icons.bookmark
-                    : Icons.bookmark_border,
+                trade.isBookmarked ? Icons.bookmark : Icons.bookmark_border,
                 size: 20,
                 color: trade.isBookmarked
                     ? theme.primaryColor
                     : Colors.grey[600],
               ),
-              constraints: const BoxConstraints(
-                minWidth: 32,
-                minHeight: 32,
-              ),
+              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
               padding: EdgeInsets.zero,
             ),
           ],

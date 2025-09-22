@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:plant_social/features/plant_community/presentation/screens/plant_questions_screen.dart';
-import 'package:plant_social/features/plant_community/presentation/screens/plant_trades_screen.dart';
+import 'package:leafwise/features/plant_community/presentation/screens/plant_questions_screen.dart';
+import 'package:leafwise/features/plant_community/presentation/screens/plant_trades_screen.dart';
 
 class PlantCommunityScreen extends ConsumerStatefulWidget {
   const PlantCommunityScreen({super.key});
 
   @override
-  ConsumerState<PlantCommunityScreen> createState() => _PlantCommunityScreenState();
+  ConsumerState<PlantCommunityScreen> createState() =>
+      _PlantCommunityScreenState();
 }
 
 class _PlantCommunityScreenState extends ConsumerState<PlantCommunityScreen>
@@ -37,7 +38,7 @@ class _PlantCommunityScreenState extends ConsumerState<PlantCommunityScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Plant Community'),
@@ -45,14 +46,8 @@ class _PlantCommunityScreenState extends ConsumerState<PlantCommunityScreen>
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
-            Tab(
-              icon: Icon(Icons.help_outline),
-              text: 'Q&A',
-            ),
-            Tab(
-              icon: Icon(Icons.swap_horiz),
-              text: 'Trades',
-            ),
+            Tab(icon: Icon(Icons.help_outline), text: 'Q&A'),
+            Tab(icon: Icon(Icons.swap_horiz), text: 'Trades'),
           ],
           indicatorColor: theme.primaryColor,
           labelColor: theme.primaryColor,
@@ -73,10 +68,7 @@ class _PlantCommunityScreenState extends ConsumerState<PlantCommunityScreen>
       ),
       body: TabBarView(
         controller: _tabController,
-        children: const [
-          PlantQuestionsScreen(),
-          PlantTradesScreen(),
-        ],
+        children: const [PlantQuestionsScreen(), PlantTradesScreen()],
       ),
       floatingActionButton: _buildFloatingActionButton(),
     );
@@ -84,14 +76,12 @@ class _PlantCommunityScreenState extends ConsumerState<PlantCommunityScreen>
 
   Widget _buildFloatingActionButton() {
     final theme = Theme.of(context);
-    
+
     return FloatingActionButton(
       onPressed: _onFabPressed,
       tooltip: _currentIndex == 0 ? 'Ask Question' : 'Create Trade',
       backgroundColor: theme.primaryColor,
-      child: Icon(
-        _currentIndex == 0 ? Icons.add_comment : Icons.add_business,
-      ),
+      child: Icon(_currentIndex == 0 ? Icons.add_comment : Icons.add_business),
     );
   }
 
@@ -125,12 +115,14 @@ class PlantCommunityBottomNavScreen extends ConsumerStatefulWidget {
   const PlantCommunityBottomNavScreen({super.key});
 
   @override
-  ConsumerState<PlantCommunityBottomNavScreen> createState() => _PlantCommunityBottomNavScreenState();
+  ConsumerState<PlantCommunityBottomNavScreen> createState() =>
+      _PlantCommunityBottomNavScreenState();
 }
 
-class _PlantCommunityBottomNavScreenState extends ConsumerState<PlantCommunityBottomNavScreen> {
+class _PlantCommunityBottomNavScreenState
+    extends ConsumerState<PlantCommunityBottomNavScreen> {
   int _currentIndex = 0;
-  
+
   final List<Widget> _screens = const [
     PlantQuestionsScreen(),
     PlantTradesScreen(),
@@ -139,12 +131,9 @@ class _PlantCommunityBottomNavScreenState extends ConsumerState<PlantCommunityBo
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
+      body: IndexedStack(index: _currentIndex, children: _screens),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),

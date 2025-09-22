@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:plant_social/core/models/user.dart';
+import 'package:leafwise/core/models/user.dart';
 
 part 'story.freezed.dart';
 part 'story.g.dart';
@@ -13,12 +13,7 @@ enum StoryType {
   plant_identification, // Phase 2
 }
 
-enum StoryPrivacyLevel {
-  public,
-  friends,
-  close_friends,
-  private,
-}
+enum StoryPrivacyLevel { public, friends, close_friends, private }
 
 @freezed
 class Story with _$Story {
@@ -40,14 +35,14 @@ class Story with _$Story {
     @Default(false) bool isArchived,
     required DateTime createdAt,
     DateTime? updatedAt,
-    
+
     // User info (populated from join)
     User? user,
-    
+
     // Viewer's interaction status
     @Default(false) bool hasViewed,
     @Default(false) bool hasLiked,
-    
+
     // Plant-specific fields for Phase 2
     String? plantId,
     Map<String, dynamic>? plantData,
@@ -65,12 +60,13 @@ class StoryView with _$StoryView {
     required String storyId,
     required String userId,
     required DateTime viewedAt,
-    
+
     // User info (populated from join)
     User? user,
   }) = _StoryView;
 
-  factory StoryView.fromJson(Map<String, dynamic> json) => _$StoryViewFromJson(json);
+  factory StoryView.fromJson(Map<String, dynamic> json) =>
+      _$StoryViewFromJson(json);
 }
 
 @freezed
@@ -80,12 +76,13 @@ class StoryLike with _$StoryLike {
     required String storyId,
     required String userId,
     required DateTime createdAt,
-    
+
     // User info (populated from join)
     User? user,
   }) = _StoryLike;
 
-  factory StoryLike.fromJson(Map<String, dynamic> json) => _$StoryLikeFromJson(json);
+  factory StoryLike.fromJson(Map<String, dynamic> json) =>
+      _$StoryLikeFromJson(json);
 }
 
 @freezed
@@ -100,15 +97,16 @@ class StoryComment with _$StoryComment {
     @Default(false) bool hasLiked,
     required DateTime createdAt,
     DateTime? updatedAt,
-    
+
     // User info (populated from join)
     User? user,
-    
+
     // Replies (if it's a parent comment)
     @Default([]) List<StoryComment> replies,
   }) = _StoryComment;
 
-  factory StoryComment.fromJson(Map<String, dynamic> json) => _$StoryCommentFromJson(json);
+  factory StoryComment.fromJson(Map<String, dynamic> json) =>
+      _$StoryCommentFromJson(json);
 }
 
 @freezed
@@ -128,7 +126,8 @@ class CreateStoryRequest with _$CreateStoryRequest {
     List<String>? careTips,
   }) = _CreateStoryRequest;
 
-  factory CreateStoryRequest.fromJson(Map<String, dynamic> json) => _$CreateStoryRequestFromJson(json);
+  factory CreateStoryRequest.fromJson(Map<String, dynamic> json) =>
+      _$CreateStoryRequestFromJson(json);
 }
 
 @freezed
@@ -140,5 +139,6 @@ class StoryFeed with _$StoryFeed {
     @Default(false) bool hasUnviewedStories,
   }) = _StoryFeed;
 
-  factory StoryFeed.fromJson(Map<String, dynamic> json) => _$StoryFeedFromJson(json);
+  factory StoryFeed.fromJson(Map<String, dynamic> json) =>
+      _$StoryFeedFromJson(json);
 }

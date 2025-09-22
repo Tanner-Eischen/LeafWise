@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:plant_social/core/router/app_router.dart';
-import 'package:plant_social/features/auth/providers/auth_provider.dart';
+import 'package:leafwise/core/router/app_router.dart';
+import 'package:leafwise/features/auth/providers/auth_provider.dart';
 
 class StoriesBar extends ConsumerWidget {
   const StoriesBar({super.key});
@@ -11,7 +11,7 @@ class StoriesBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final user = ref.watch(authProvider).user;
-    
+
     return Container(
       height: 120,
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -21,7 +21,7 @@ class StoriesBar extends ConsumerWidget {
           // Add Story Button
           _buildAddStoryItem(context, theme, user),
           const SizedBox(width: 12),
-          
+
           // Sample Stories (placeholder)
           ..._buildSampleStories(context, theme),
         ],
@@ -29,7 +29,11 @@ class StoriesBar extends ConsumerWidget {
     );
   }
 
-  Widget _buildAddStoryItem(BuildContext context, ThemeData theme, dynamic user) {
+  Widget _buildAddStoryItem(
+    BuildContext context,
+    ThemeData theme,
+    dynamic user,
+  ) {
     return GestureDetector(
       onTap: () {
         context.go(AppRoutes.camera);
@@ -173,10 +177,7 @@ class StoriesBar extends ConsumerWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: hasStory
-                      ? Border.all(
-                          color: theme.colorScheme.surface,
-                          width: 2,
-                        )
+                      ? Border.all(color: theme.colorScheme.surface, width: 2)
                       : null,
                 ),
                 child: CircleAvatar(

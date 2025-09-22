@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:plant_social/core/services/api_service.dart';
-import 'package:plant_social/features/seasonal_ai/models/seasonal_ai_models.dart';
+import 'package:leafwise/core/services/api_service.dart';
+import 'package:leafwise/features/seasonal_ai/models/seasonal_ai_models.dart';
 
 /// Service for handling seasonal AI predictions and environmental data integration
 class SeasonalAIService {

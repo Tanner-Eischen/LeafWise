@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:plant_social/core/router/app_router.dart';
-import 'package:plant_social/features/auth/providers/auth_provider.dart';
-import 'package:plant_social/features/auth/presentation/widgets/auth_text_field.dart';
-import 'package:plant_social/features/auth/presentation/widgets/auth_button.dart';
-import 'package:plant_social/core/exceptions/api_exception.dart';
+import 'package:leafwise/core/router/app_router.dart';
+import 'package:leafwise/features/auth/providers/auth_provider.dart';
+import 'package:leafwise/features/auth/presentation/widgets/auth_text_field.dart';
+import 'package:leafwise/features/auth/presentation/widgets/auth_button.dart';
+import 'package:leafwise/core/exceptions/api_exception.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -32,11 +32,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     try {
-      await ref.read(authProvider.notifier).login(
-        _emailController.text.trim(),
-        _passwordController.text,
-      );
-      
+      await ref
+          .read(authProvider.notifier)
+          .login(_emailController.text.trim(), _passwordController.text);
+
       if (mounted) {
         context.go(AppRoutes.home);
       }
@@ -82,7 +81,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final authState = ref.watch(authProvider);
-    
+
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       body: SafeArea(
@@ -94,7 +93,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 40),
-                
+
                 // Logo and Welcome Text
                 Center(
                   child: Column(
@@ -112,9 +111,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           color: theme.colorScheme.onPrimary,
                         ),
                       ),
-                      
+
                       const SizedBox(height: 24),
-                      
+
                       Text(
                         'Welcome Back',
                         style: theme.textTheme.headlineMedium?.copyWith(
@@ -122,9 +121,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           color: theme.colorScheme.onSurface,
                         ),
                       ),
-                      
+
                       const SizedBox(height: 8),
-                      
+
                       Text(
                         'Sign in to continue growing with your plant community',
                         style: theme.textTheme.bodyMedium?.copyWith(
@@ -135,9 +134,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ],
                   ),
                 ),
-                
+
                 const SizedBox(height: 48),
-                
+
                 // Email Field
                 AuthTextField(
                   controller: _emailController,
@@ -148,9 +147,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   validator: _validateEmail,
                   textInputAction: TextInputAction.next,
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Password Field
                 AuthTextField(
                   controller: _passwordController,
@@ -160,7 +159,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   prefixIcon: Icons.lock_outlined,
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                      _obscurePassword
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
                     ),
                     onPressed: () {
                       setState(() {
@@ -172,9 +173,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   textInputAction: TextInputAction.done,
                   onSubmitted: (_) => _handleLogin(),
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Remember Me and Forgot Password
                 Row(
                   children: [
@@ -186,13 +187,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         });
                       },
                     ),
-                    Text(
-                      'Remember me',
-                      style: theme.textTheme.bodyMedium,
-                    ),
-                    
+                    Text('Remember me', style: theme.textTheme.bodyMedium),
+
                     const Spacer(),
-                    
+
                     // Forgot Password Link
                     Align(
                       alignment: Alignment.centerRight,
@@ -209,18 +207,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 32),
-                
+
                 // Login Button
                 AuthButton(
                   text: 'Sign In',
                   onPressed: authState.isLoading ? null : _handleLogin,
                   isLoading: authState.isLoading,
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Divider
                 Row(
                   children: [
@@ -245,9 +243,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Social Login Buttons
                 Text(
                   'Or continue with',
@@ -257,7 +255,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                
+
                 Row(
                   children: [
                     Expanded(
@@ -280,7 +278,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                
+
                 SizedBox(
                   width: double.infinity,
                   child: _buildSocialLoginButton(
@@ -290,9 +288,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     () => _handleSocialLogin('Facebook'),
                   ),
                 ),
-                
+
                 const SizedBox(height: 32),
-                
+
                 // Sign Up Link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -327,7 +325,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   void _showForgotPasswordDialog(BuildContext context) {
     final emailController = TextEditingController();
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -366,7 +364,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 _sendPasswordResetEmail(email);
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Please enter your email address')),
+                  const SnackBar(
+                    content: Text('Please enter your email address'),
+                  ),
                 );
               }
             },
@@ -390,15 +390,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  Widget _buildSocialLoginButton(String platform, IconData icon, Color color, VoidCallback onPressed) {
+  Widget _buildSocialLoginButton(
+    String platform,
+    IconData icon,
+    Color color,
+    VoidCallback onPressed,
+  ) {
     return OutlinedButton(
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
         padding: const EdgeInsets.symmetric(vertical: 12),
         side: BorderSide(color: Colors.grey[300]!),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,

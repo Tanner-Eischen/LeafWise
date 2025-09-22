@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:plant_social/core/router/app_router.dart';
+import 'package:leafwise/core/router/app_router.dart';
 
 /// Chat screen showing list of conversations
 /// Displays recent conversations and allows starting new chats
@@ -60,17 +60,21 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   List<MockConversation> get _filteredConversations {
     if (_searchQuery.isEmpty) return _mockConversations;
-    
+
     return _mockConversations.where((conversation) {
-      return conversation.userName.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-             conversation.lastMessage.toLowerCase().contains(_searchQuery.toLowerCase());
+      return conversation.userName.toLowerCase().contains(
+            _searchQuery.toLowerCase(),
+          ) ||
+          conversation.lastMessage.toLowerCase().contains(
+            _searchQuery.toLowerCase(),
+          );
     }).toList();
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
@@ -81,9 +85,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           IconButton(
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Starting new chat...'),
-                ),
+                const SnackBar(content: Text('Starting new chat...')),
               );
             },
             icon: const Icon(Icons.edit_outlined),
@@ -122,11 +124,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   borderSide: BorderSide.none,
                 ),
                 filled: true,
-                fillColor: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                fillColor: theme.colorScheme.surfaceContainerHighest
+                    .withOpacity(0.5),
               ),
             ),
           ),
-          
+
           // Conversations list
           Expanded(
             child: _filteredConversations.isEmpty
@@ -145,7 +148,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         onPressed: () {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-                                content: Text('Opening conversation with plant enthusiast!'),
+              content: Text('Opening conversation with plant enthusiast!'),
             ),
           );
         },
@@ -166,14 +169,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            _searchQuery.isNotEmpty ? 'No conversations found' : 'No messages yet',
+            _searchQuery.isNotEmpty
+                ? 'No conversations found'
+                : 'No messages yet',
             style: theme.textTheme.headlineSmall?.copyWith(
               color: theme.colorScheme.onSurface.withOpacity(0.7),
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            _searchQuery.isNotEmpty 
+            _searchQuery.isNotEmpty
                 ? 'Try searching with different keywords'
                 : 'Start chatting with your plant friends!',
             style: theme.textTheme.bodyMedium?.copyWith(
@@ -185,7 +190,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     );
   }
 
-  Widget _buildConversationTile(MockConversation conversation, ThemeData theme) {
+  Widget _buildConversationTile(
+    MockConversation conversation,
+    ThemeData theme,
+  ) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       leading: Stack(
@@ -226,8 +234,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             child: Text(
               conversation.userName,
               style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: conversation.unreadCount > 0 
-                    ? FontWeight.bold 
+                fontWeight: conversation.unreadCount > 0
+                    ? FontWeight.bold
                     : FontWeight.normal,
               ),
             ),
@@ -251,8 +259,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 color: conversation.unreadCount > 0
                     ? theme.colorScheme.onSurface
                     : theme.colorScheme.onSurface.withOpacity(0.7),
-                fontWeight: conversation.unreadCount > 0 
-                    ? FontWeight.w500 
+                fontWeight: conversation.unreadCount > 0
+                    ? FontWeight.w500
                     : FontWeight.normal,
               ),
             ),
@@ -287,7 +295,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   String _formatTimestamp(DateTime timestamp) {
     final now = DateTime.now();
     final difference = now.difference(timestamp);
-    
+
     if (difference.inMinutes < 1) {
       return 'now';
     } else if (difference.inHours < 1) {

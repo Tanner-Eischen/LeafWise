@@ -3,18 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:camera/camera.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:plant_social/features/plant_identification/providers/plant_identification_provider.dart';
-import 'package:plant_social/features/plant_identification/presentation/widgets/plant_identification_result.dart';
-import 'package:plant_social/features/plant_identification/presentation/widgets/plant_identification_loading.dart';
+import 'package:leafwise/features/plant_identification/providers/plant_identification_provider.dart';
+import 'package:leafwise/features/plant_identification/providers/enhanced_plant_identification_provider.dart';
+import 'package:leafwise/features/plant_identification/presentation/widgets/plant_identification_result.dart';
+import 'package:leafwise/features/plant_identification/presentation/widgets/plant_identification_loading.dart';
+import 'package:leafwise/features/plant_identification/presentation/widgets/offline_identification_result.dart';
+import 'package:leafwise/features/plant_identification/models/offline_plant_identification_models.dart';
 
 class PlantIdentificationScreen extends ConsumerStatefulWidget {
   const PlantIdentificationScreen({super.key});
 
   @override
-  ConsumerState<PlantIdentificationScreen> createState() => _PlantIdentificationScreenState();
+  ConsumerState<PlantIdentificationScreen> createState() =>
+      _PlantIdentificationScreenState();
 }
 
-class _PlantIdentificationScreenState extends ConsumerState<PlantIdentificationScreen> {
+class _PlantIdentificationScreenState
+    extends ConsumerState<PlantIdentificationScreen> {
   CameraController? _cameraController;
   List<CameraDescription>? _cameras;
   bool _isCameraInitialized = false;
@@ -61,9 +66,25 @@ class _PlantIdentificationScreenState extends ConsumerState<PlantIdentificationS
     try {
       final XFile image = await _cameraController!.takePicture();
       final File imageFile = File(image.path);
-      
-      // Identify the plant
-      await ref.read(plantIdentificationProvider.notifier).identifyPlant(imageFile);
+
+      // Check connectivity and use appropriate identification method
+      final offlineState = ref.read(enhancedPlantIdentificationStateProvider);
+      final isOffline = offlineState.connectivityStatus?.maybeWhen(
+               offline: () => true,
+               orElse: () => false,
+             ) ?? false;
+
+      if (isOffline || offlineState.currentModel != null) {
+        // Use offline identification
+        await ref
+            .read(enhancedPlantIdentificationStateProvider.notifier)
+            .identifyPlantOffline(imageFile);
+      } else {
+        // Use online identification
+        await ref
+            .read(plantIdentificationProvider.notifier)
+            .identifyPlant(imageFile);
+      }
     } catch (e) {
       debugPrint('Error taking picture: $e');
     }
@@ -77,10 +98,28 @@ class _PlantIdentificationScreenState extends ConsumerState<PlantIdentificationS
         maxHeight: 1024,
         imageQuality: 85,
       );
-      
+
       if (image != null) {
         final File imageFile = File(image.path);
-        await ref.read(plantIdentificationProvider.notifier).identifyPlant(imageFile);
+
+        // Check connectivity and use appropriate identification method
+        final offlineState = ref.read(enhancedPlantIdentificationStateProvider);
+        final isOffline = offlineState.connectivityStatus?.maybeWhen(
+              offline: () => true,
+              orElse: () => false,
+            ) ?? false;
+
+        if (isOffline || offlineState.currentModel != null) {
+          // Use offline identification
+          await ref
+              .read(enhancedPlantIdentificationStateProvider.notifier)
+              .identifyPlantOffline(imageFile);
+        } else {
+          // Use online identification
+          await ref
+              .read(plantIdentificationProvider.notifier)
+              .identifyPlant(imageFile);
+        }
       }
     } catch (e) {
       debugPrint('Error picking image: $e');
@@ -90,7 +129,20 @@ class _PlantIdentificationScreenState extends ConsumerState<PlantIdentificationS
   @override
   Widget build(BuildContext context) {
     final plantState = ref.watch(plantIdentificationProvider);
+    final offlineState = ref.watch(enhancedPlantIdentificationStateProvider);
     final theme = Theme.of(context);
+
+    // Determine if we're in offline mode
+    final isOffline = offlineState.connectivityStatus?.maybeWhen(
+               offline: () => true,
+               orElse: () => false,
+             ) ?? false;
+    final hasOfflineModel = offlineState.currentModel != null;
+    final isLoading = plantState.isLoading || offlineState.isLoading;
+    final currentOfflineIdentification =
+        offlineState.localIdentifications.isNotEmpty
+        ? offlineState.localIdentifications.first
+        : null;
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -101,11 +153,65 @@ class _PlantIdentificationScreenState extends ConsumerState<PlantIdentificationS
           icon: const Icon(Icons.close, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text(
-          'Plant Identification',
-          style: TextStyle(color: Colors.white),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Plant Identification',
+              style: TextStyle(color: Colors.white, fontSize: 18),
+            ),
+            // Connectivity status indicator
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  isOffline ? Icons.wifi_off : Icons.wifi,
+                  color: isOffline ? Colors.orange : Colors.green,
+                  size: 16,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  isOffline ? 'Offline Mode' : 'Online',
+                  style: TextStyle(
+                    color: isOffline ? Colors.orange : Colors.green,
+                    fontSize: 12,
+                  ),
+                ),
+                if (hasOfflineModel) ...
+                  [
+                    const SizedBox(width: 8),
+                    const Icon(
+                      Icons.model_training,
+                      color: Colors.blue,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 4),
+                    const Text(
+                      'AI Ready',
+                      style: TextStyle(color: Colors.blue, fontSize: 12),
+                    ),
+                  ],
+              ],
+            ),
+          ],
         ),
         actions: [
+          // Sync status indicator
+          if (offlineState.localIdentifications.any(
+            (id) => id.syncStatus.maybeWhen(
+                  notSynced: () => true,
+                  orElse: () => false,
+                ),
+          ))
+            IconButton(
+              icon: const Icon(Icons.sync_problem, color: Colors.orange),
+              onPressed: () {
+                // Navigate to offline mode screen or show sync options
+                Navigator.of(context).pushNamed('/offline-mode');
+              },
+              tooltip: 'Pending sync',
+            ),
           IconButton(
             icon: const Icon(Icons.history, color: Colors.white),
             onPressed: () {
@@ -119,31 +225,53 @@ class _PlantIdentificationScreenState extends ConsumerState<PlantIdentificationS
         children: [
           // Camera preview
           if (_isCameraInitialized && _cameraController != null)
-            Positioned.fill(
-              child: CameraPreview(_cameraController!),
-            )
+            Positioned.fill(child: CameraPreview(_cameraController!))
           else
-            const Center(
-              child: CircularProgressIndicator(color: Colors.white),
-            ),
+            const Center(child: CircularProgressIndicator(color: Colors.white)),
 
           // Plant identification overlay
-          if (plantState.isLoading)
+          if (isLoading)
             const PlantIdentificationLoading()
           else if (plantState.currentIdentification != null)
             PlantIdentificationResult(
               identification: plantState.currentIdentification!,
               onClose: () {
-                ref.read(plantIdentificationProvider.notifier).clearCurrentIdentification();
+                ref
+                    .read(plantIdentificationProvider.notifier)
+                    .clearCurrentIdentification();
               },
               onSaveToCollection: () {
-                ref.read(plantIdentificationProvider.notifier)
+                ref
+                    .read(plantIdentificationProvider.notifier)
                     .saveToCollection(plantState.currentIdentification!.id);
+              },
+            )
+          else if (currentOfflineIdentification != null &&
+              currentOfflineIdentification.identifiedAt.isAfter(
+                DateTime.now().subtract(const Duration(seconds: 10)),
+              ))
+            OfflineIdentificationResult(
+              identification: currentOfflineIdentification,
+              onClose: () {
+                // Clear the recent offline identification by reloading
+                ref
+                    .read(enhancedPlantIdentificationStateProvider.notifier)
+                    .loadLocalIdentifications();
+              },
+              onSync: () {
+                ref
+                    .read(enhancedPlantIdentificationStateProvider.notifier)
+                    .syncIdentification(currentOfflineIdentification.localId);
               },
             ),
 
           // Camera controls
-          if (!plantState.isLoading && plantState.currentIdentification == null)
+          if (!isLoading &&
+              plantState.currentIdentification == null &&
+              (currentOfflineIdentification == null ||
+                  !currentOfflineIdentification.identifiedAt.isAfter(
+                    DateTime.now().subtract(const Duration(seconds: 10)),
+                  )))
             Positioned(
               bottom: 0,
               left: 0,
@@ -154,10 +282,7 @@ class _PlantIdentificationScreenState extends ConsumerState<PlantIdentificationS
                   gradient: LinearGradient(
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter,
-                    colors: [
-                      Colors.black.withOpacity(0.8),
-                      Colors.transparent,
-                    ],
+                    colors: [Colors.black.withOpacity(0.8), Colors.transparent],
                   ),
                 ),
                 child: Row(
@@ -235,7 +360,12 @@ class _PlantIdentificationScreenState extends ConsumerState<PlantIdentificationS
             ),
 
           // Instructions overlay
-          if (!plantState.isLoading && plantState.currentIdentification == null)
+          if (!isLoading &&
+              plantState.currentIdentification == null &&
+              (currentOfflineIdentification == null ||
+                  !currentOfflineIdentification.identifiedAt.isAfter(
+                    DateTime.now().subtract(const Duration(seconds: 10)),
+                  )))
             Positioned(
               top: 100,
               left: 20,
@@ -246,39 +376,61 @@ class _PlantIdentificationScreenState extends ConsumerState<PlantIdentificationS
                   color: Colors.black.withOpacity(0.6),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Column(
+                child: Column(
                   children: [
                     Icon(
-                      Icons.eco,
+                      isOffline ? Icons.offline_bolt : Icons.eco,
                       color: Colors.white,
                       size: 32,
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
-                      'Point your camera at a plant',
-                      style: TextStyle(
+                      isOffline
+                          ? 'Offline Plant Identification'
+                          : 'Point your camera at a plant',
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
-                      'Take a clear photo to identify the species',
-                      style: TextStyle(
+                      isOffline
+                          ? hasOfflineModel
+                                ? 'Using on-device AI model for identification'
+                                : 'No offline model available. Download a model to identify plants offline.'
+                          : 'Take a clear photo to identify the species',
+                      style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 14,
                       ),
                       textAlign: TextAlign.center,
                     ),
+                    if (isOffline && !hasOfflineModel) ...
+                      [
+                        const SizedBox(height: 12),
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.of(
+                              context,
+                            ).pushNamed('/model-management');
+                          },
+                          icon: const Icon(Icons.download),
+                          label: const Text('Download Model'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: theme.primaryColor,
+                          ),
+                        ),
+                      ],
                   ],
                 ),
               ),
             ),
 
           // Error message
-          if (plantState.error != null)
+          if (plantState.error != null || offlineState.error != null)
             Positioned(
               top: 100,
               left: 20,
@@ -295,15 +447,67 @@ class _PlantIdentificationScreenState extends ConsumerState<PlantIdentificationS
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        plantState.error!,
+                        plantState.error ?? offlineState.error ?? '',
                         style: const TextStyle(color: Colors.white),
                       ),
                     ),
                     IconButton(
                       icon: const Icon(Icons.close, color: Colors.white),
                       onPressed: () {
-                        ref.read(plantIdentificationProvider.notifier).clearError();
+                        if (plantState.error != null) {
+                          ref
+                              .read(plantIdentificationProvider.notifier)
+                              .clearError();
+                        }
+                        if (offlineState.error != null) {
+                          ref
+                              .read(
+                                enhancedPlantIdentificationStateProvider
+                                    .notifier,
+                              )
+                              .clearError();
+                        }
                       },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+          // Sync status overlay
+          if (offlineState.localIdentifications.any(
+            (id) => id.syncStatus.maybeWhen(
+                  syncing: () => true,
+                  orElse: () => false,
+                ),
+          ))
+            Positioned(
+              top: 60,
+              right: 20,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.9),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      'Syncing...',
+                      style: TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ],
                 ),

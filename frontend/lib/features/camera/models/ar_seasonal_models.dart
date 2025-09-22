@@ -4,8 +4,8 @@
 /// These models extend the base seasonal AI models with AR-specific visualization data.
 library;
 
-import 'package:plant_social/features/seasonal_ai/models/seasonal_ai_models.dart';
-import 'package:plant_social/features/timelapse/models/timelapse_models.dart';
+import 'package:leafwise/features/seasonal_ai/models/seasonal_ai_models.dart';
+import 'package:leafwise/features/timelapse/models/timelapse_models.dart';
 
 /// AR-specific seasonal overlay data
 class ARSeasonalOverlay {

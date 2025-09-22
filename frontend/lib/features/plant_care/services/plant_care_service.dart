@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:plant_social/core/services/api_service.dart';
-import 'package:plant_social/features/plant_care/models/plant_care_models.dart';
+import 'package:leafwise/core/services/api_service.dart';
+import 'package:leafwise/features/plant_care/models/plant_care_models.dart';
 
 class PlantCareService {
   final ApiService _apiService;
@@ -39,7 +39,10 @@ class PlantCareService {
     }
   }
 
-  Future<UserPlant> updateUserPlant(String plantId, UserPlantRequest request) async {
+  Future<UserPlant> updateUserPlant(
+    String plantId,
+    UserPlantRequest request,
+  ) async {
     try {
       final response = await _apiService.put(
         '/user-plants/$plantId',
@@ -71,7 +74,8 @@ class PlantCareService {
       final queryParams = <String, dynamic>{};
       if (userPlantId != null) queryParams['user_plant_id'] = userPlantId;
       if (careType != null) queryParams['care_type'] = careType;
-      if (startDate != null) queryParams['start_date'] = startDate.toIso8601String();
+      if (startDate != null)
+        queryParams['start_date'] = startDate.toIso8601String();
       if (endDate != null) queryParams['end_date'] = endDate.toIso8601String();
       if (limit != null) queryParams['limit'] = limit;
 
@@ -107,7 +111,10 @@ class PlantCareService {
     }
   }
 
-  Future<PlantCareLog> updateCareLog(String logId, PlantCareRequest request) async {
+  Future<PlantCareLog> updateCareLog(
+    String logId,
+    PlantCareRequest request,
+  ) async {
     try {
       final response = await _apiService.put(
         '/care-logs/$logId',
@@ -177,7 +184,9 @@ class PlantCareService {
     }
   }
 
-  Future<PlantCareReminder> createReminder(PlantCareReminderRequest request) async {
+  Future<PlantCareReminder> createReminder(
+    PlantCareReminderRequest request,
+  ) async {
     try {
       final response = await _apiService.post(
         '/care-reminders',
@@ -214,17 +223,16 @@ class PlantCareService {
 
   Future<PlantCareReminder> completeReminder(String reminderId) async {
     try {
-      final response = await _apiService.post('/care-reminders/$reminderId/complete');
+      final response = await _apiService.post(
+        '/care-reminders/$reminderId/complete',
+      );
       return PlantCareReminder.fromJson(response.data['data']);
     } catch (e) {
       throw _handleError(e);
     }
   }
 
-  Future<PlantCareReminder> snoozeReminder(
-    String reminderId,
-    int days,
-  ) async {
+  Future<PlantCareReminder> snoozeReminder(String reminderId, int days) async {
     try {
       final response = await _apiService.post(
         '/care-reminders/$reminderId/snooze',
@@ -275,7 +283,8 @@ class PlantCareService {
     try {
       final queryParams = <String, dynamic>{};
       if (userPlantId != null) queryParams['user_plant_id'] = userPlantId;
-      if (startDate != null) queryParams['start_date'] = startDate.toIso8601String();
+      if (startDate != null)
+        queryParams['start_date'] = startDate.toIso8601String();
       if (endDate != null) queryParams['end_date'] = endDate.toIso8601String();
 
       final response = await _apiService.get(

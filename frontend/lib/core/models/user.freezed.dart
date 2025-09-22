@@ -37,7 +37,16 @@ mixin _$User {
   DateTime? get lastSeen => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
   DateTime? get updatedAt =>
-      throw _privateConstructorUsedError; // Plant-specific fields for Phase 2
+      throw _privateConstructorUsedError; // Role-based access control fields
+  bool get isAdmin => throw _privateConstructorUsedError;
+  bool get isExpert => throw _privateConstructorUsedError;
+  bool get isModerator => throw _privateConstructorUsedError;
+  bool get isSuperuser => throw _privateConstructorUsedError;
+  String? get adminPermissions =>
+      throw _privateConstructorUsedError; // JSON string of admin permissions
+  String? get expertSpecialties =>
+      throw _privateConstructorUsedError; // JSON string of expert specialties
+// Plant-specific fields for Phase 2
   List<String> get plantInterests => throw _privateConstructorUsedError;
   String? get experienceLevel =>
       throw _privateConstructorUsedError; // 'beginner', 'intermediate', 'expert'
@@ -78,6 +87,12 @@ abstract class $UserCopyWith<$Res> {
       DateTime? lastSeen,
       DateTime createdAt,
       DateTime? updatedAt,
+      bool isAdmin,
+      bool isExpert,
+      bool isModerator,
+      bool isSuperuser,
+      String? adminPermissions,
+      String? expertSpecialties,
       List<String> plantInterests,
       String? experienceLevel,
       List<String> favoriteGenres,
@@ -117,6 +132,12 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
     Object? lastSeen = freezed,
     Object? createdAt = null,
     Object? updatedAt = freezed,
+    Object? isAdmin = null,
+    Object? isExpert = null,
+    Object? isModerator = null,
+    Object? isSuperuser = null,
+    Object? adminPermissions = freezed,
+    Object? expertSpecialties = freezed,
     Object? plantInterests = null,
     Object? experienceLevel = freezed,
     Object? favoriteGenres = null,
@@ -192,6 +213,30 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      isAdmin: null == isAdmin
+          ? _value.isAdmin
+          : isAdmin // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isExpert: null == isExpert
+          ? _value.isExpert
+          : isExpert // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isModerator: null == isModerator
+          ? _value.isModerator
+          : isModerator // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isSuperuser: null == isSuperuser
+          ? _value.isSuperuser
+          : isSuperuser // ignore: cast_nullable_to_non_nullable
+              as bool,
+      adminPermissions: freezed == adminPermissions
+          ? _value.adminPermissions
+          : adminPermissions // ignore: cast_nullable_to_non_nullable
+              as String?,
+      expertSpecialties: freezed == expertSpecialties
+          ? _value.expertSpecialties
+          : expertSpecialties // ignore: cast_nullable_to_non_nullable
+              as String?,
       plantInterests: null == plantInterests
           ? _value.plantInterests
           : plantInterests // ignore: cast_nullable_to_non_nullable
@@ -241,6 +286,12 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
       DateTime? lastSeen,
       DateTime createdAt,
       DateTime? updatedAt,
+      bool isAdmin,
+      bool isExpert,
+      bool isModerator,
+      bool isSuperuser,
+      String? adminPermissions,
+      String? expertSpecialties,
       List<String> plantInterests,
       String? experienceLevel,
       List<String> favoriteGenres,
@@ -277,6 +328,12 @@ class __$$UserImplCopyWithImpl<$Res>
     Object? lastSeen = freezed,
     Object? createdAt = null,
     Object? updatedAt = freezed,
+    Object? isAdmin = null,
+    Object? isExpert = null,
+    Object? isModerator = null,
+    Object? isSuperuser = null,
+    Object? adminPermissions = freezed,
+    Object? expertSpecialties = freezed,
     Object? plantInterests = null,
     Object? experienceLevel = freezed,
     Object? favoriteGenres = null,
@@ -352,6 +409,30 @@ class __$$UserImplCopyWithImpl<$Res>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      isAdmin: null == isAdmin
+          ? _value.isAdmin
+          : isAdmin // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isExpert: null == isExpert
+          ? _value.isExpert
+          : isExpert // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isModerator: null == isModerator
+          ? _value.isModerator
+          : isModerator // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isSuperuser: null == isSuperuser
+          ? _value.isSuperuser
+          : isSuperuser // ignore: cast_nullable_to_non_nullable
+              as bool,
+      adminPermissions: freezed == adminPermissions
+          ? _value.adminPermissions
+          : adminPermissions // ignore: cast_nullable_to_non_nullable
+              as String?,
+      expertSpecialties: freezed == expertSpecialties
+          ? _value.expertSpecialties
+          : expertSpecialties // ignore: cast_nullable_to_non_nullable
+              as String?,
       plantInterests: null == plantInterests
           ? _value._plantInterests
           : plantInterests // ignore: cast_nullable_to_non_nullable
@@ -397,6 +478,12 @@ class _$UserImpl implements _User {
       this.lastSeen,
       required this.createdAt,
       this.updatedAt,
+      this.isAdmin = false,
+      this.isExpert = false,
+      this.isModerator = false,
+      this.isSuperuser = false,
+      this.adminPermissions,
+      this.expertSpecialties,
       final List<String> plantInterests = const [],
       this.experienceLevel,
       final List<String> favoriteGenres = const [],
@@ -448,8 +535,28 @@ class _$UserImpl implements _User {
   final DateTime createdAt;
   @override
   final DateTime? updatedAt;
+// Role-based access control fields
+  @override
+  @JsonKey()
+  final bool isAdmin;
+  @override
+  @JsonKey()
+  final bool isExpert;
+  @override
+  @JsonKey()
+  final bool isModerator;
+  @override
+  @JsonKey()
+  final bool isSuperuser;
+  @override
+  final String? adminPermissions;
+// JSON string of admin permissions
+  @override
+  final String? expertSpecialties;
+// JSON string of expert specialties
 // Plant-specific fields for Phase 2
   final List<String> _plantInterests;
+// JSON string of expert specialties
 // Plant-specific fields for Phase 2
   @override
   @JsonKey()
@@ -480,7 +587,7 @@ class _$UserImpl implements _User {
 
   @override
   String toString() {
-    return 'User(id: $id, email: $email, username: $username, displayName: $displayName, bio: $bio, profilePictureUrl: $profilePictureUrl, location: $location, dateOfBirth: $dateOfBirth, isPrivate: $isPrivate, followersCount: $followersCount, followingCount: $followingCount, postsCount: $postsCount, isActive: $isActive, isVerified: $isVerified, lastSeen: $lastSeen, createdAt: $createdAt, updatedAt: $updatedAt, plantInterests: $plantInterests, experienceLevel: $experienceLevel, favoriteGenres: $favoriteGenres, gardenType: $gardenType, climate: $climate)';
+    return 'User(id: $id, email: $email, username: $username, displayName: $displayName, bio: $bio, profilePictureUrl: $profilePictureUrl, location: $location, dateOfBirth: $dateOfBirth, isPrivate: $isPrivate, followersCount: $followersCount, followingCount: $followingCount, postsCount: $postsCount, isActive: $isActive, isVerified: $isVerified, lastSeen: $lastSeen, createdAt: $createdAt, updatedAt: $updatedAt, isAdmin: $isAdmin, isExpert: $isExpert, isModerator: $isModerator, isSuperuser: $isSuperuser, adminPermissions: $adminPermissions, expertSpecialties: $expertSpecialties, plantInterests: $plantInterests, experienceLevel: $experienceLevel, favoriteGenres: $favoriteGenres, gardenType: $gardenType, climate: $climate)';
   }
 
   @override
@@ -519,6 +626,17 @@ class _$UserImpl implements _User {
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
                 other.updatedAt == updatedAt) &&
+            (identical(other.isAdmin, isAdmin) || other.isAdmin == isAdmin) &&
+            (identical(other.isExpert, isExpert) ||
+                other.isExpert == isExpert) &&
+            (identical(other.isModerator, isModerator) ||
+                other.isModerator == isModerator) &&
+            (identical(other.isSuperuser, isSuperuser) ||
+                other.isSuperuser == isSuperuser) &&
+            (identical(other.adminPermissions, adminPermissions) ||
+                other.adminPermissions == adminPermissions) &&
+            (identical(other.expertSpecialties, expertSpecialties) ||
+                other.expertSpecialties == expertSpecialties) &&
             const DeepCollectionEquality()
                 .equals(other._plantInterests, _plantInterests) &&
             (identical(other.experienceLevel, experienceLevel) ||
@@ -551,6 +669,12 @@ class _$UserImpl implements _User {
         lastSeen,
         createdAt,
         updatedAt,
+        isAdmin,
+        isExpert,
+        isModerator,
+        isSuperuser,
+        adminPermissions,
+        expertSpecialties,
         const DeepCollectionEquality().hash(_plantInterests),
         experienceLevel,
         const DeepCollectionEquality().hash(_favoriteGenres),
@@ -593,6 +717,12 @@ abstract class _User implements User {
       final DateTime? lastSeen,
       required final DateTime createdAt,
       final DateTime? updatedAt,
+      final bool isAdmin,
+      final bool isExpert,
+      final bool isModerator,
+      final bool isSuperuser,
+      final String? adminPermissions,
+      final String? expertSpecialties,
       final List<String> plantInterests,
       final String? experienceLevel,
       final List<String> favoriteGenres,
@@ -634,7 +764,20 @@ abstract class _User implements User {
   @override
   DateTime get createdAt;
   @override
-  DateTime? get updatedAt; // Plant-specific fields for Phase 2
+  DateTime? get updatedAt; // Role-based access control fields
+  @override
+  bool get isAdmin;
+  @override
+  bool get isExpert;
+  @override
+  bool get isModerator;
+  @override
+  bool get isSuperuser;
+  @override
+  String? get adminPermissions; // JSON string of admin permissions
+  @override
+  String? get expertSpecialties; // JSON string of expert specialties
+// Plant-specific fields for Phase 2
   @override
   List<String> get plantInterests;
   @override

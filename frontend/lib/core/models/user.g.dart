@@ -30,6 +30,12 @@ _$UserImpl _$$UserImplFromJson(Map<String, dynamic> json) => _$UserImpl(
       updatedAt: json['updatedAt'] == null
           ? null
           : DateTime.parse(json['updatedAt'] as String),
+      isAdmin: json['isAdmin'] as bool? ?? false,
+      isExpert: json['isExpert'] as bool? ?? false,
+      isModerator: json['isModerator'] as bool? ?? false,
+      isSuperuser: json['isSuperuser'] as bool? ?? false,
+      adminPermissions: json['adminPermissions'] as String?,
+      expertSpecialties: json['expertSpecialties'] as String?,
       plantInterests: (json['plantInterests'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
@@ -62,6 +68,12 @@ Map<String, dynamic> _$$UserImplToJson(_$UserImpl instance) =>
       'lastSeen': instance.lastSeen?.toIso8601String(),
       'createdAt': instance.createdAt.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
+      'isAdmin': instance.isAdmin,
+      'isExpert': instance.isExpert,
+      'isModerator': instance.isModerator,
+      'isSuperuser': instance.isSuperuser,
+      'adminPermissions': instance.adminPermissions,
+      'expertSpecialties': instance.expertSpecialties,
       'plantInterests': instance.plantInterests,
       'experienceLevel': instance.experienceLevel,
       'favoriteGenres': instance.favoriteGenres,

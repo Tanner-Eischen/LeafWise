@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:plant_social/core/router/app_router.dart';
-import 'package:plant_social/features/auth/providers/auth_provider.dart';
-import 'package:plant_social/features/auth/models/auth_models.dart';
-import 'package:plant_social/features/auth/presentation/widgets/auth_text_field.dart';
-import 'package:plant_social/features/auth/presentation/widgets/auth_button.dart';
-import 'package:plant_social/core/exceptions/api_exception.dart';
+import 'package:leafwise/core/router/app_router.dart';
+import 'package:leafwise/features/auth/providers/auth_provider.dart';
+import 'package:leafwise/features/auth/models/auth_models.dart';
+import 'package:leafwise/features/auth/presentation/widgets/auth_text_field.dart';
+import 'package:leafwise/features/auth/presentation/widgets/auth_button.dart';
+import 'package:leafwise/core/exceptions/api_exception.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -38,9 +38,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   Future<void> _handleRegister() async {
     if (!_formKey.currentState!.validate()) return;
-    
+
     if (!_acceptTerms) {
-      _showErrorSnackBar('Please accept the Terms of Service and Privacy Policy');
+      _showErrorSnackBar(
+        'Please accept the Terms of Service and Privacy Policy',
+      );
       return;
     }
 
@@ -50,13 +52,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         username: _usernameController.text.trim(),
         password: _passwordController.text,
         confirmPassword: _confirmPasswordController.text,
-        displayName: _displayNameController.text.trim().isNotEmpty 
-            ? _displayNameController.text.trim() 
+        displayName: _displayNameController.text.trim().isNotEmpty
+            ? _displayNameController.text.trim()
             : null,
       );
-      
+
       await ref.read(authProvider.notifier).register(request);
-      
+
       if (mounted) {
         context.go(AppRoutes.home);
       }
@@ -128,7 +130,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final authState = ref.watch(authProvider);
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Register'),
@@ -162,19 +164,19 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           color: theme.colorScheme.onPrimary,
                         ),
                       ),
-                      
+
                       const SizedBox(height: 24),
-                      
+
                       Text(
-                        'Join Plant Social',
+                        'Join LeafWise',
                         style: theme.textTheme.headlineMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: theme.colorScheme.onSurface,
                         ),
                       ),
-                      
+
                       const SizedBox(height: 8),
-                      
+
                       Text(
                         'Create your account and start your plant journey',
                         style: theme.textTheme.bodyMedium?.copyWith(
@@ -185,9 +187,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ],
                   ),
                 ),
-                
+
                 const SizedBox(height: 32),
-                
+
                 // Email Field
                 AuthTextField(
                   controller: _emailController,
@@ -198,9 +200,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   validator: _validateEmail,
                   textInputAction: TextInputAction.next,
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Username Field
                 AuthTextField(
                   controller: _usernameController,
@@ -210,9 +212,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   validator: _validateUsername,
                   textInputAction: TextInputAction.next,
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Display Name Field (Optional)
                 AuthTextField(
                   controller: _displayNameController,
@@ -221,9 +223,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   prefixIcon: Icons.badge_outlined,
                   textInputAction: TextInputAction.next,
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Password Field
                 AuthTextField(
                   controller: _passwordController,
@@ -233,7 +235,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   prefixIcon: Icons.lock_outlined,
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                      _obscurePassword
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
                     ),
                     onPressed: () {
                       setState(() {
@@ -244,9 +248,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   validator: _validatePassword,
                   textInputAction: TextInputAction.next,
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Confirm Password Field
                 AuthTextField(
                   controller: _confirmPasswordController,
@@ -256,7 +260,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   prefixIcon: Icons.lock_outlined,
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscureConfirmPassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                      _obscureConfirmPassword
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
                     ),
                     onPressed: () {
                       setState(() {
@@ -268,9 +274,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   textInputAction: TextInputAction.done,
                   onSubmitted: (_) => _handleRegister(),
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Terms and Conditions
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -289,7 +295,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         child: RichText(
                           text: TextSpan(
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurface.withOpacity(0.7),
+                              color: theme.colorScheme.onSurface.withOpacity(
+                                0.7,
+                              ),
                             ),
                             children: [
                               const TextSpan(text: 'I agree to the '),
@@ -315,18 +323,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 32),
-                
+
                 // Register Button
                 AuthButton(
                   text: 'Create Account',
                   onPressed: authState.isLoading ? null : _handleRegister,
                   isLoading: authState.isLoading,
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Sign In Link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

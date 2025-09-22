@@ -7,8 +7,9 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:math' as math;
-import 'package:plant_social/features/camera/models/ar_seasonal_models.dart';
-import 'package:plant_social/features/camera/services/ar_seasonal_service.dart';
+import 'package:leafwise/features/camera/models/ar_seasonal_models.dart';
+import 'package:leafwise/features/camera/services/ar_seasonal_service.dart';
+import 'package:leafwise/features/camera/providers/ar_providers.dart';
 
 /// Provider for AR seasonal transformation state
 final arSeasonalTransformationProvider =
@@ -234,9 +235,9 @@ class _ARSeasonalTransformationState
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
+                const Text(
                   'Seasonal Transformation',
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
@@ -380,7 +381,7 @@ class _ARSeasonalTransformationState
       top: 180,
       left: 20,
       right: 20,
-      child: Container(
+      child: SizedBox(
         height: 60,
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
@@ -538,12 +539,12 @@ class _ARSeasonalTransformationState
       left: 20,
       right: 20,
       child: Container(
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
+        padding: const EdgeInsets.all(16),
+        decoration: const BoxDecoration(
           color: Colors.black54,
           borderRadius: BorderRadius.all(Radius.circular(12)),
         ),
-        child: Row(
+        child: const Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
@@ -741,7 +742,7 @@ class SeasonalTransformationPainter extends CustomPainter {
     // Draw stem
     paint.color = _parseColor(model.stemColor);
     final stemHeight = (model.height / 20) * size.height;
-    final stemWidth = 4.0;
+    const stemWidth = 4.0;
 
     canvas.drawRRect(
       RRect.fromRectAndRadius(
@@ -778,7 +779,7 @@ class SeasonalTransformationPainter extends CustomPainter {
 
   void _drawLeaf(Canvas canvas, Offset center, Paint paint, double angle) {
     final leafPath = Path();
-    final leafSize = 8.0;
+    const leafSize = 8.0;
 
     leafPath.moveTo(center.dx, center.dy);
     leafPath.quadraticBezierTo(
@@ -876,7 +877,7 @@ class ParticleEffectPainter extends CustomPainter {
         screenSize.height / 2 + (plantPosition.y * screenSize.height * 0.3);
 
     // Draw seasonal particles
-    final particleCount = 20;
+    const particleCount = 20;
     for (int i = 0; i < particleCount; i++) {
       final angle = (i / particleCount) * 2 * math.pi;
       final radius = 50 + (progress * 30);

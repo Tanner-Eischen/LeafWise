@@ -1,10 +1,21 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:plant_social/core/network/api_client.dart';
-import 'package:plant_social/features/plant_identification/models/plant_identification_models.dart';
-import 'package:plant_social/features/plant_care/models/plant_care_models.dart'
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:leafwise/core/network/api_client.dart';
+import 'package:leafwise/features/plant_identification/models/plant_identification_models.dart';
+import 'package:leafwise/features/plant_care/models/plant_care_models.dart'
     as plant_care;
+
+/// Provider for the plant identification service
+final plantIdentificationServiceProvider = Provider<PlantIdentificationService>(
+  (ref) {
+    // This would need to be properly wired with the actual ApiClient provider
+    // For now, we'll create a placeholder that can be replaced
+    throw UnimplementedError(
+      'PlantIdentificationService provider needs proper ApiClient integration',
+    );
+  },
+);
 
 class PlantIdentificationService {
   final ApiClient _apiClient;

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:plant_social/core/router/app_router.dart';
-import 'package:plant_social/features/auth/providers/auth_provider.dart';
-import 'package:plant_social/features/home/presentation/screens/home_screen.dart';
+import 'package:leafwise/core/router/app_router.dart';
+import 'package:leafwise/features/auth/providers/auth_provider.dart';
+import 'package:leafwise/features/home/presentation/screens/home_screen.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
@@ -70,7 +70,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final authState = ref.watch(authProvider);
-    
+
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       body: PageView(
@@ -140,10 +140,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               color: theme.colorScheme.primary,
             ),
             const SizedBox(height: 16),
-            Text(
-              'Camera Feature',
-              style: theme.textTheme.headlineSmall,
-            ),
+            Text('Camera Feature', style: theme.textTheme.headlineSmall),
             const SizedBox(height: 8),
             Text(
               'Take photos and create stories',
@@ -174,10 +171,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               color: theme.colorScheme.primary,
             ),
             const SizedBox(height: 16),
-            Text(
-              'Messages',
-              style: theme.textTheme.headlineSmall,
-            ),
+            Text('Messages', style: theme.textTheme.headlineSmall),
             const SizedBox(height: 8),
             Text(
               'Chat with your plant friends',
@@ -208,10 +202,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               color: theme.colorScheme.primary,
             ),
             const SizedBox(height: 16),
-            Text(
-              'Stories',
-              style: theme.textTheme.headlineSmall,
-            ),
+            Text('Stories', style: theme.textTheme.headlineSmall),
             const SizedBox(height: 8),
             Text(
               'Share your plant moments',
@@ -225,7 +216,11 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     );
   }
 
-  Widget _buildProfilePlaceholder(BuildContext context, ThemeData theme, String? userName) {
+  Widget _buildProfilePlaceholder(
+    BuildContext context,
+    ThemeData theme,
+    String? userName,
+  ) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
@@ -253,10 +248,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            Text(
-              userName ?? 'User',
-              style: theme.textTheme.headlineSmall,
-            ),
+            Text(userName ?? 'User', style: theme.textTheme.headlineSmall),
             const SizedBox(height: 8),
             Text(
               'Plant enthusiast',
@@ -268,9 +260,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
             ElevatedButton.icon(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Opening profile editor...'),
-                  ),
+                  const SnackBar(content: Text('Opening profile editor...')),
                 );
               },
               icon: const Icon(Icons.edit),

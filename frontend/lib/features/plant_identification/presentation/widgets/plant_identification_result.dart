@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:plant_social/features/plant_identification/models/plant_identification_models.dart';
+import 'package:leafwise/features/plant_identification/models/plant_identification_models.dart';
 
 class PlantIdentificationResult extends StatelessWidget {
   final PlantIdentification identification;
@@ -16,7 +16,7 @@ class PlantIdentificationResult extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Positioned(
       bottom: 0,
       left: 0,
@@ -72,10 +72,7 @@ class PlantIdentificationResult extends StatelessWidget {
                       ],
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: onClose,
-                  ),
+                  IconButton(icon: const Icon(Icons.close), onPressed: onClose),
                 ],
               ),
             ),
@@ -118,9 +115,7 @@ class PlantIdentificationResult extends StatelessWidget {
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Colors.grey[50],
-                border: Border(
-                  top: BorderSide(color: Colors.grey[200]!),
-                ),
+                border: Border(top: BorderSide(color: Colors.grey[200]!)),
               ),
               child: Row(
                 children: [
@@ -229,7 +224,7 @@ class PlantIdentificationResult extends StatelessWidget {
 
   Widget _buildCareInfo(ThemeData theme) {
     final careInfo = identification.careInfo;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -240,29 +235,50 @@ class PlantIdentificationResult extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        _buildCareItem(Icons.wb_sunny, 'Light', careInfo.lightRequirement, theme),
-        _buildCareItem(Icons.water_drop, 'Water', careInfo.waterFrequency, theme),
-        _buildCareItem(Icons.trending_up, 'Care Level', careInfo.careLevel, theme),
+        _buildCareItem(
+          Icons.wb_sunny,
+          'Light',
+          careInfo.lightRequirement,
+          theme,
+        ),
+        _buildCareItem(
+          Icons.water_drop,
+          'Water',
+          careInfo.waterFrequency,
+          theme,
+        ),
+        _buildCareItem(
+          Icons.trending_up,
+          'Care Level',
+          careInfo.careLevel,
+          theme,
+        ),
         if (careInfo.humidity != null)
           _buildCareItem(Icons.opacity, 'Humidity', careInfo.humidity!, theme),
         if (careInfo.temperature != null)
-          _buildCareItem(Icons.thermostat, 'Temperature', careInfo.temperature!, theme),
+          _buildCareItem(
+            Icons.thermostat,
+            'Temperature',
+            careInfo.temperature!,
+            theme,
+          ),
         if (careInfo.toxicity != null)
           _buildCareItem(Icons.warning, 'Toxicity', careInfo.toxicity!, theme),
       ],
     );
   }
 
-  Widget _buildCareItem(IconData icon, String label, String value, ThemeData theme) {
+  Widget _buildCareItem(
+    IconData icon,
+    String label,
+    String value,
+    ThemeData theme,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         children: [
-          Icon(
-            icon,
-            size: 20,
-            color: theme.primaryColor,
-          ),
+          Icon(icon, size: 20, color: theme.primaryColor),
           const SizedBox(width: 12),
           Text(
             '$label: ',
@@ -270,12 +286,7 @@ class PlantIdentificationResult extends StatelessWidget {
               fontWeight: FontWeight.w500,
             ),
           ),
-          Expanded(
-            child: Text(
-              value,
-              style: theme.textTheme.bodyMedium,
-            ),
-          ),
+          Expanded(child: Text(value, style: theme.textTheme.bodyMedium)),
         ],
       ),
     );
@@ -297,10 +308,7 @@ class PlantIdentificationResult extends StatelessWidget {
           runSpacing: 4,
           children: identification.alternativeNames.map((name) {
             return Chip(
-              label: Text(
-                name,
-                style: theme.textTheme.bodySmall,
-              ),
+              label: Text(name, style: theme.textTheme.bodySmall),
               backgroundColor: theme.primaryColor.withOpacity(0.1),
               side: BorderSide.none,
             );
@@ -322,10 +330,7 @@ class PlantIdentificationResult extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        Text(
-          identification.description!,
-          style: theme.textTheme.bodyMedium,
-        ),
+        Text(identification.description!, style: theme.textTheme.bodyMedium),
         const SizedBox(height: 16),
       ],
     );

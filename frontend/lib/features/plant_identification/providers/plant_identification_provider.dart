@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:plant_social/core/network/api_client.dart';
-import 'package:plant_social/features/plant_identification/models/plant_identification_models.dart';
-import 'package:plant_social/features/plant_care/models/plant_care_models.dart';
-import 'package:plant_social/features/plant_identification/services/plant_identification_service.dart';
+import 'package:leafwise/core/network/api_client.dart';
+import 'package:leafwise/features/plant_identification/models/plant_identification_models.dart';
+import 'package:leafwise/features/plant_care/models/plant_care_models.dart';
+import 'package:leafwise/features/plant_identification/services/plant_identification_service.dart';
 import 'dart:io';
 
 // Service provider
@@ -11,14 +11,16 @@ final plantIdentificationServiceProvider = Provider<PlantIdentificationService>(
 );
 
 // State notifier for plant identification
-class PlantIdentificationNotifier extends StateNotifier<PlantIdentificationState> {
+class PlantIdentificationNotifier
+    extends StateNotifier<PlantIdentificationState> {
   final PlantIdentificationService _service;
 
-  PlantIdentificationNotifier(this._service) : super(const PlantIdentificationState());
+  PlantIdentificationNotifier(this._service)
+    : super(const PlantIdentificationState());
 
   Future<void> identifyPlant(File imageFile) async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
       final identification = await _service.identifyPlant(imageFile);
       state = state.copyWith(
@@ -27,27 +29,18 @@ class PlantIdentificationNotifier extends StateNotifier<PlantIdentificationState
         identifications: [identification, ...state.identifications],
       );
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
   Future<void> loadIdentificationHistory() async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
       final history = await _service.getIdentificationHistory();
-      state = state.copyWith(
-        isLoading: false,
-        history: history,
-      );
+      state = state.copyWith(isLoading: false, history: history);
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
@@ -58,18 +51,12 @@ class PlantIdentificationNotifier extends StateNotifier<PlantIdentificationState
     }
 
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
       final results = await _service.searchPlants(query);
-      state = state.copyWith(
-        isLoading: false,
-        identifications: results,
-      );
+      state = state.copyWith(isLoading: false, identifications: results);
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
@@ -91,23 +78,30 @@ class PlantIdentificationNotifier extends StateNotifier<PlantIdentificationState
   }
 
   void clearSearch() {
-    state = state.copyWith(
-      identifications: [],
-      error: null,
-    );
+    state = state.copyWith(identifications: [], error: null);
   }
 }
 
 // State notifier provider
-final plantIdentificationProvider = StateNotifierProvider<PlantIdentificationNotifier, PlantIdentificationState>(
-  (ref) => PlantIdentificationNotifier(ref.read(plantIdentificationServiceProvider)),
-);
+final plantIdentificationProvider =
+    StateNotifierProvider<
+      PlantIdentificationNotifier,
+      PlantIdentificationState
+    >(
+      (ref) => PlantIdentificationNotifier(
+        ref.read(plantIdentificationServiceProvider),
+      ),
+    );
 
 // Individual providers for specific use cases
-final plantIdentificationHistoryProvider = FutureProvider<List<PlantIdentification>>(
-  (ref) => ref.read(plantIdentificationServiceProvider).getIdentificationHistory(),
-);
+final plantIdentificationHistoryProvider =
+    FutureProvider<List<PlantIdentification>>(
+      (ref) => ref
+          .read(plantIdentificationServiceProvider)
+          .getIdentificationHistory(),
+    );
 
 final plantSpeciesProvider = FutureProvider.family<PlantSpecies, String>(
-  (ref, speciesId) => ref.read(plantIdentificationServiceProvider).getPlantSpecies(speciesId),
+  (ref, speciesId) =>
+      ref.read(plantIdentificationServiceProvider).getPlantSpecies(speciesId),
 );

@@ -1,4 +1,4 @@
-# plant_social
+# leafwise
 
 A new Flutter project.
 

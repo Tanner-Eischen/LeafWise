@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:plant_social/features/plant_care/models/plant_care_models.dart';
-import 'package:plant_social/features/plant_care/providers/plant_care_provider.dart';
-import 'package:plant_social/features/plant_care/presentation/screens/add_plant_screen.dart';
-import 'package:plant_social/features/plant_care/presentation/screens/plant_detail_screen.dart';
-import 'package:plant_social/features/plant_care/presentation/screens/care_reminders_screen.dart';
-import 'package:plant_social/features/plant_care/presentation/screens/care_logs_screen.dart';
-import 'package:plant_social/features/plant_care/presentation/widgets/plant_card.dart';
-import 'package:plant_social/features/plant_care/presentation/widgets/care_reminder_card.dart';
-import 'package:plant_social/features/seasonal_ai/presentation/widgets/seasonal_predictions_widget.dart';
-import 'package:plant_social/features/timelapse/presentation/widgets/timelapse_tracking_widget.dart';
-import 'package:plant_social/core/widgets/loading_widget.dart';
-import 'package:plant_social/core/widgets/error_widget.dart';
+import 'package:leafwise/features/plant_care/models/plant_care_models.dart';
+import 'package:leafwise/features/plant_care/providers/plant_care_provider.dart';
+import 'package:leafwise/features/plant_care/presentation/screens/add_plant_screen.dart';
+import 'package:leafwise/features/plant_care/presentation/screens/plant_detail_screen.dart';
+import 'package:leafwise/features/plant_care/presentation/screens/care_reminders_screen.dart';
+import 'package:leafwise/features/plant_care/presentation/screens/care_logs_screen.dart';
+import 'package:leafwise/features/plant_care/presentation/widgets/plant_card.dart';
+import 'package:leafwise/features/plant_care/presentation/widgets/care_reminder_card.dart';
+import 'package:leafwise/features/seasonal_ai/presentation/widgets/seasonal_predictions_widget.dart';
+import 'package:leafwise/features/timelapse/presentation/widgets/timelapse_tracking_widget.dart';
+import 'package:leafwise/core/widgets/loading_widget.dart';
+import 'package:leafwise/core/widgets/error_widget.dart';
 
 class PlantCareDashboardScreen extends ConsumerStatefulWidget {
   const PlantCareDashboardScreen({super.key});
@@ -30,7 +30,7 @@ class _PlantCareDashboardScreenState
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    
+
     // Load initial data
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(plantCareProvider.notifier).loadUserPlants();
@@ -96,9 +96,7 @@ class _PlantCareDashboardScreenState
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const AddPlantScreen(),
-            ),
+            MaterialPageRoute(builder: (context) => const AddPlantScreen()),
           );
         },
         backgroundColor: theme.primaryColor,
@@ -134,9 +132,7 @@ class _PlantCareDashboardScreenState
       child: CustomScrollView(
         slivers: [
           // Quick stats
-          SliverToBoxAdapter(
-            child: _buildQuickStats(state, theme),
-          ),
+          SliverToBoxAdapter(child: _buildQuickStats(state, theme)),
 
           // Plants grid
           SliverPadding(
@@ -148,22 +144,20 @@ class _PlantCareDashboardScreenState
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
               ),
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final plant = state.userPlants[index];
-                  return PlantCard(
-                    plant: plant,
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => PlantDetailScreen(plantId: plant.id),
-                        ),
-                      );
-                    },
-                  );
-                },
-                childCount: state.userPlants.length,
-              ),
+              delegate: SliverChildBuilderDelegate((context, index) {
+                final plant = state.userPlants[index];
+                return PlantCard(
+                  plant: plant,
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            PlantDetailScreen(plantId: plant.id),
+                      ),
+                    );
+                  },
+                );
+              }, childCount: state.userPlants.length),
             ),
           ),
         ],
@@ -204,10 +198,14 @@ class _PlantCareDashboardScreenState
             reminder: reminder,
             onTap: () {},
             onComplete: () {
-              ref.read(plantCareProvider.notifier).completeReminder(reminder.id);
+              ref
+                  .read(plantCareProvider.notifier)
+                  .completeReminder(reminder.id);
             },
             onSnooze: () {
-              ref.read(plantCareProvider.notifier).snoozeReminder(reminder.id, 1);
+              ref
+                  .read(plantCareProvider.notifier)
+                  .snoozeReminder(reminder.id, 1);
             },
           );
         },
@@ -234,7 +232,10 @@ class _PlantCareDashboardScreenState
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [theme.primaryColor, theme.primaryColor.withValues(alpha: 0.8)],
+              colors: [
+                theme.primaryColor,
+                theme.primaryColor.withValues(alpha: 0.8),
+              ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -305,7 +306,7 @@ class _PlantCareDashboardScreenState
             ],
           ),
         ),
-        
+
         // Rich Analytics Cards
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -314,19 +315,19 @@ class _PlantCareDashboardScreenState
               // ML Health Predictions Card
               _buildMLHealthCard(theme, state),
               const SizedBox(height: 12),
-              
+
               // RAG Insights Card
               _buildRAGInsightsCard(theme),
               const SizedBox(height: 12),
-              
+
               // Community Analytics Card
               _buildCommunityAnalyticsCard(theme),
               const SizedBox(height: 12),
-              
+
               // Seasonal AI Predictions Widget
               const SeasonalPredictionsWidget(),
               const SizedBox(height: 12),
-              
+
               // Time-lapse Tracking Widget
               const TimelapseTrackingWidget(),
             ],
@@ -336,14 +337,15 @@ class _PlantCareDashboardScreenState
     );
   }
 
-  Widget _buildStatItem(String label, String value, IconData icon, Color color) {
+  Widget _buildStatItem(
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Column(
       children: [
-        Icon(
-          icon,
-          color: color,
-          size: 24,
-        ),
+        Icon(icon, color: color, size: 24),
         const SizedBox(height: 8),
         Text(
           value,
@@ -355,10 +357,7 @@ class _PlantCareDashboardScreenState
         ),
         Text(
           label,
-          style: TextStyle(
-            color: color.withValues(alpha: 0.9),
-            fontSize: 12,
-          ),
+          style: TextStyle(color: color.withValues(alpha: 0.9), fontSize: 12),
         ),
       ],
     );
@@ -369,11 +368,7 @@ class _PlantCareDashboardScreenState
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.eco,
-            size: 80,
-            color: Colors.grey[400],
-          ),
+          Icon(Icons.eco, size: 80, color: Colors.grey[400]),
           const SizedBox(height: 16),
           Text(
             'No plants yet',
@@ -393,9 +388,7 @@ class _PlantCareDashboardScreenState
           ElevatedButton.icon(
             onPressed: () {
               Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const AddPlantScreen(),
-                ),
+                MaterialPageRoute(builder: (context) => const AddPlantScreen()),
               );
             },
             icon: const Icon(Icons.add),
@@ -403,10 +396,7 @@ class _PlantCareDashboardScreenState
             style: ElevatedButton.styleFrom(
               backgroundColor: theme.primaryColor,
               foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 24,
-                vertical: 12,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             ),
           ),
         ],
@@ -419,11 +409,7 @@ class _PlantCareDashboardScreenState
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.schedule,
-            size: 80,
-            color: Colors.grey[400],
-          ),
+          Icon(Icons.schedule, size: 80, color: Colors.grey[400]),
           const SizedBox(height: 16),
           Text(
             'No upcoming reminders',
@@ -457,10 +443,7 @@ class _PlantCareDashboardScreenState
         'growth_rate': 0.91,
       },
       'risk_factors': [],
-      'predictions': {
-        'next_week_health': 0.89,
-        'care_success_rate': 0.85,
-      }
+      'predictions': {'next_week_health': 0.89, 'care_success_rate': 0.85},
     };
 
     return Card(
@@ -482,11 +465,16 @@ class _PlantCareDashboardScreenState
                 ),
                 const Spacer(),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.green.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
+                    border: Border.all(
+                      color: Colors.green.withValues(alpha: 0.3),
+                    ),
                   ),
                   child: Text(
                     'LOW RISK',
@@ -499,7 +487,7 @@ class _PlantCareDashboardScreenState
               ],
             ),
             const SizedBox(height: 16),
-            
+
             // Overall Health Score
             Row(
               children: [
@@ -524,7 +512,11 @@ class _PlantCareDashboardScreenState
                             ),
                           ),
                           const SizedBox(width: 8),
-                          const Icon(Icons.health_and_safety, color: Colors.green, size: 20),
+                          const Icon(
+                            Icons.health_and_safety,
+                            color: Colors.green,
+                            size: 20,
+                          ),
                         ],
                       ),
                     ],
@@ -550,7 +542,7 @@ class _PlantCareDashboardScreenState
               ],
             ),
             const SizedBox(height: 16),
-            
+
             // Feature Scores
             Text(
               'Health Factors',
@@ -563,9 +555,9 @@ class _PlantCareDashboardScreenState
             _buildFeatureScore(theme, 'Light Exposure', 0.85),
             _buildFeatureScore(theme, 'Soil Nutrients', 0.78),
             _buildFeatureScore(theme, 'Growth Rate', 0.91),
-            
+
             const SizedBox(height: 12),
-            
+
             // Predictions
             Container(
               padding: const EdgeInsets.all(12),
@@ -607,18 +599,19 @@ class _PlantCareDashboardScreenState
   }
 
   Widget _buildFeatureScore(ThemeData theme, String label, double score) {
-    Color scoreColor = score >= 0.8 ? Colors.green : score >= 0.6 ? Colors.orange : Colors.red;
-    
+    Color scoreColor = score >= 0.8
+        ? Colors.green
+        : score >= 0.6
+        ? Colors.orange
+        : Colors.red;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         children: [
           Expanded(
             flex: 2,
-            child: Text(
-              label,
-              style: theme.textTheme.bodySmall,
-            ),
+            child: Text(label, style: theme.textTheme.bodySmall),
           ),
           Expanded(
             flex: 3,
@@ -649,13 +642,18 @@ class _PlantCareDashboardScreenState
       'total_queries': 2847,
       'success_rate': 94,
       'avg_response_time': 245,
-      'recent_queries': ['Plant Health', 'Watering Tips', 'Pest Control', 'Fertilizer'],
+      'recent_queries': [
+        'Plant Health',
+        'Watering Tips',
+        'Pest Control',
+        'Fertilizer',
+      ],
       'response_quality': 0.94,
       'knowledge_coverage': {
         'Plant Care': 89.0,
         'Disease Treatment': 76.0,
         'Nutrition': 82.0,
-      }
+      },
     };
 
     return Card(
@@ -677,7 +675,10 @@ class _PlantCareDashboardScreenState
                 ),
                 const Spacer(),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.green.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
@@ -693,7 +694,7 @@ class _PlantCareDashboardScreenState
               ],
             ),
             const SizedBox(height: 16),
-            
+
             // RAG Statistics
             Row(
               children: [
@@ -701,9 +702,7 @@ class _PlantCareDashboardScreenState
                   child: _buildMiniMetric(theme, 'Total Queries', '2,847'),
                 ),
                 const SizedBox(width: 12),
-                Expanded(
-                  child: _buildMiniMetric(theme, 'Success Rate', '94%'),
-                ),
+                Expanded(child: _buildMiniMetric(theme, 'Success Rate', '94%')),
                 const SizedBox(width: 12),
                 Expanded(
                   child: _buildMiniMetric(theme, 'Avg Response', '245ms'),
@@ -711,7 +710,7 @@ class _PlantCareDashboardScreenState
               ],
             ),
             const SizedBox(height: 16),
-            
+
             // Knowledge Coverage
             Text(
               'Knowledge Coverage',
@@ -723,9 +722,9 @@ class _PlantCareDashboardScreenState
             _buildKnowledgeItem(theme, 'Plant Care', 89),
             _buildKnowledgeItem(theme, 'Disease Treatment', 76),
             _buildKnowledgeItem(theme, 'Nutrition', 82),
-            
+
             const SizedBox(height: 12),
-            
+
             // Response Quality
             Row(
               children: [
@@ -776,10 +775,7 @@ class _PlantCareDashboardScreenState
         children: [
           Expanded(
             flex: 2,
-            child: Text(
-              label,
-              style: theme.textTheme.bodySmall,
-            ),
+            child: Text(label, style: theme.textTheme.bodySmall),
           ),
           Expanded(
             flex: 3,
@@ -832,11 +828,15 @@ class _PlantCareDashboardScreenState
                   ),
                 ),
                 const Spacer(),
-                Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[600]),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 16,
+                  color: Colors.grey[600],
+                ),
               ],
             ),
             const SizedBox(height: 16),
-            
+
             // Matching Score
             Row(
               children: [
@@ -867,13 +867,15 @@ class _PlantCareDashboardScreenState
                   child: CircularProgressIndicator(
                     value: 0.76,
                     backgroundColor: Colors.grey[200],
-                    valueColor: AlwaysStoppedAnimation<Color>(theme.primaryColor),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      theme.primaryColor,
+                    ),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            
+
             // Top Shared Interests
             Text(
               'Top Shared Interests',
@@ -887,30 +889,40 @@ class _PlantCareDashboardScreenState
               runSpacing: 4,
               children: [
                 Chip(
-                  label: Text('Indoor Plants 78%', style: theme.textTheme.bodySmall),
+                  label: Text(
+                    'Indoor Plants 78%',
+                    style: theme.textTheme.bodySmall,
+                  ),
                   backgroundColor: theme.primaryColor.withValues(alpha: 0.1),
-                  side: BorderSide(color: theme.primaryColor.withValues(alpha: 0.3)),
+                  side: BorderSide(
+                    color: theme.primaryColor.withValues(alpha: 0.3),
+                  ),
                 ),
                 Chip(
-                  label: Text('Succulents 62%', style: theme.textTheme.bodySmall),
+                  label: Text(
+                    'Succulents 62%',
+                    style: theme.textTheme.bodySmall,
+                  ),
                   backgroundColor: theme.primaryColor.withValues(alpha: 0.1),
-                  side: BorderSide(color: theme.primaryColor.withValues(alpha: 0.3)),
+                  side: BorderSide(
+                    color: theme.primaryColor.withValues(alpha: 0.3),
+                  ),
                 ),
                 Chip(
                   label: Text('Herbs 45%', style: theme.textTheme.bodySmall),
                   backgroundColor: theme.primaryColor.withValues(alpha: 0.1),
-                  side: BorderSide(color: theme.primaryColor.withValues(alpha: 0.3)),
+                  side: BorderSide(
+                    color: theme.primaryColor.withValues(alpha: 0.3),
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 12),
-            
+
             // Community Stats
             Row(
               children: [
-                Expanded(
-                  child: _buildMiniMetric(theme, 'Similar Users', '34'),
-                ),
+                Expanded(child: _buildMiniMetric(theme, 'Similar Users', '34')),
                 const SizedBox(width: 16),
                 Expanded(
                   child: _buildMiniMetric(theme, 'Influence Score', '3.2'),

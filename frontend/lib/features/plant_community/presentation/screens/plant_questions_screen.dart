@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:plant_social/features/plant_community/models/plant_community_models.dart';
-import 'package:plant_social/features/plant_community/providers/plant_community_provider.dart';
-import 'package:plant_social/features/plant_community/presentation/widgets/question_card.dart';
-import 'package:plant_social/core/widgets/custom_search_bar.dart';
+import 'package:leafwise/features/plant_community/models/plant_community_models.dart';
+import 'package:leafwise/features/plant_community/providers/plant_community_provider.dart';
+import 'package:leafwise/features/plant_community/presentation/widgets/question_card.dart';
+import 'package:leafwise/core/widgets/custom_search_bar.dart';
 
 class PlantQuestionsScreen extends ConsumerStatefulWidget {
   const PlantQuestionsScreen({super.key});
 
   @override
-  ConsumerState<PlantQuestionsScreen> createState() => _PlantQuestionsScreenState();
+  ConsumerState<PlantQuestionsScreen> createState() =>
+      _PlantQuestionsScreenState();
 }
 
 class _PlantQuestionsScreenState extends ConsumerState<PlantQuestionsScreen>
     with SingleTickerProviderStateMixin {
   final _scrollController = ScrollController();
   final _searchController = TextEditingController();
-  
+
   String? _selectedCategory;
   String? _selectedSort = SortOption.newest;
   bool _showFilters = false;
@@ -25,7 +26,7 @@ class _PlantQuestionsScreenState extends ConsumerState<PlantQuestionsScreen>
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    
+
     // Load initial questions
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(plantCommunityProvider.notifier).loadQuestions(refresh: true);
@@ -44,13 +45,15 @@ class _PlantQuestionsScreenState extends ConsumerState<PlantQuestionsScreen>
         _scrollController.position.maxScrollExtent - 200) {
       final state = ref.read(plantCommunityProvider);
       if (!state.isLoading && state.hasMoreQuestions) {
-        ref.read(plantCommunityProvider.notifier).loadQuestions(
-          category: _selectedCategory,
-          search: _searchController.text.trim().isEmpty
-              ? null
-              : _searchController.text.trim(),
-          sortBy: _selectedSort,
-        );
+        ref
+            .read(plantCommunityProvider.notifier)
+            .loadQuestions(
+              category: _selectedCategory,
+              search: _searchController.text.trim().isEmpty
+                  ? null
+                  : _searchController.text.trim(),
+              sortBy: _selectedSort,
+            );
       }
     }
   }
@@ -95,9 +98,7 @@ class _PlantQuestionsScreenState extends ConsumerState<PlantQuestionsScreen>
           if (_showFilters) _buildFilters(theme),
 
           // Questions list
-          Expanded(
-            child: _buildQuestionsList(questions, state),
-          ),
+          Expanded(child: _buildQuestionsList(questions, state)),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -113,9 +114,7 @@ class _PlantQuestionsScreenState extends ConsumerState<PlantQuestionsScreen>
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.grey[50],
-        border: Border(
-          bottom: BorderSide(color: Colors.grey[200]!),
-        ),
+        border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,7 +140,7 @@ class _PlantQuestionsScreenState extends ConsumerState<PlantQuestionsScreen>
                     () => _selectCategory(null),
                   );
                 }
-                
+
                 final category = QuestionCategory.all[index - 1];
                 return _buildCategoryChip(
                   QuestionCategory.getDisplayName(category),
@@ -184,13 +183,9 @@ class _PlantQuestionsScreenState extends ConsumerState<PlantQuestionsScreen>
     );
   }
 
-  Widget _buildCategoryChip(
-    String label,
-    bool isSelected,
-    VoidCallback onTap,
-  ) {
+  Widget _buildCategoryChip(String label, bool isSelected, VoidCallback onTap) {
     final theme = Theme.of(context);
-    
+
     return Padding(
       padding: const EdgeInsets.only(right: 8),
       child: FilterChip(
@@ -213,9 +208,7 @@ class _PlantQuestionsScreenState extends ConsumerState<PlantQuestionsScreen>
     PlantCommunityState state,
   ) {
     if (state.isLoading && questions.isEmpty) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     if (state.error != null && questions.isEmpty) {
@@ -223,25 +216,16 @@ class _PlantQuestionsScreenState extends ConsumerState<PlantQuestionsScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.grey[400],
-            ),
+            Icon(Icons.error_outline, size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
             Text(
               'Failed to load questions',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 18, color: Colors.grey[600]),
             ),
             const SizedBox(height: 8),
             Text(
               state.error!,
-              style: TextStyle(
-                color: Colors.grey[500],
-              ),
+              style: TextStyle(color: Colors.grey[500]),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
@@ -259,25 +243,16 @@ class _PlantQuestionsScreenState extends ConsumerState<PlantQuestionsScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.help_outline,
-              size: 64,
-              color: Colors.grey[400],
-            ),
+            Icon(Icons.help_outline, size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
             Text(
               'No questions found',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 18, color: Colors.grey[600]),
             ),
             const SizedBox(height: 8),
             Text(
               'Be the first to ask a question!',
-              style: TextStyle(
-                color: Colors.grey[500],
-              ),
+              style: TextStyle(color: Colors.grey[500]),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
@@ -299,9 +274,7 @@ class _PlantQuestionsScreenState extends ConsumerState<PlantQuestionsScreen>
           if (index >= questions.length) {
             return const Padding(
               padding: EdgeInsets.all(16),
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
+              child: Center(child: CircularProgressIndicator()),
             );
           }
 
@@ -340,18 +313,22 @@ class _PlantQuestionsScreenState extends ConsumerState<PlantQuestionsScreen>
   }
 
   Future<void> _refreshQuestions() async {
-    await ref.read(plantCommunityProvider.notifier).loadQuestions(
-      refresh: true,
-      category: _selectedCategory,
-      search: _searchController.text.trim().isEmpty
-          ? null
-          : _searchController.text.trim(),
-      sortBy: _selectedSort,
-    );
+    await ref
+        .read(plantCommunityProvider.notifier)
+        .loadQuestions(
+          refresh: true,
+          category: _selectedCategory,
+          search: _searchController.text.trim().isEmpty
+              ? null
+              : _searchController.text.trim(),
+          sortBy: _selectedSort,
+        );
   }
 
   void _voteQuestion(String questionId, String voteType) {
-    ref.read(plantCommunityProvider.notifier).voteQuestion(questionId, voteType);
+    ref
+        .read(plantCommunityProvider.notifier)
+        .voteQuestion(questionId, voteType);
   }
 
   void _bookmarkQuestion(String questionId) {
@@ -359,10 +336,7 @@ class _PlantQuestionsScreenState extends ConsumerState<PlantQuestionsScreen>
   }
 
   void _navigateToAskQuestion() {
-    Navigator.pushNamed(
-      context,
-      '/ask-question',
-    ).then((result) {
+    Navigator.pushNamed(context, '/ask-question').then((result) {
       if (result == true) {
         _refreshQuestions();
       }
@@ -370,10 +344,6 @@ class _PlantQuestionsScreenState extends ConsumerState<PlantQuestionsScreen>
   }
 
   void _navigateToQuestionDetail(PlantQuestion question) {
-    Navigator.pushNamed(
-      context,
-      '/question-detail',
-      arguments: question.id,
-    );
+    Navigator.pushNamed(context, '/question-detail', arguments: question.id);
   }
 }

@@ -6,12 +6,12 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:plant_social/features/camera/models/ar_seasonal_models.dart';
-import 'package:plant_social/features/camera/widgets/ar_seasonal_overlay.dart';
-import 'package:plant_social/features/camera/widgets/ar_growth_projection.dart';
-import 'package:plant_social/features/camera/widgets/ar_timelapse_preview.dart';
-import 'package:plant_social/features/camera/widgets/ar_seasonal_transformation.dart';
-import 'package:plant_social/features/seasonal_ai/models/seasonal_ai_models.dart';
+import 'package:leafwise/features/camera/models/ar_seasonal_models.dart';
+import 'package:leafwise/features/camera/widgets/ar_seasonal_overlay.dart';
+import 'package:leafwise/features/camera/widgets/ar_growth_projection.dart';
+import 'package:leafwise/features/camera/widgets/ar_timelapse_preview.dart';
+import 'package:leafwise/features/camera/widgets/ar_seasonal_transformation.dart';
+import 'package:leafwise/features/seasonal_ai/models/seasonal_ai_models.dart';
 
 /// AR mode enumeration
 enum ARSeasonalMode {
@@ -56,8 +56,8 @@ class _ARSeasonalIntegrationState extends ConsumerState<ARSeasonalIntegration>
 
   // Configuration states
   ARVisualizationConfig _overlayConfig = const ARVisualizationConfig();
-  ARProjectionConfig _projectionConfig = const ARProjectionConfig();
-  ARTimelapseControls _timelapseControls = const ARTimelapseControls();
+  final ARProjectionConfig _projectionConfig = const ARProjectionConfig();
+  final ARTimelapseControls _timelapseControls = const ARTimelapseControls();
 
   @override
   void initState() {

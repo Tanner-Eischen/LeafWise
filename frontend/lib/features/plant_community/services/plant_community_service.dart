@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:plant_social/features/plant_community/models/plant_community_models.dart';
-import 'package:plant_social/core/services/api_service.dart';
-import 'package:plant_social/core/services/storage_service.dart';
+import 'package:leafwise/features/plant_community/models/plant_community_models.dart';
+import 'package:leafwise/core/services/api_service.dart';
+import 'package:leafwise/core/services/storage_service.dart';
 
 class PlantCommunityService {
   final ApiService _apiService;
@@ -33,9 +33,7 @@ class PlantCommunityService {
       );
 
       final List<dynamic> questionsJson = response.data['questions'] ?? [];
-      return questionsJson
-          .map((json) => PlantQuestion.fromJson(json))
-          .toList();
+      return questionsJson.map((json) => PlantQuestion.fromJson(json)).toList();
     } catch (e) {
       throw Exception('Failed to load questions: $e');
     }
@@ -56,7 +54,7 @@ class PlantCommunityService {
   }) async {
     try {
       String? imageUrl;
-      
+
       // Upload image if provided
       if (imageFile != null) {
         imageUrl = await _uploadImage(imageFile, 'questions');
@@ -85,7 +83,7 @@ class PlantCommunityService {
   }) async {
     try {
       String? imageUrl;
-      
+
       // Upload image if provided
       if (imageFile != null) {
         imageUrl = await _uploadImage(imageFile, 'questions');
@@ -176,9 +174,7 @@ class PlantCommunityService {
       );
 
       final List<dynamic> answersJson = response.data['answers'] ?? [];
-      return answersJson
-          .map((json) => PlantAnswer.fromJson(json))
-          .toList();
+      return answersJson.map((json) => PlantAnswer.fromJson(json)).toList();
     } catch (e) {
       throw Exception('Failed to load answers: $e');
     }
@@ -191,7 +187,7 @@ class PlantCommunityService {
   }) async {
     try {
       String? imageUrl;
-      
+
       // Upload image if provided
       if (imageFile != null) {
         imageUrl = await _uploadImage(imageFile, 'answers');
@@ -220,7 +216,7 @@ class PlantCommunityService {
   }) async {
     try {
       String? imageUrl;
-      
+
       // Upload image if provided
       if (imageFile != null) {
         imageUrl = await _uploadImage(imageFile, 'answers');
@@ -288,9 +284,7 @@ class PlantCommunityService {
       );
 
       final List<dynamic> tradesJson = response.data['trades'] ?? [];
-      return tradesJson
-          .map((json) => PlantTrade.fromJson(json))
-          .toList();
+      return tradesJson.map((json) => PlantTrade.fromJson(json)).toList();
     } catch (e) {
       throw Exception('Failed to load trades: $e');
     }
@@ -311,7 +305,7 @@ class PlantCommunityService {
   }) async {
     try {
       List<String> imageUrls = [];
-      
+
       // Upload images if provided
       if (imageFiles != null && imageFiles.isNotEmpty) {
         for (final imageFile in imageFiles) {
@@ -320,10 +314,7 @@ class PlantCommunityService {
         }
       }
 
-      final requestData = {
-        ...request.toJson(),
-        'image_urls': imageUrls,
-      };
+      final requestData = {...request.toJson(), 'image_urls': imageUrls};
 
       final response = await _apiService.post(
         '/plant-trades',
@@ -343,7 +334,7 @@ class PlantCommunityService {
   }) async {
     try {
       List<String> imageUrls = [];
-      
+
       // Upload images if provided
       if (imageFiles != null && imageFiles.isNotEmpty) {
         for (final imageFile in imageFiles) {
@@ -400,10 +391,7 @@ class PlantCommunityService {
     }
   }
 
-  Future<PlantTrade> updateTradeStatus(
-    String tradeId,
-    String status,
-  ) async {
+  Future<PlantTrade> updateTradeStatus(String tradeId, String status) async {
     try {
       final response = await _apiService.put(
         '/plant-trades/$tradeId/status',
@@ -425,16 +413,11 @@ class PlantCommunityService {
     try {
       final response = await _apiService.get(
         '/users/$userId/questions',
-        queryParameters: {
-          'page': page,
-          'limit': limit,
-        },
+        queryParameters: {'page': page, 'limit': limit},
       );
 
       final List<dynamic> questionsJson = response.data['questions'] ?? [];
-      return questionsJson
-          .map((json) => PlantQuestion.fromJson(json))
-          .toList();
+      return questionsJson.map((json) => PlantQuestion.fromJson(json)).toList();
     } catch (e) {
       throw Exception('Failed to load user questions: $e');
     }
@@ -448,16 +431,11 @@ class PlantCommunityService {
     try {
       final response = await _apiService.get(
         '/users/$userId/answers',
-        queryParameters: {
-          'page': page,
-          'limit': limit,
-        },
+        queryParameters: {'page': page, 'limit': limit},
       );
 
       final List<dynamic> answersJson = response.data['answers'] ?? [];
-      return answersJson
-          .map((json) => PlantAnswer.fromJson(json))
-          .toList();
+      return answersJson.map((json) => PlantAnswer.fromJson(json)).toList();
     } catch (e) {
       throw Exception('Failed to load user answers: $e');
     }
@@ -471,16 +449,11 @@ class PlantCommunityService {
     try {
       final response = await _apiService.get(
         '/users/$userId/trades',
-        queryParameters: {
-          'page': page,
-          'limit': limit,
-        },
+        queryParameters: {'page': page, 'limit': limit},
       );
 
       final List<dynamic> tradesJson = response.data['trades'] ?? [];
-      return tradesJson
-          .map((json) => PlantTrade.fromJson(json))
-          .toList();
+      return tradesJson.map((json) => PlantTrade.fromJson(json)).toList();
     } catch (e) {
       throw Exception('Failed to load user trades: $e');
     }
@@ -494,16 +467,11 @@ class PlantCommunityService {
     try {
       final response = await _apiService.get(
         '/bookmarks/questions',
-        queryParameters: {
-          'page': page,
-          'limit': limit,
-        },
+        queryParameters: {'page': page, 'limit': limit},
       );
 
       final List<dynamic> questionsJson = response.data['questions'] ?? [];
-      return questionsJson
-          .map((json) => PlantQuestion.fromJson(json))
-          .toList();
+      return questionsJson.map((json) => PlantQuestion.fromJson(json)).toList();
     } catch (e) {
       throw Exception('Failed to load bookmarked questions: $e');
     }
@@ -516,16 +484,11 @@ class PlantCommunityService {
     try {
       final response = await _apiService.get(
         '/bookmarks/trades',
-        queryParameters: {
-          'page': page,
-          'limit': limit,
-        },
+        queryParameters: {'page': page, 'limit': limit},
       );
 
       final List<dynamic> tradesJson = response.data['trades'] ?? [];
-      return tradesJson
-          .map((json) => PlantTrade.fromJson(json))
-          .toList();
+      return tradesJson.map((json) => PlantTrade.fromJson(json)).toList();
     } catch (e) {
       throw Exception('Failed to load bookmarked trades: $e');
     }
@@ -542,10 +505,7 @@ class PlantCommunityService {
         'category': category,
       });
 
-      final response = await _apiService.post(
-        '/upload/image',
-        data: formData,
-      );
+      final response = await _apiService.post('/upload/image', data: formData);
 
       return response.data['url'];
     } catch (e) {

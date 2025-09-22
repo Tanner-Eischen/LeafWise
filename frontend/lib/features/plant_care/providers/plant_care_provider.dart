@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:plant_social/core/services/api_service.dart';
-import 'package:plant_social/features/plant_care/models/plant_care_models.dart';
-import 'package:plant_social/features/plant_care/services/plant_care_service.dart';
+import 'package:leafwise/core/services/api_service.dart';
+import 'package:leafwise/features/plant_care/models/plant_care_models.dart';
+import 'package:leafwise/features/plant_care/services/plant_care_service.dart';
 
 // Service provider
 final plantCareServiceProvider = Provider<PlantCareService>((ref) {
@@ -10,10 +10,11 @@ final plantCareServiceProvider = Provider<PlantCareService>((ref) {
 });
 
 // Main state provider
-final plantCareProvider = StateNotifierProvider<PlantCareNotifier, PlantCareState>((ref) {
-  final service = ref.watch(plantCareServiceProvider);
-  return PlantCareNotifier(service);
-});
+final plantCareProvider =
+    StateNotifierProvider<PlantCareNotifier, PlantCareState>((ref) {
+      final service = ref.watch(plantCareServiceProvider);
+      return PlantCareNotifier(service);
+    });
 
 // Individual providers for specific use cases
 final userPlantsProvider = Provider<List<UserPlant>>((ref) {
@@ -33,26 +34,34 @@ final upcomingRemindersProvider = Provider<List<PlantCareReminder>>((ref) {
 });
 
 // Individual user plant provider
-final userPlantProvider = FutureProvider.family<UserPlant, String>((ref, plantId) async {
+final userPlantProvider = FutureProvider.family<UserPlant, String>((
+  ref,
+  plantId,
+) async {
   final service = ref.watch(plantCareServiceProvider);
   return service.getUserPlant(plantId);
 });
 
 // Plant species provider for selection
-final plantSpeciesSearchProvider = FutureProvider.family<List<PlantSpecies>, String>((ref, query) async {
-  final service = ref.watch(plantCareServiceProvider);
-  return service.searchPlantSpecies(search: query, limit: 20);
-});
+final plantSpeciesSearchProvider =
+    FutureProvider.family<List<PlantSpecies>, String>((ref, query) async {
+      final service = ref.watch(plantCareServiceProvider);
+      return service.searchPlantSpecies(search: query, limit: 20);
+    });
 
 // Care statistics provider
-final careStatisticsProvider = FutureProvider.family<Map<String, dynamic>, CareStatisticsParams>((ref, params) async {
-  final service = ref.watch(plantCareServiceProvider);
-  return service.getCareStatistics(
-    userPlantId: params.userPlantId,
-    startDate: params.startDate,
-    endDate: params.endDate,
-  );
-});
+final careStatisticsProvider =
+    FutureProvider.family<Map<String, dynamic>, CareStatisticsParams>((
+      ref,
+      params,
+    ) async {
+      final service = ref.watch(plantCareServiceProvider);
+      return service.getCareStatistics(
+        userPlantId: params.userPlantId,
+        startDate: params.startDate,
+        endDate: params.endDate,
+      );
+    });
 
 class PlantCareNotifier extends StateNotifier<PlantCareState> {
   final PlantCareService _service;
@@ -64,15 +73,9 @@ class PlantCareNotifier extends StateNotifier<PlantCareState> {
     state = state.copyWith(isLoadingPlants: true, error: null);
     try {
       final plants = await _service.getUserPlants();
-      state = state.copyWith(
-        userPlants: plants,
-        isLoadingPlants: false,
-      );
+      state = state.copyWith(userPlants: plants, isLoadingPlants: false);
     } catch (e) {
-      state = state.copyWith(
-        isLoadingPlants: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoadingPlants: false, error: e.toString());
     }
   }
 
@@ -85,10 +88,7 @@ class PlantCareNotifier extends StateNotifier<PlantCareState> {
         isCreating: false,
       );
     } catch (e) {
-      state = state.copyWith(
-        isCreating: false,
-        createError: e.toString(),
-      );
+      state = state.copyWith(isCreating: false, createError: e.toString());
       rethrow;
     }
   }
@@ -100,16 +100,10 @@ class PlantCareNotifier extends StateNotifier<PlantCareState> {
       final updatedPlants = state.userPlants.map((plant) {
         return plant.id == plantId ? updatedPlant : plant;
       }).toList();
-      
-      state = state.copyWith(
-        userPlants: updatedPlants,
-        isUpdating: false,
-      );
+
+      state = state.copyWith(userPlants: updatedPlants, isUpdating: false);
     } catch (e) {
-      state = state.copyWith(
-        isUpdating: false,
-        updateError: e.toString(),
-      );
+      state = state.copyWith(isUpdating: false, updateError: e.toString());
       rethrow;
     }
   }
@@ -118,17 +112,13 @@ class PlantCareNotifier extends StateNotifier<PlantCareState> {
     state = state.copyWith(isDeleting: true, deleteError: null);
     try {
       await _service.deleteUserPlant(plantId);
-      final updatedPlants = state.userPlants.where((plant) => plant.id != plantId).toList();
-      
-      state = state.copyWith(
-        userPlants: updatedPlants,
-        isDeleting: false,
-      );
+      final updatedPlants = state.userPlants
+          .where((plant) => plant.id != plantId)
+          .toList();
+
+      state = state.copyWith(userPlants: updatedPlants, isDeleting: false);
     } catch (e) {
-      state = state.copyWith(
-        isDeleting: false,
-        deleteError: e.toString(),
-      );
+      state = state.copyWith(isDeleting: false, deleteError: e.toString());
       rethrow;
     }
   }
@@ -148,15 +138,9 @@ class PlantCareNotifier extends StateNotifier<PlantCareState> {
         startDate: startDate,
         endDate: endDate,
       );
-      state = state.copyWith(
-        careLogs: logs,
-        isLoadingLogs: false,
-      );
+      state = state.copyWith(careLogs: logs, isLoadingLogs: false);
     } catch (e) {
-      state = state.copyWith(
-        isLoadingLogs: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoadingLogs: false, error: e.toString());
     }
   }
 
@@ -169,10 +153,7 @@ class PlantCareNotifier extends StateNotifier<PlantCareState> {
         isCreating: false,
       );
     } catch (e) {
-      state = state.copyWith(
-        isCreating: false,
-        createError: e.toString(),
-      );
+      state = state.copyWith(isCreating: false, createError: e.toString());
       rethrow;
     }
   }
@@ -184,16 +165,10 @@ class PlantCareNotifier extends StateNotifier<PlantCareState> {
       final updatedLogs = state.careLogs.map((log) {
         return log.id == logId ? updatedLog : log;
       }).toList();
-      
-      state = state.copyWith(
-        careLogs: updatedLogs,
-        isUpdating: false,
-      );
+
+      state = state.copyWith(careLogs: updatedLogs, isUpdating: false);
     } catch (e) {
-      state = state.copyWith(
-        isUpdating: false,
-        updateError: e.toString(),
-      );
+      state = state.copyWith(isUpdating: false, updateError: e.toString());
       rethrow;
     }
   }
@@ -202,17 +177,13 @@ class PlantCareNotifier extends StateNotifier<PlantCareState> {
     state = state.copyWith(isDeleting: true, deleteError: null);
     try {
       await _service.deleteCareLog(logId);
-      final updatedLogs = state.careLogs.where((log) => log.id != logId).toList();
-      
-      state = state.copyWith(
-        careLogs: updatedLogs,
-        isDeleting: false,
-      );
+      final updatedLogs = state.careLogs
+          .where((log) => log.id != logId)
+          .toList();
+
+      state = state.copyWith(careLogs: updatedLogs, isDeleting: false);
     } catch (e) {
-      state = state.copyWith(
-        isDeleting: false,
-        deleteError: e.toString(),
-      );
+      state = state.copyWith(isDeleting: false, deleteError: e.toString());
       rethrow;
     }
   }
@@ -230,15 +201,9 @@ class PlantCareNotifier extends StateNotifier<PlantCareState> {
         careType: careType,
         isActive: isActive,
       );
-      state = state.copyWith(
-        reminders: reminders,
-        isLoadingReminders: false,
-      );
+      state = state.copyWith(reminders: reminders, isLoadingReminders: false);
     } catch (e) {
-      state = state.copyWith(
-        isLoadingReminders: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoadingReminders: false, error: e.toString());
     }
   }
 
@@ -251,10 +216,7 @@ class PlantCareNotifier extends StateNotifier<PlantCareState> {
         isLoadingReminders: false,
       );
     } catch (e) {
-      state = state.copyWith(
-        isLoadingReminders: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoadingReminders: false, error: e.toString());
     }
   }
 
@@ -267,31 +229,28 @@ class PlantCareNotifier extends StateNotifier<PlantCareState> {
         isCreating: false,
       );
     } catch (e) {
-      state = state.copyWith(
-        isCreating: false,
-        createError: e.toString(),
-      );
+      state = state.copyWith(isCreating: false, createError: e.toString());
       rethrow;
     }
   }
 
-  Future<void> updateReminder(String reminderId, PlantCareReminderRequest request) async {
+  Future<void> updateReminder(
+    String reminderId,
+    PlantCareReminderRequest request,
+  ) async {
     state = state.copyWith(isUpdating: true, updateError: null);
     try {
-      final updatedReminder = await _service.updateReminder(reminderId, request);
+      final updatedReminder = await _service.updateReminder(
+        reminderId,
+        request,
+      );
       final updatedReminders = state.reminders.map((reminder) {
         return reminder.id == reminderId ? updatedReminder : reminder;
       }).toList();
-      
-      state = state.copyWith(
-        reminders: updatedReminders,
-        isUpdating: false,
-      );
+
+      state = state.copyWith(reminders: updatedReminders, isUpdating: false);
     } catch (e) {
-      state = state.copyWith(
-        isUpdating: false,
-        updateError: e.toString(),
-      );
+      state = state.copyWith(isUpdating: false, updateError: e.toString());
       rethrow;
     }
   }
@@ -300,19 +259,20 @@ class PlantCareNotifier extends StateNotifier<PlantCareState> {
     state = state.copyWith(isDeleting: true, deleteError: null);
     try {
       await _service.deleteReminder(reminderId);
-      final updatedReminders = state.reminders.where((reminder) => reminder.id != reminderId).toList();
-      final updatedUpcoming = state.upcomingReminders.where((reminder) => reminder.id != reminderId).toList();
-      
+      final updatedReminders = state.reminders
+          .where((reminder) => reminder.id != reminderId)
+          .toList();
+      final updatedUpcoming = state.upcomingReminders
+          .where((reminder) => reminder.id != reminderId)
+          .toList();
+
       state = state.copyWith(
         reminders: updatedReminders,
         upcomingReminders: updatedUpcoming,
         isDeleting: false,
       );
     } catch (e) {
-      state = state.copyWith(
-        isDeleting: false,
-        deleteError: e.toString(),
-      );
+      state = state.copyWith(isDeleting: false, deleteError: e.toString());
       rethrow;
     }
   }
@@ -324,18 +284,17 @@ class PlantCareNotifier extends StateNotifier<PlantCareState> {
       final updatedReminders = state.reminders.map((reminder) {
         return reminder.id == reminderId ? updatedReminder : reminder;
       }).toList();
-      final updatedUpcoming = state.upcomingReminders.where((reminder) => reminder.id != reminderId).toList();
-      
+      final updatedUpcoming = state.upcomingReminders
+          .where((reminder) => reminder.id != reminderId)
+          .toList();
+
       state = state.copyWith(
         reminders: updatedReminders,
         upcomingReminders: updatedUpcoming,
         isUpdating: false,
       );
     } catch (e) {
-      state = state.copyWith(
-        isUpdating: false,
-        updateError: e.toString(),
-      );
+      state = state.copyWith(isUpdating: false, updateError: e.toString());
       rethrow;
     }
   }
@@ -350,17 +309,14 @@ class PlantCareNotifier extends StateNotifier<PlantCareState> {
       final updatedUpcoming = state.upcomingReminders.map((reminder) {
         return reminder.id == reminderId ? updatedReminder : reminder;
       }).toList();
-      
+
       state = state.copyWith(
         reminders: updatedReminders,
         upcomingReminders: updatedUpcoming,
         isUpdating: false,
       );
     } catch (e) {
-      state = state.copyWith(
-        isUpdating: false,
-        updateError: e.toString(),
-      );
+      state = state.copyWith(isUpdating: false, updateError: e.toString());
       rethrow;
     }
   }
@@ -386,11 +342,7 @@ class CareStatisticsParams {
   final DateTime? startDate;
   final DateTime? endDate;
 
-  const CareStatisticsParams({
-    this.userPlantId,
-    this.startDate,
-    this.endDate,
-  });
+  const CareStatisticsParams({this.userPlantId, this.startDate, this.endDate});
 
   @override
   bool operator ==(Object other) {

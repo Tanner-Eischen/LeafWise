@@ -1,42 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:plant_social/features/auth/presentation/screens/login_screen.dart';
-import 'package:plant_social/features/auth/presentation/screens/register_screen.dart';
-import 'package:plant_social/features/auth/presentation/screens/splash_screen.dart';
-import 'package:plant_social/features/home/presentation/screens/main_screen.dart';
-import 'package:plant_social/features/camera/presentation/screens/camera_screen.dart';
-import 'package:plant_social/features/chat/presentation/screens/chat_screen.dart';
-import 'package:plant_social/features/chat/presentation/screens/conversation_screen.dart';
-import 'package:plant_social/features/stories/presentation/screens/story_viewer_screen.dart';
-import 'package:plant_social/features/stories/presentation/screens/story_creation_screen.dart';
-import 'package:plant_social/features/profile/presentation/screens/profile_screen.dart';
-import 'package:plant_social/features/profile/presentation/screens/profile_edit_screen.dart';
-import 'package:plant_social/features/friends/presentation/screens/friends_screen.dart';
-import 'package:plant_social/features/friends/presentation/screens/add_friends_screen.dart';
-import 'package:plant_social/features/plant/presentation/screens/plant_features_screen.dart';
-import 'package:plant_social/features/auth/providers/auth_provider.dart';
+import 'package:leafwise/features/auth/presentation/screens/login_screen.dart';
+import 'package:leafwise/features/auth/presentation/screens/register_screen.dart';
+import 'package:leafwise/features/auth/presentation/screens/splash_screen.dart';
+import 'package:leafwise/features/home/presentation/screens/main_screen.dart';
+import 'package:leafwise/features/camera/presentation/screens/camera_screen.dart';
+import 'package:leafwise/features/chat/presentation/screens/chat_screen.dart';
+import 'package:leafwise/features/chat/presentation/screens/conversation_screen.dart';
+import 'package:leafwise/features/stories/presentation/screens/story_viewer_screen.dart';
+import 'package:leafwise/features/stories/presentation/screens/story_creation_screen.dart';
+import 'package:leafwise/features/profile/presentation/screens/profile_screen.dart';
+import 'package:leafwise/features/profile/presentation/screens/profile_edit_screen.dart';
+import 'package:leafwise/features/friends/presentation/screens/friends_screen.dart';
+import 'package:leafwise/features/friends/presentation/screens/add_friends_screen.dart';
+import 'package:leafwise/features/plant/presentation/screens/plant_features_screen.dart';
+import 'package:leafwise/features/telemetry/screens/telemetry_tile_demo_screen.dart';
+import 'package:leafwise/features/telemetry/presentation/telemetry_feature.dart';
+import 'package:leafwise/features/telemetry/presentation/screens/telemetry_history_screen.dart';
+import 'package:leafwise/features/telemetry/presentation/screens/telemetry_detail_screen.dart';
+import 'package:leafwise/features/telemetry/presentation/screens/light_measurement_screen.dart';
+import 'package:leafwise/features/telemetry/presentation/screens/growth_photo_capture_screen.dart';
+import 'package:leafwise/features/auth/providers/auth_provider.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
-  
+
   return GoRouter(
     initialLocation: '/splash',
     redirect: (BuildContext context, GoRouterState state) {
       final isLoggedIn = authState.isAuthenticated;
-      final isLoggingIn = state.matchedLocation == '/login' || 
-                         state.matchedLocation == '/register';
-      
+      final isLoggingIn =
+          state.matchedLocation == '/login' ||
+          state.matchedLocation == '/register';
+
       // If not logged in and not on auth screens, redirect to login
       if (!isLoggedIn && !isLoggingIn && state.matchedLocation != '/splash') {
         return '/login';
       }
-      
+
       // If logged in and on auth screens, redirect to home
       if (isLoggedIn && isLoggingIn) {
         return '/home';
       }
-      
+
       return null;
     },
     routes: [
@@ -44,26 +51,30 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/splash',
         name: 'splash',
-        builder: (BuildContext context, GoRouterState state) => const SplashScreen(),
+        builder: (BuildContext context, GoRouterState state) =>
+            const SplashScreen(),
       ),
-      
+
       // Authentication Routes
       GoRoute(
         path: '/login',
         name: 'login',
-        builder: (BuildContext context, GoRouterState state) => const LoginScreen(),
+        builder: (BuildContext context, GoRouterState state) =>
+            const LoginScreen(),
       ),
       GoRoute(
         path: '/register',
         name: 'register',
-        builder: (BuildContext context, GoRouterState state) => const RegisterScreen(),
+        builder: (BuildContext context, GoRouterState state) =>
+            const RegisterScreen(),
       ),
-      
+
       // Main App Routes
       GoRoute(
         path: '/home',
         name: 'home',
-        builder: (BuildContext context, GoRouterState state) => const MainScreen(),
+        builder: (BuildContext context, GoRouterState state) =>
+            const MainScreen(),
         routes: [
           // Camera Route
           GoRoute(
@@ -81,7 +92,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
-          
+
           // Chat Routes
           GoRoute(
             path: 'chat',
@@ -94,15 +105,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 builder: (context, state) {
                   final userId = state.pathParameters['userId']!;
                   final userName = state.uri.queryParameters['userName'];
-                  return ConversationScreen(
-                    userId: userId,
-                    userName: userName,
-                  );
+                  return ConversationScreen(userId: userId, userName: userName);
                 },
               ),
             ],
           ),
-          
+
           // Stories Routes
           GoRoute(
             path: 'story/:storyId',
@@ -110,13 +118,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) {
               final storyId = state.pathParameters['storyId']!;
               final userId = state.uri.queryParameters['userId'];
-              return StoryViewerScreen(
-                storyId: storyId,
-                userId: userId,
-              );
+              return StoryViewerScreen(storyId: storyId, userId: userId);
             },
           ),
-          
+
           // Profile Routes
           GoRoute(
             path: 'profile',
@@ -130,7 +135,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
-          
+
           // Friends Routes
           GoRoute(
             path: 'friends',
@@ -144,12 +149,103 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
-          
+
           // Plant Features Routes
           GoRoute(
             path: 'plants',
             name: 'plants',
             builder: (context, state) => const PlantFeaturesScreen(),
+            routes: [
+              // Plant-specific telemetry route
+              GoRoute(
+                path: ':plantId/telemetry',
+                name: 'plant-telemetry',
+                redirect: (context, state) {
+                  final authState = ref.read(authProvider);
+                  if (!authState.isAuthenticated) {
+                    return '/login';
+                  }
+                  // Check if user has telemetry access (expert, admin, or moderator)
+                  final user = authState.user;
+                  if (user != null && !user.hasTelemetryAccess) {
+                    // Redirect to plants page if user doesn't have telemetry access
+                    return '/home/plants';
+                  }
+                  return null; // Allow access
+                },
+                builder: (context, state) {
+                  final plantId = state.pathParameters['plantId']!;
+                  return TelemetryHistoryScreen(plantId: plantId);
+                },
+                routes: [
+                  // Plant telemetry detail route
+                  GoRoute(
+                    path: ':telemetryId',
+                    name: 'plant-telemetry-detail',
+                    builder: (context, state) {
+                      final telemetryId = state.pathParameters['telemetryId']!;
+                      return TelemetryDetailScreen(telemetryId: telemetryId);
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          // Telemetry Routes
+          GoRoute(
+            path: 'telemetry',
+            name: 'telemetry',
+            redirect: (context, state) {
+              final authState = ref.read(authProvider);
+              if (!authState.isAuthenticated) {
+                return '/login';
+              }
+              // Check if user has telemetry access (expert, admin, or moderator)
+              final user = authState.user;
+              if (user != null && !user.hasTelemetryAccess) {
+                // Redirect to home if user doesn't have telemetry access
+                return '/home';
+              }
+              return null; // Allow access
+            },
+            builder: (context, state) => const TelemetryFeature(),
+            routes: [
+              // Telemetry history route
+              GoRoute(
+                path: 'history',
+                name: 'telemetry-history',
+                builder: (context, state) => const TelemetryHistoryScreen(),
+              ),
+              // Light measurement route
+              GoRoute(
+                path: 'light-measurement',
+                name: 'light-measurement',
+                builder: (context, state) => const LightMeasurementScreen(),
+              ),
+              // Growth photo capture route
+              GoRoute(
+                path: 'growth-photo-capture',
+                name: 'growth-photo-capture',
+                builder: (context, state) => const GrowthPhotoCaptureScreen(),
+              ),
+              // Telemetry detail route
+              GoRoute(
+                path: ':telemetryId',
+                name: 'telemetry-detail',
+                builder: (context, state) {
+                  final telemetryId = state.pathParameters['telemetryId']!;
+                  return TelemetryDetailScreen(telemetryId: telemetryId);
+                },
+              ),
+            ],
+          ),
+
+          // Telemetry Demo Route (temporary for testing)
+          GoRoute(
+            path: 'telemetry-demo',
+            name: 'telemetry-demo',
+            builder: (context, state) => const TelemetryTileDemoScreen(),
           ),
         ],
       ),
@@ -159,11 +255,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.red,
-            ),
+            const Icon(Icons.error_outline, size: 64, color: Colors.red),
             const SizedBox(height: 16),
             Text(
               'Page not found',
@@ -202,4 +294,12 @@ class AppRoutes {
   static const String friends = 'friends';
   static const String addFriends = 'add-friends';
   static const String plants = 'plants';
+  static const String plantTelemetry = 'plant-telemetry';
+  static const String plantTelemetryDetail = 'plant-telemetry-detail';
+  static const String telemetry = 'telemetry';
+  static const String telemetryHistory = 'telemetry-history';
+  static const String telemetryDetail = 'telemetry-detail';
+  static const String lightMeasurement = 'light-measurement';
+  static const String growthPhotoCapture = 'growth-photo-capture';
+  static const String telemetryDemo = 'telemetry-demo';
 }

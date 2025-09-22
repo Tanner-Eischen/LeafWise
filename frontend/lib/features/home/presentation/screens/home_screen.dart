@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:plant_social/core/router/app_router.dart';
-import 'package:plant_social/features/auth/providers/auth_provider.dart';
+import 'package:leafwise/core/router/app_router.dart';
+import 'package:leafwise/features/auth/providers/auth_provider.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -31,7 +31,7 @@ class HomeScreen extends ConsumerWidget {
             ),
             const SizedBox(width: 12),
             Text(
-              'Plant Social',
+              'LeafWise',
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: theme.colorScheme.onSurface,
@@ -158,14 +158,26 @@ class HomeScreen extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  _buildFeedItem(theme, 'Alice Green',
-                      'Just repotted my monstera! 🌱', '2h ago'),
+                  _buildFeedItem(
+                    theme,
+                    'Alice Green',
+                    'Just repotted my monstera! 🌱',
+                    '2h ago',
+                  ),
                   const SizedBox(height: 16),
-                  _buildFeedItem(theme, 'Bob Plant',
-                      'Check out my new succulent collection 🌵', '5h ago'),
+                  _buildFeedItem(
+                    theme,
+                    'Bob Plant',
+                    'Check out my new succulent collection 🌵',
+                    '5h ago',
+                  ),
                   const SizedBox(height: 16),
-                  _buildFeedItem(theme, 'Carol Bloom',
-                      'Need help identifying this plant!', '1d ago'),
+                  _buildFeedItem(
+                    theme,
+                    'Carol Bloom',
+                    'Need help identifying this plant!',
+                    '1d ago',
+                  ),
                 ],
               ),
             ),
@@ -199,11 +211,7 @@ class HomeScreen extends ConsumerWidget {
                   color: theme.colorScheme.primary.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(
-                  icon,
-                  color: theme.colorScheme.primary,
-                  size: 24,
-                ),
+                child: Icon(icon, color: theme.colorScheme.primary, size: 24),
               ),
               const SizedBox(height: 8),
               Text(
@@ -325,10 +333,7 @@ class HomeScreen extends ConsumerWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: hasStory
-                      ? Border.all(
-                          color: theme.colorScheme.surface,
-                          width: 2,
-                        )
+                      ? Border.all(color: theme.colorScheme.surface, width: 2)
                       : null,
                 ),
                 child: CircleAvatar(
@@ -362,7 +367,11 @@ class HomeScreen extends ConsumerWidget {
   }
 
   Widget _buildFeedItem(
-      ThemeData theme, String userName, String content, String timeAgo) {
+    ThemeData theme,
+    String userName,
+    String content,
+    String timeAgo,
+  ) {
     return Card(
       elevation: 2,
       shadowColor: theme.colorScheme.shadow.withOpacity(0.1),
@@ -417,10 +426,7 @@ class HomeScreen extends ConsumerWidget {
             const SizedBox(height: 12),
 
             // Content
-            Text(
-              content,
-              style: theme.textTheme.bodyMedium,
-            ),
+            Text(content, style: theme.textTheme.bodyMedium),
 
             const SizedBox(height: 16),
 
@@ -432,11 +438,7 @@ class HomeScreen extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Center(
-                child: Icon(
-                  Icons.image,
-                  size: 48,
-                  color: Colors.grey[400],
-                ),
+                child: Icon(Icons.image, size: 48, color: Colors.grey[400]),
               ),
             ),
 

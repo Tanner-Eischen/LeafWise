@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:plant_social/core/router/app_router.dart';
+import 'package:leafwise/core/router/app_router.dart';
 
 class FriendSuggestions extends ConsumerWidget {
   const FriendSuggestions({super.key});
@@ -9,7 +9,7 @@ class FriendSuggestions extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -40,7 +40,7 @@ class FriendSuggestions extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 16),
-          
+
           // Horizontal scrollable suggestions
           SizedBox(
             height: 200,
@@ -80,7 +80,8 @@ class FriendSuggestions extends ConsumerWidget {
               // Avatar
               CircleAvatar(
                 radius: 32,
-                backgroundColor: (suggestion['avatarColor'] as Color).withOpacity(0.2),
+                backgroundColor: (suggestion['avatarColor'] as Color)
+                    .withOpacity(0.2),
                 child: Text(
                   suggestion['name'][0].toUpperCase(),
                   style: theme.textTheme.titleLarge?.copyWith(
@@ -89,9 +90,9 @@ class FriendSuggestions extends ConsumerWidget {
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 12),
-              
+
               // Name
               Text(
                 suggestion['name'] as String,
@@ -103,9 +104,9 @@ class FriendSuggestions extends ConsumerWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              
+
               const SizedBox(height: 4),
-              
+
               // Mutual friends or connection reason
               Text(
                 suggestion['connection'] as String,
@@ -116,16 +117,19 @@ class FriendSuggestions extends ConsumerWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
-              
+
               const Spacer(),
-              
+
               // Action buttons
               Row(
                 children: [
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () {
-                        _handleIgnoreSuggestion(context, suggestion['name'] as String);
+                        _handleIgnoreSuggestion(
+                          context,
+                          suggestion['name'] as String,
+                        );
                       },
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 8),

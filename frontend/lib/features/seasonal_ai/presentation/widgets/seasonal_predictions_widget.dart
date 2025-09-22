@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:plant_social/features/seasonal_ai/models/seasonal_ai_models.dart';
-import 'package:plant_social/features/seasonal_ai/providers/seasonal_ai_provider.dart';
-import 'package:plant_social/core/widgets/loading_widget.dart';
-import 'package:plant_social/core/widgets/error_widget.dart';
+import 'package:leafwise/features/seasonal_ai/models/seasonal_ai_models.dart';
+import 'package:leafwise/features/seasonal_ai/providers/seasonal_ai_provider.dart';
+import 'package:leafwise/core/widgets/loading_widget.dart';
+import 'package:leafwise/core/widgets/error_widget.dart';
 
 class SeasonalPredictionsWidget extends ConsumerWidget {
   final String? plantId;

@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:plant_social/core/services/api_service.dart';
-import 'package:plant_social/features/timelapse/models/timelapse_models.dart';
-import 'package:plant_social/features/timelapse/models/timelapse_models_extended.dart';
+import 'package:leafwise/core/services/api_service.dart';
+import 'package:leafwise/features/timelapse/models/timelapse_models.dart';
+import 'package:leafwise/features/timelapse/models/timelapse_models_extended.dart';
 
 /// Service for handling time-lapse photo management and video generation
 class TimelapseService {

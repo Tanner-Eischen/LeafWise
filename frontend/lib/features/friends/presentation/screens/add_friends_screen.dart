@@ -59,7 +59,7 @@ class _AddFriendsScreenState extends ConsumerState<AddFriendsScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add Friends'),
@@ -105,11 +105,9 @@ class _AddFriendsScreenState extends ConsumerState<AddFriendsScreen> {
         children: [
           // Search section
           _buildSearchSection(theme),
-          
+
           // Content
-          Expanded(
-            child: _buildContent(theme),
-          ),
+          Expanded(child: _buildContent(theme)),
         ],
       ),
     );
@@ -151,9 +149,9 @@ class _AddFriendsScreenState extends ConsumerState<AddFriendsScreen> {
               fillColor: theme.colorScheme.surface,
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Quick actions
           Row(
             children: [
@@ -197,17 +195,11 @@ class _AddFriendsScreenState extends ConsumerState<AddFriendsScreen> {
         decoration: BoxDecoration(
           color: theme.colorScheme.primary.withOpacity(0.1),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: theme.colorScheme.primary.withOpacity(0.2),
-          ),
+          border: Border.all(color: theme.colorScheme.primary.withOpacity(0.2)),
         ),
         child: Column(
           children: [
-            Icon(
-              icon,
-              color: theme.colorScheme.primary,
-              size: 24,
-            ),
+            Icon(icon, color: theme.colorScheme.primary, size: 24),
             const SizedBox(height: 8),
             Text(
               title,
@@ -235,7 +227,7 @@ class _AddFriendsScreenState extends ConsumerState<AddFriendsScreen> {
     if (_searchQuery.isEmpty) {
       return _buildSuggestionsView(theme);
     }
-    
+
     if (_isSearching) {
       return const Center(
         child: Column(
@@ -248,17 +240,17 @@ class _AddFriendsScreenState extends ConsumerState<AddFriendsScreen> {
         ),
       );
     }
-    
+
     if (_searchResults.isEmpty) {
       return _buildEmptySearchResults(theme);
     }
-    
+
     return _buildSearchResults(theme);
   }
 
   Widget _buildSuggestionsView(ThemeData theme) {
     final suggestions = _getMockSuggestions();
-    
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -278,11 +270,11 @@ class _AddFriendsScreenState extends ConsumerState<AddFriendsScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          
+
           ...suggestions.map((user) => _buildUserCard(user, theme)),
-          
+
           const SizedBox(height: 24),
-          
+
           // Popular plant enthusiasts section
           Text(
             'Popular Plant Enthusiasts',
@@ -298,8 +290,10 @@ class _AddFriendsScreenState extends ConsumerState<AddFriendsScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          
-          ...(_getMockPopularUsers().map((user) => _buildUserCard(user, theme))),
+
+          ...(_getMockPopularUsers().map(
+            (user) => _buildUserCard(user, theme),
+          )),
         ],
       ),
     );
@@ -373,7 +367,7 @@ class _AddFriendsScreenState extends ConsumerState<AddFriendsScreen> {
               ),
             ),
             const SizedBox(width: 12),
-            
+
             // User info
             Expanded(
               child: Column(
@@ -433,7 +427,7 @@ class _AddFriendsScreenState extends ConsumerState<AddFriendsScreen> {
               ),
             ),
             const SizedBox(width: 12),
-            
+
             // Action button
             _buildActionButton(user, theme),
           ],
@@ -450,34 +444,25 @@ class _AddFriendsScreenState extends ConsumerState<AddFriendsScreen> {
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           ),
-          child: const Text(
-            'Add',
-            style: TextStyle(fontSize: 12),
-          ),
+          child: const Text('Add', style: TextStyle(fontSize: 12)),
         );
-      
+
       case UserStatus.requestSent:
         return OutlinedButton(
           onPressed: () => _cancelFriendRequest(user),
           style: OutlinedButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           ),
-          child: const Text(
-            'Requested',
-            style: TextStyle(fontSize: 12),
-          ),
+          child: const Text('Requested', style: TextStyle(fontSize: 12)),
         );
-      
+
       case UserStatus.friends:
         return OutlinedButton(
           onPressed: () => _viewProfile(user),
           style: OutlinedButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           ),
-          child: const Text(
-            'Friends',
-            style: TextStyle(fontSize: 12),
-          ),
+          child: const Text('Friends', style: TextStyle(fontSize: 12)),
         );
     }
   }
@@ -559,12 +544,12 @@ class _AddFriendsScreenState extends ConsumerState<AddFriendsScreen> {
         status: UserStatus.notConnected,
       ),
     ];
-    
+
     return allUsers.where((user) {
       final searchLower = query.toLowerCase();
       return user.displayName.toLowerCase().contains(searchLower) ||
-             user.username.toLowerCase().contains(searchLower) ||
-             user.bio.toLowerCase().contains(searchLower);
+          user.username.toLowerCase().contains(searchLower) ||
+          user.bio.toLowerCase().contains(searchLower);
     }).toList();
   }
 
@@ -586,7 +571,7 @@ class _AddFriendsScreenState extends ConsumerState<AddFriendsScreen> {
     setState(() {
       user.status = UserStatus.requestSent;
     });
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Friend request sent to ${user.displayName}'),
@@ -599,7 +584,7 @@ class _AddFriendsScreenState extends ConsumerState<AddFriendsScreen> {
     setState(() {
       user.status = UserStatus.notConnected;
     });
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Friend request to ${user.displayName} cancelled'),
@@ -621,7 +606,7 @@ class _AddFriendsScreenState extends ConsumerState<AddFriendsScreen> {
       builder: (context) => AlertDialog(
         title: const Text('Sync Contacts'),
         content: const Text(
-          'Allow Plant Social to access your contacts to find friends who are already using the app?',
+          'Allow LeafWise to access your contacts to find friends who are already using the app?',
         ),
         actions: [
           TextButton(
@@ -659,10 +644,7 @@ class _AddFriendsScreenState extends ConsumerState<AddFriendsScreen> {
             const SizedBox(height: 16),
             const Text(
               'Invite Friends',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             Container(
@@ -675,7 +657,7 @@ class _AddFriendsScreenState extends ConsumerState<AddFriendsScreen> {
                 children: [
                   Expanded(
                     child: Text(
-                      'https://plantsocial.app/invite/abc123',
+                      'https://leafwise.app/invite/abc123',
                       style: TextStyle(fontFamily: 'monospace'),
                     ),
                   ),
@@ -731,11 +713,7 @@ class _AddFriendsScreenState extends ConsumerState<AddFriendsScreen> {
               child: const Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.qr_code,
-                    size: 80,
-                    color: Colors.grey,
-                  ),
+                  Icon(Icons.qr_code, size: 80, color: Colors.grey),
                   SizedBox(height: 8),
                   Text(
                     'QR Code\n(Demo)',
@@ -772,22 +750,15 @@ class _AddFriendsScreenState extends ConsumerState<AddFriendsScreen> {
   void _showComingSoon(String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-                          content: Text('$feature feature is now available!'),
-        action: SnackBarAction(
-          label: 'OK',
-          onPressed: () {},
-        ),
+        content: Text('$feature feature is now available!'),
+        action: SnackBarAction(label: 'OK', onPressed: () {}),
       ),
     );
   }
 }
 
 /// User status enum
-enum UserStatus {
-  notConnected,
-  requestSent,
-  friends,
-}
+enum UserStatus { notConnected, requestSent, friends }
 
 /// Mock user model for demonstration
 class MockUser {

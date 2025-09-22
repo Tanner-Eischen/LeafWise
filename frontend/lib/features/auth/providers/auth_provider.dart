@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:plant_social/core/constants/app_constants.dart';
-import 'package:plant_social/core/models/user.dart';
-import 'package:plant_social/features/auth/models/auth_models.dart';
-import 'package:plant_social/features/auth/repositories/auth_repository.dart';
+import 'package:leafwise/core/constants/app_constants.dart';
+import 'package:leafwise/core/models/user.dart';
+import 'package:leafwise/features/auth/models/auth_models.dart';
+import 'package:leafwise/features/auth/repositories/auth_repository.dart';
 
 class AuthState {
   final User? user;
@@ -20,7 +20,7 @@ class AuthState {
     this.error,
     this.isInitialized = false,
   });
-  
+
   AuthState copyWith({
     User? user,
     bool? isAuthenticated,
@@ -36,7 +36,7 @@ class AuthState {
       isInitialized: isInitialized ?? this.isInitialized,
     );
   }
-  
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
@@ -47,7 +47,7 @@ class AuthState {
         other.error == error &&
         other.isInitialized == isInitialized;
   }
-  
+
   @override
   int get hashCode {
     return user.hashCode ^
@@ -69,19 +69,19 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> _initializeAuth() async {
     try {
       state = state.copyWith(isLoading: true);
-      
+
       // Check if user is already logged in
       final accessToken = await _storage.read(key: AppConstants.accessTokenKey);
       final userDataJson = await _storage.read(key: AppConstants.userDataKey);
-      
+
       if (accessToken != null && userDataJson != null) {
         try {
           final userData = json.decode(userDataJson) as Map<String, dynamic>;
           final user = User.fromJson(userData);
-          
+
           // Verify token is still valid by fetching current user
           final currentUser = await _authRepository.getCurrentUser();
-          
+
           state = state.copyWith(
             user: currentUser,
             isAuthenticated: true,
@@ -118,17 +118,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> login(String email, String password) async {
     try {
       state = state.copyWith(isLoading: true, error: null);
-      
-      final loginRequest = LoginRequest(
-        email: email,
-        password: password,
-      );
-      
+
+      final loginRequest = LoginRequest(email: email, password: password);
+
       final authResponse = await _authRepository.login(loginRequest);
-      
+
       // Store tokens and user data
       await _storeAuthData(authResponse);
-      
+
       state = state.copyWith(
         user: authResponse.user,
         isAuthenticated: true,
@@ -136,10 +133,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         error: null,
       );
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
       rethrow;
     }
   }
@@ -147,12 +141,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> register(RegisterRequest request) async {
     try {
       state = state.copyWith(isLoading: true, error: null);
-      
+
       final authResponse = await _authRepository.register(request);
-      
+
       // Store tokens and user data
       await _storeAuthData(authResponse);
-      
+
       state = state.copyWith(
         user: authResponse.user,
         isAuthenticated: true,
@@ -160,10 +154,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         error: null,
       );
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
       rethrow;
     }
   }
@@ -171,7 +162,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> logout() async {
     try {
       state = state.copyWith(isLoading: true);
-      
+
       // Call logout endpoint
       await _authRepository.logout();
     } catch (e) {
@@ -180,7 +171,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     } finally {
       // Clear local data regardless of API call result
       await _clearAuthData();
-      
+
       state = const AuthState(
         isAuthenticated: false,
         isLoading: false,
@@ -191,16 +182,16 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<void> refreshUser() async {
     if (!state.isAuthenticated) return;
-    
+
     try {
       final user = await _authRepository.getCurrentUser();
-      
+
       // Update stored user data
       await _storage.write(
         key: AppConstants.userDataKey,
         value: json.encode(user.toJson()),
       );
-      
+
       state = state.copyWith(user: user);
     } catch (e) {
       // If refresh fails, user might need to re-authenticate
@@ -214,7 +205,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       key: AppConstants.userDataKey,
       value: json.encode(updatedUser.toJson()),
     );
-    
+
     state = state.copyWith(user: updatedUser);
   }
 
@@ -251,14 +242,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
 // Providers
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   const storage = FlutterSecureStorage(
-    aOptions: AndroidOptions(
-      encryptedSharedPreferences: true,
-    ),
+    aOptions: AndroidOptions(encryptedSharedPreferences: true),
     iOptions: IOSOptions(
       accessibility: KeychainAccessibility.first_unlock_this_device,
     ),
   );
-  
+
   final authRepository = ref.watch(authRepositoryProvider);
   return AuthNotifier(authRepository, storage);
 });

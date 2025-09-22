@@ -1,6 +1,6 @@
 ﻿import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:plant_social/core/network/api_client.dart';
+import 'package:leafwise/core/network/api_client.dart';
 
 /// Service for fetching real-time data for AR overlays
 class ARDataService {
@@ -33,7 +33,8 @@ class ARDataService {
         'scientificName': data['species']?['scientific_name'] ?? 'Unknown',
         'commonName': data['species']?['common_name'] ?? 'Unknown Plant',
         'confidence': (data['confidence_score'] ?? 0.0).toDouble(),
-        'description': data['species']?['description'] ?? 'No description available',
+        'description':
+            data['species']?['description'] ?? 'No description available',
         'plantType': plantTypeFilter ?? 'Unknown',
         'careInfo': {
           'light': data['species']?['light_requirements'] ?? 'Medium light',
@@ -53,7 +54,9 @@ class ARDataService {
   }
 
   /// Save identified plant to user's collection
-  Future<Map<String, dynamic>> savePlantToCollection(Map<String, dynamic> plantData) async {
+  Future<Map<String, dynamic>> savePlantToCollection(
+    Map<String, dynamic> plantData,
+  ) async {
     try {
       final response = await _apiClient.post(
         '/user-plants',
@@ -63,7 +66,8 @@ class ARDataService {
           'scientific_name': plantData['scientific_name'],
           'common_name': plantData['common_name'],
           'location': 'AR Identified',
-          'acquired_date': plantData['identified_date'] ?? DateTime.now().toIso8601String(),
+          'acquired_date':
+              plantData['identified_date'] ?? DateTime.now().toIso8601String(),
           'notes': 'Identified using AR plant scanner',
           'care_preferences': plantData['care_info'],
           'plant_type': plantData['plant_type'],
@@ -111,10 +115,13 @@ class ARDataService {
   }
 
   /// Snooze care reminder for specified duration
-  Future<Map<String, dynamic>> snoozeReminder(String reminderId, Duration snoozeFor) async {
+  Future<Map<String, dynamic>> snoozeReminder(
+    String reminderId,
+    Duration snoozeFor,
+  ) async {
     try {
       final newDueDate = DateTime.now().add(snoozeFor);
-      
+
       final response = await _apiClient.put(
         '/care-reminders/$reminderId/snooze',
         data: {
@@ -139,18 +146,24 @@ class ARDataService {
   /// Get enhanced plant identification history for AR context
   Future<List<Map<String, dynamic>>> getARIdentificationHistory() async {
     try {
-      final response = await _apiClient.get('/plant-id/history?source=ar_scanner');
+      final response = await _apiClient.get(
+        '/plant-id/history?source=ar_scanner',
+      );
       final List<dynamic> data = response.data['data'] ?? [];
-      
-      return data.map((item) => {
-        'id': item['id'],
-        'plant_name': item['identified_name'],
-        'confidence': (item['confidence_score'] ?? 0.0).toDouble(),
-        'identified_at': DateTime.parse(item['created_at']),
-        'was_saved': item['was_saved_to_collection'] ?? false,
-        'image_url': item['image_url'],
-        'plant_type': item['plant_type_filter'],
-      }).toList();
+
+      return data
+          .map(
+            (item) => {
+              'id': item['id'],
+              'plant_name': item['identified_name'],
+              'confidence': (item['confidence_score'] ?? 0.0).toDouble(),
+              'identified_at': DateTime.parse(item['created_at']),
+              'was_saved': item['was_saved_to_collection'] ?? false,
+              'image_url': item['image_url'],
+              'plant_type': item['plant_type_filter'],
+            },
+          )
+          .toList();
     } catch (e) {
       // Return empty list if service unavailable
       return [];
@@ -162,16 +175,20 @@ class ARDataService {
     try {
       final response = await _apiClient.get('/ar/performance-metrics');
       final data = response.data['data'];
-      
+
       return {
-        'identification_accuracy': (data['avg_confidence_score'] ?? 0.8).toDouble(),
+        'identification_accuracy': (data['avg_confidence_score'] ?? 0.8)
+            .toDouble(),
         'average_response_time_ms': data['avg_response_time_ms'] ?? 2500,
         'successful_identifications': data['successful_count'] ?? 0,
         'failed_identifications': data['failed_count'] ?? 0,
         'user_satisfaction_rating': (data['avg_user_rating'] ?? 4.2).toDouble(),
-        'most_identified_types': List<String>.from(data['popular_plant_types'] ?? []),
+        'most_identified_types': List<String>.from(
+          data['popular_plant_types'] ?? [],
+        ),
         'recommendations': {
-          'optimal_lighting': data['optimal_lighting_conditions'] ?? 'Natural daylight',
+          'optimal_lighting':
+              data['optimal_lighting_conditions'] ?? 'Natural daylight',
           'best_distance': data['optimal_camera_distance'] ?? '12-18 inches',
           'image_quality_tips': List<String>.from(data['quality_tips'] ?? []),
         },
@@ -200,18 +217,25 @@ class ARDataService {
   }
 
   /// Update AR tracking preferences
-  Future<Map<String, dynamic>> updateARTrackingPreferences(Map<String, dynamic> preferences) async {
+  Future<Map<String, dynamic>> updateARTrackingPreferences(
+    Map<String, dynamic> preferences,
+  ) async {
     try {
       final response = await _apiClient.put(
         '/user/ar-preferences',
         data: {
           'tracking_sensitivity': preferences['tracking_sensitivity'] ?? 0.7,
           'overlay_opacity': preferences['overlay_opacity'] ?? 0.8,
-          'preferred_plant_types': List<String>.from(preferences['preferred_plant_types'] ?? []),
-          'enable_health_overlays': preferences['enable_health_overlays'] ?? true,
+          'preferred_plant_types': List<String>.from(
+            preferences['preferred_plant_types'] ?? [],
+          ),
+          'enable_health_overlays':
+              preferences['enable_health_overlays'] ?? true,
           'enable_care_reminders': preferences['enable_care_reminders'] ?? true,
-          'enable_growth_tracking': preferences['enable_growth_tracking'] ?? true,
-          'auto_save_identifications': preferences['auto_save_identifications'] ?? false,
+          'enable_growth_tracking':
+              preferences['enable_growth_tracking'] ?? true,
+          'auto_save_identifications':
+              preferences['auto_save_identifications'] ?? false,
         },
       );
 
@@ -230,7 +254,7 @@ class ARDataService {
     try {
       final response = await _apiClient.get('/user-plants/plantId');
       final plantData = response.data['data'];
-      
+
       // Generate health metrics based on plant data
       return {
         'overallHealth': 0.78,
@@ -265,9 +289,24 @@ class ARDataService {
       return {
         'overallHealth': 0.75,
         'metrics': [
-          {'name': 'Leaf Health', 'score': 0.8, 'status': 'good', 'icon': 'eco'},
-          {'name': 'Soil Moisture', 'score': 0.6, 'status': 'warning', 'icon': 'water_drop'},
-          {'name': 'Light Exposure', 'score': 0.9, 'status': 'good', 'icon': 'wb_sunny'},
+          {
+            'name': 'Leaf Health',
+            'score': 0.8,
+            'status': 'good',
+            'icon': 'eco',
+          },
+          {
+            'name': 'Soil Moisture',
+            'score': 0.6,
+            'status': 'warning',
+            'icon': 'water_drop',
+          },
+          {
+            'name': 'Light Exposure',
+            'score': 0.9,
+            'status': 'good',
+            'icon': 'wb_sunny',
+          },
         ],
         'recommendations': ['Check soil moisture', 'Ensure adequate light'],
       };
@@ -281,18 +320,29 @@ class ARDataService {
       if (plantId != null) queryParams['user_plant_id'] = plantId;
       queryParams['is_due'] = true;
 
-      final response = await _apiClient.get('/care-reminders', queryParameters: queryParams);
+      final response = await _apiClient.get(
+        '/care-reminders',
+        queryParameters: queryParams,
+      );
       final List<dynamic> data = response.data['data'] ?? [];
-      
-      return data.map((reminder) => {
-        'id': reminder['id'],
-        'type': reminder['careType'],
-        'description': _getDescriptionForCareType(reminder['careType']),
-        'dueDate': DateTime.parse(reminder['nextDueDate']),
-        'priority': _getPriorityFromDueDate(DateTime.parse(reminder['nextDueDate'])),
-        'icon': _getIconForCareType(reminder['careType']),
-        'isOverdue': DateTime.parse(reminder['nextDueDate']).isBefore(DateTime.now()),
-      }).toList();
+
+      return data
+          .map(
+            (reminder) => {
+              'id': reminder['id'],
+              'type': reminder['careType'],
+              'description': _getDescriptionForCareType(reminder['careType']),
+              'dueDate': DateTime.parse(reminder['nextDueDate']),
+              'priority': _getPriorityFromDueDate(
+                DateTime.parse(reminder['nextDueDate']),
+              ),
+              'icon': _getIconForCareType(reminder['careType']),
+              'isOverdue': DateTime.parse(
+                reminder['nextDueDate'],
+              ).isBefore(DateTime.now()),
+            },
+          )
+          .toList();
     } catch (e) {
       // Return mock reminders
       final now = DateTime.now();
@@ -327,7 +377,7 @@ class ARDataService {
       final acquiredDate = DateTime.parse(plantData['acquiredDate']);
       final now = DateTime.now();
       final daysSinceAcquired = now.difference(acquiredDate).inDays;
-      
+
       return {
         'stages': [
           {
@@ -363,10 +413,30 @@ class ARDataService {
       final now = DateTime.now();
       return {
         'stages': [
-          {'name': 'Seedling', 'date': now.subtract(const Duration(days: 90)), 'description': 'Initial growth', 'isCompleted': true},
-          {'name': 'Young Plant', 'date': now.subtract(const Duration(days: 60)), 'description': 'Developing roots', 'isCompleted': true},
-          {'name': 'Mature', 'date': now.subtract(const Duration(days: 30)), 'description': 'Established growth', 'isCompleted': true},
-          {'name': 'Flowering', 'date': now, 'description': 'Reproductive stage', 'isCompleted': false},
+          {
+            'name': 'Seedling',
+            'date': now.subtract(const Duration(days: 90)),
+            'description': 'Initial growth',
+            'isCompleted': true,
+          },
+          {
+            'name': 'Young Plant',
+            'date': now.subtract(const Duration(days: 60)),
+            'description': 'Developing roots',
+            'isCompleted': true,
+          },
+          {
+            'name': 'Mature',
+            'date': now.subtract(const Duration(days: 30)),
+            'description': 'Established growth',
+            'isCompleted': true,
+          },
+          {
+            'name': 'Flowering',
+            'date': now,
+            'description': 'Reproductive stage',
+            'isCompleted': false,
+          },
         ],
         'currentStage': 2,
         'progressPercentage': 75.0,
@@ -377,13 +447,19 @@ class ARDataService {
   /// Get seasonal care data
   Future<Map<String, dynamic>> getSeasonalCareData(String plantId) async {
     final currentSeason = _getCurrentSeason().toLowerCase();
-    
+
     return {
       'currentSeason': currentSeason,
       'adjustments': {
-        'watering': currentSeason == 'summer' ? 'Increase frequency' : 'Reduce frequency',
-        'light': currentSeason == 'winter' ? 'Move to brighter location' : 'Current location is fine',
-        'humidity': currentSeason == 'winter' ? 'Use humidifier' : 'Natural humidity sufficient',
+        'watering': currentSeason == 'summer'
+            ? 'Increase frequency'
+            : 'Reduce frequency',
+        'light': currentSeason == 'winter'
+            ? 'Move to brighter location'
+            : 'Current location is fine',
+        'humidity': currentSeason == 'winter'
+            ? 'Use humidifier'
+            : 'Natural humidity sufficient',
       },
       'tips': [
         'Monitor soil moisture more frequently in currentSeason',
@@ -392,7 +468,7 @@ class ARDataService {
       ],
     };
   }
-  
+
   /// Generate timelapse video from plant growth images
   Future<Map<String, dynamic>> generateTimelapseVideo(String plantId) async {
     try {
@@ -406,7 +482,7 @@ class ARDataService {
           'quality': 'high',
         },
       );
-      
+
       return {
         'success': true,
         'video_url': response.data['video_url'],
@@ -431,21 +507,31 @@ class ARDataService {
 
   String _getIconForCareType(String careType) {
     switch (careType.toLowerCase()) {
-      case 'watering': return 'water_drop';
-      case 'fertilizing': return 'science';
-      case 'pruning': return 'content_cut';
-      case 'repotting': return 'local_florist';
-      default: return 'schedule';
+      case 'watering':
+        return 'water_drop';
+      case 'fertilizing':
+        return 'science';
+      case 'pruning':
+        return 'content_cut';
+      case 'repotting':
+        return 'local_florist';
+      default:
+        return 'schedule';
     }
   }
 
   String _getDescriptionForCareType(String careType) {
     switch (careType.toLowerCase()) {
-      case 'watering': return 'Time to water your plant';
-      case 'fertilizing': return 'Fertilize to promote growth';
-      case 'pruning': return 'Prune dead or overgrown parts';
-      case 'repotting': return 'Consider repotting for better growth';
-      default: return 'Plant care task due';
+      case 'watering':
+        return 'Time to water your plant';
+      case 'fertilizing':
+        return 'Fertilize to promote growth';
+      case 'pruning':
+        return 'Prune dead or overgrown parts';
+      case 'repotting':
+        return 'Consider repotting for better growth';
+      default:
+        return 'Plant care task due';
     }
   }
 

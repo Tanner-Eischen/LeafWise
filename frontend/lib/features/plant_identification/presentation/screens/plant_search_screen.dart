@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:plant_social/features/plant_identification/models/plant_identification_models.dart';
-import 'package:plant_social/features/plant_identification/providers/plant_identification_provider.dart';
-import 'package:plant_social/features/plant_identification/presentation/screens/plant_species_detail_screen.dart';
-import 'package:plant_social/core/widgets/loading_widget.dart';
-import 'package:plant_social/core/widgets/error_widget.dart';
+import 'package:leafwise/features/plant_identification/models/plant_identification_models.dart';
+import 'package:leafwise/features/plant_identification/providers/plant_identification_provider.dart';
+import 'package:leafwise/features/plant_identification/presentation/screens/plant_species_detail_screen.dart';
+import 'package:leafwise/core/widgets/loading_widget.dart';
+import 'package:leafwise/core/widgets/error_widget.dart';
 
 class PlantSearchScreen extends ConsumerStatefulWidget {
   const PlantSearchScreen({super.key});
@@ -65,9 +65,7 @@ class _PlantSearchScreenState extends ConsumerState<PlantSearchScreen> {
           ),
 
           // Search results
-          Expanded(
-            child: _buildSearchResults(state, theme),
-          ),
+          Expanded(child: _buildSearchResults(state, theme)),
         ],
       ),
     );
@@ -91,10 +89,7 @@ class _PlantSearchScreenState extends ConsumerState<PlantSearchScreen> {
         focusNode: _searchFocusNode,
         decoration: InputDecoration(
           hintText: 'Search for plants...',
-          prefixIcon: Icon(
-            Icons.search,
-            color: Colors.grey[600],
-          ),
+          prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
           suffixIcon: _currentQuery.isNotEmpty
               ? IconButton(
                   icon: const Icon(Icons.clear),
@@ -103,7 +98,9 @@ class _PlantSearchScreenState extends ConsumerState<PlantSearchScreen> {
                     setState(() {
                       _currentQuery = '';
                     });
-                    ref.read(plantIdentificationProvider.notifier).clearSearch();
+                    ref
+                        .read(plantIdentificationProvider.notifier)
+                        .clearSearch();
                   },
                 )
               : null,
@@ -121,7 +118,9 @@ class _PlantSearchScreenState extends ConsumerState<PlantSearchScreen> {
             // Debounce search
             Future.delayed(const Duration(milliseconds: 500), () {
               if (_searchController.text == query && query.trim().isNotEmpty) {
-                ref.read(plantIdentificationProvider.notifier).searchPlants(query);
+                ref
+                    .read(plantIdentificationProvider.notifier)
+                    .searchPlants(query);
               }
             });
           } else {
@@ -152,7 +151,9 @@ class _PlantSearchScreenState extends ConsumerState<PlantSearchScreen> {
           message: state.error!,
           onRetry: () {
             if (_currentQuery.isNotEmpty) {
-              ref.read(plantIdentificationProvider.notifier).searchPlants(_currentQuery);
+              ref
+                  .read(plantIdentificationProvider.notifier)
+                  .searchPlants(_currentQuery);
             }
           },
         ),
@@ -178,11 +179,7 @@ class _PlantSearchScreenState extends ConsumerState<PlantSearchScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.search,
-            size: 80,
-            color: Colors.grey[400],
-          ),
+          Icon(Icons.search, size: 80, color: Colors.grey[400]),
           const SizedBox(height: 16),
           Text(
             'Search for Plants',
@@ -235,7 +232,9 @@ class _PlantSearchScreenState extends ConsumerState<PlantSearchScreen> {
                 setState(() {
                   _currentQuery = suggestion;
                 });
-                ref.read(plantIdentificationProvider.notifier).searchPlants(suggestion);
+                ref
+                    .read(plantIdentificationProvider.notifier)
+                    .searchPlants(suggestion);
               },
               child: Container(
                 padding: const EdgeInsets.symmetric(
@@ -269,11 +268,7 @@ class _PlantSearchScreenState extends ConsumerState<PlantSearchScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.search_off,
-            size: 80,
-            color: Colors.grey[400],
-          ),
+          Icon(Icons.search_off, size: 80, color: Colors.grey[400]),
           const SizedBox(height: 16),
           Text(
             'No plants found',
@@ -315,9 +310,7 @@ class _PlantSearchScreenState extends ConsumerState<PlantSearchScreen> {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () {
@@ -353,11 +346,7 @@ class _PlantSearchScreenState extends ConsumerState<PlantSearchScreen> {
                             );
                           },
                         )
-                      : Icon(
-                          Icons.eco,
-                          color: Colors.grey[400],
-                          size: 30,
-                        ),
+                      : Icon(Icons.eco, color: Colors.grey[400], size: 30),
                 ),
               ),
               const SizedBox(width: 16),
@@ -399,10 +388,7 @@ class _PlantSearchScreenState extends ConsumerState<PlantSearchScreen> {
               ),
 
               // Arrow icon
-              Icon(
-                Icons.chevron_right,
-                color: Colors.grey[400],
-              ),
+              Icon(Icons.chevron_right, color: Colors.grey[400]),
             ],
           ),
         ),

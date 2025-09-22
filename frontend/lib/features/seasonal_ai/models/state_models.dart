@@ -1,11 +1,11 @@
 /// State management models for seasonal AI
-/// 
+///
 /// This file contains state management classes for seasonal AI features.
 /// Uses Freezed for immutable data classes with JSON serialization.
 library;
 
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:plant_social/features/seasonal_ai/models/care_models.dart';
+import 'package:leafwise/features/seasonal_ai/models/care_models.dart';
 import 'prediction_models.dart';
 import 'environmental_models.dart';
 import 'transition_and_phase_models.dart';

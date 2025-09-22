@@ -24,6 +24,14 @@ class User with _$User {
     required DateTime createdAt,
     DateTime? updatedAt,
     
+    // Role-based access control fields
+    @Default(false) bool isAdmin,
+    @Default(false) bool isExpert,
+    @Default(false) bool isModerator,
+    @Default(false) bool isSuperuser,
+    String? adminPermissions, // JSON string of admin permissions
+    String? expertSpecialties, // JSON string of expert specialties
+    
     // Plant-specific fields for Phase 2
     @Default([]) List<String> plantInterests,
     String? experienceLevel, // 'beginner', 'intermediate', 'expert'
@@ -98,6 +106,15 @@ extension UserExtension on User {
   }
   
   bool get hasProfilePicture => profilePictureUrl?.isNotEmpty == true;
+  
+  /// Check if user has telemetry access (expert, admin, or moderator)
+  bool get hasTelemetryAccess => isExpert || isAdmin || isModerator;
+  
+  /// Check if user has admin privileges
+  bool get hasAdminAccess => isAdmin || isSuperuser;
+  
+  /// Check if user can moderate content
+  bool get canModerate => isModerator || isAdmin || isSuperuser;
   
   bool get isOnline {
     if (lastSeen == null) return false;

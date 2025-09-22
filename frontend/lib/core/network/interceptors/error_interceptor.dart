@@ -1,16 +1,18 @@
 import 'package:dio/dio.dart';
-import 'package:plant_social/core/exceptions/api_exception.dart';
+import 'package:leafwise/core/exceptions/api_exception.dart';
 
 class ErrorInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     final apiException = _handleError(err);
-    handler.reject(DioException(
-      requestOptions: err.requestOptions,
-      error: apiException,
-      type: err.type,
-      response: err.response,
-    ));
+    handler.reject(
+      DioException(
+        requestOptions: err.requestOptions,
+        error: apiException,
+        type: err.type,
+        response: err.response,
+      ),
+    );
   }
 
   ApiException _handleError(DioException error) {
@@ -36,7 +38,8 @@ class ErrorInterceptor extends Interceptor {
 
       case DioExceptionType.connectionError:
         return const ApiException(
-          message: 'No internet connection. Please check your network settings.',
+          message:
+              'No internet connection. Please check your network settings.',
           statusCode: 0,
           type: ApiExceptionType.network,
         );
@@ -93,7 +96,8 @@ class ErrorInterceptor extends Interceptor {
         break;
       case 403:
         type = ApiExceptionType.forbidden;
-        message = 'Access denied. You don\'t have permission to perform this action.';
+        message =
+            'Access denied. You don\'t have permission to perform this action.';
         break;
       case 404:
         type = ApiExceptionType.notFound;

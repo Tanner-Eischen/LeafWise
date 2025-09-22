@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:plant_social/features/plant_community/models/plant_community_models.dart';
-import 'package:plant_social/core/utils/date_utils.dart' as AppDateUtils;
-import 'package:plant_social/core/widgets/user_avatar.dart';
-import 'package:plant_social/core/widgets/vote_buttons.dart';
+import 'package:leafwise/features/plant_community/models/plant_community_models.dart';
+import 'package:leafwise/core/utils/date_utils.dart' as AppDateUtils;
+import 'package:leafwise/core/widgets/user_avatar.dart';
+import 'package:leafwise/core/widgets/vote_buttons.dart';
 
 class QuestionCard extends StatelessWidget {
   final PlantQuestion question;
@@ -23,13 +23,11 @@ class QuestionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
@@ -143,11 +141,7 @@ class QuestionCard extends StatelessWidget {
               color: Colors.green,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(
-              Icons.check,
-              size: 16,
-              color: Colors.white,
-            ),
+            child: const Icon(Icons.check, size: 16, color: Colors.white),
           ),
       ],
     );
@@ -157,28 +151,31 @@ class QuestionCard extends StatelessWidget {
     return Wrap(
       spacing: 6,
       runSpacing: 6,
-      children: question.tags.take(showFullContent ? question.tags.length : 3).map((tag) {
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: Colors.grey[100],
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Text(
-            '#$tag',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: Colors.grey[700],
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        );
-      }).toList(),
+      children: question.tags
+          .take(showFullContent ? question.tags.length : 3)
+          .map((tag) {
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                '#$tag',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: Colors.grey[700],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            );
+          })
+          .toList(),
     );
   }
 
   Widget _buildImagePreview() {
     if (question.imageUrl == null) return const SizedBox.shrink();
-    
+
     return SizedBox(
       height: 80,
       child: ClipRRect(
@@ -193,10 +190,7 @@ class QuestionCard extends StatelessWidget {
               width: 80,
               height: 80,
               color: Colors.grey[200],
-              child: const Icon(
-                Icons.image_not_supported,
-                color: Colors.grey,
-              ),
+              child: const Icon(Icons.image_not_supported, color: Colors.grey),
             );
           },
         ),
@@ -220,11 +214,7 @@ class QuestionCard extends StatelessWidget {
         // Answer count
         Row(
           children: [
-            Icon(
-              Icons.chat_bubble_outline,
-              size: 16,
-              color: Colors.grey[600],
-            ),
+            Icon(Icons.chat_bubble_outline, size: 16, color: Colors.grey[600]),
             const SizedBox(width: 4),
             Text(
               '${question.answerCount}',
@@ -239,11 +229,7 @@ class QuestionCard extends StatelessWidget {
         // View count
         Row(
           children: [
-            Icon(
-              Icons.visibility_outlined,
-              size: 16,
-              color: Colors.grey[600],
-            ),
+            Icon(Icons.visibility_outlined, size: 16, color: Colors.grey[600]),
             const SizedBox(width: 4),
             Text(
               '${question.views}',
@@ -260,18 +246,13 @@ class QuestionCard extends StatelessWidget {
         IconButton(
           onPressed: onBookmark,
           icon: Icon(
-            question.isBookmarked
-                ? Icons.bookmark
-                : Icons.bookmark_border,
+            question.isBookmarked ? Icons.bookmark : Icons.bookmark_border,
             size: 20,
             color: question.isBookmarked
                 ? theme.primaryColor
                 : Colors.grey[600],
           ),
-          constraints: const BoxConstraints(
-            minWidth: 32,
-            minHeight: 32,
-          ),
+          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
           padding: EdgeInsets.zero,
         ),
       ],
