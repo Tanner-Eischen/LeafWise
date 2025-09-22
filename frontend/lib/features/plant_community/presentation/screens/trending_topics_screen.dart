@@ -1,0 +1,323 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+class TrendingTopicsScreen extends ConsumerStatefulWidget {
+  const TrendingTopicsScreen({super.key});
+
+  @override
+  ConsumerState<TrendingTopicsScreen> createState() => _TrendingTopicsScreenState();
+}
+
+class _TrendingTopicsScreenState extends ConsumerState<TrendingTopicsScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 4, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('ML Trending Analytics'),
+        backgroundColor: theme.primaryColor,
+        foregroundColor: Colors.white,
+        bottom: TabBar(
+          controller: _tabController,
+          indicatorColor: Colors.white,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white70,
+          isScrollable: true,
+          tabs: const [
+            Tab(text: 'Trending Now', icon: Icon(Icons.trending_up)),
+            Tab(text: 'Analytics', icon: Icon(Icons.analytics)),
+            Tab(text: 'Lifecycle', icon: Icon(Icons.timeline)),
+            Tab(text: 'Personalized', icon: Icon(Icons.person)),
+          ],
+        ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _buildTrendingNowTab(theme),
+          _buildAnalyticsTab(theme),
+          _buildLifecycleTab(theme),
+          _buildPersonalizedTab(theme),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTrendingNowTab(ThemeData theme) {
+    // Mock ML trending data - would come from backend
+    final mockTrendingData = {
+      'trending_topics': [
+        {
+          'topic': 'Indoor Plant Care',
+          'engagement_rate': 0.89,
+          'momentum': 0.75,
+          'velocity': 0.82,
+          'confidence': 0.94,
+          'lifecycle_phase': 'Growing',
+          'post_count': 247,
+          'user_interaction': 1834,
+          'personalization_score': 0.87,
+        },
+        {
+          'topic': 'Succulent Propagation',
+          'engagement_rate': 0.78,
+          'momentum': 0.92,
+          'velocity': 0.88,
+          'confidence': 0.91,
+          'lifecycle_phase': 'Peak',
+          'post_count': 189,
+          'user_interaction': 2156,
+          'personalization_score': 0.73,
+        },
+      ],
+    };
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ML Analytics Header
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.psychology, color: theme.primaryColor),
+                      const SizedBox(width: 8),
+                      Text(
+                        'ML Trending Analysis',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          'REAL-TIME',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green[700],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Advanced semantic clustering with 40x more sophistication than keyword-based systems',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Trending Topics List
+          ...mockTrendingData['trending_topics']!.map<Widget>((topic) {
+            return _buildTrendingTopicCard(theme, topic as Map<String, dynamic>);
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTrendingTopicCard(ThemeData theme, Map<String, dynamic> topic) {
+    final lifecycleColor = _getLifecycleColor(topic['lifecycle_phase'] as String);
+    
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header with topic and lifecycle
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    topic['topic'] as String,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: lifecycleColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: lifecycleColor.withOpacity(0.3)),
+                  ),
+                  child: Text(
+                    topic['lifecycle_phase'] as String,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: lifecycleColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // Metrics grid
+            Row(
+              children: [
+                Expanded(
+                  child: _buildMetricItem(
+                    theme,
+                    'Engagement',
+                    '${(topic['engagement_rate'] * 100).toInt()}%',
+                    Icons.favorite,
+                    Colors.red,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildMetricItem(
+                    theme,
+                    'Momentum',
+                    '${(topic['momentum'] * 100).toInt()}%',
+                    Icons.trending_up,
+                    Colors.green,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildMetricItem(
+                    theme,
+                    'Confidence',
+                    '${(topic['confidence'] * 100).toInt()}%',
+                    Icons.verified,
+                    Colors.blue,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // Additional stats
+            Row(
+              children: [
+                Icon(Icons.post_add, size: 16, color: Colors.grey[600]),
+                const SizedBox(width: 4),
+                Text(
+                  '${topic['post_count']} posts',
+                  style: theme.textTheme.bodySmall,
+                ),
+                const SizedBox(width: 16),
+                Icon(Icons.people, size: 16, color: Colors.grey[600]),
+                const SizedBox(width: 4),
+                Text(
+                  '${topic['user_interaction']} interactions',
+                  style: theme.textTheme.bodySmall,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMetricItem(
+    ThemeData theme,
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 16),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+          Text(
+            label,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: Colors.grey[600],
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _getLifecycleColor(String phase) {
+    switch (phase) {
+      case 'Emerging':
+        return Colors.orange;
+      case 'Growing':
+        return Colors.green;
+      case 'Peak':
+        return Colors.red;
+      case 'Stable':
+        return Colors.blue;
+      case 'Declining':
+        return Colors.grey;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  Widget _buildAnalyticsTab(ThemeData theme) {
+    return const Center(
+      child: Text('Analytics Tab - Coming Soon'),
+    );
+  }
+
+  Widget _buildLifecycleTab(ThemeData theme) {
+    return const Center(
+      child: Text('Lifecycle Tab - Coming Soon'),
+    );
+  }
+
+  Widget _buildPersonalizedTab(ThemeData theme) {
+    return const Center(
+      child: Text('Personalized Tab - Coming Soon'),
+    );
+  }
+}

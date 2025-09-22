@@ -1,11 +1,31 @@
 # Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
 
-# dependencies
+# Dependencies
 node_modules/
+
+# Environment files
+.env
+.env*.local
+
+# Python virtual environment
+venv/
+env/
+.venv/
+.env/
+ENV/
+
+# Python byte-compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
 
 # Expo
 .expo/
-dist/
 web-build/
 expo-env.d.ts
 
@@ -21,17 +41,75 @@ expo-env.d.ts
 # Metro
 .metro-health-check*
 
-# debug
+# Debug
 npm-debug.*
 yarn-debug.*
 yarn-error.*
 
-# macOS
+# Testing
+test/
+tests/
+*_test.py
+test_*.py
+*_test.dart
+test_*.dart
+integration_test/
+.pytest_cache/
+.coverage
+coverage/
+htmlcov/
+*.cover
+.nyc_output
+coverage.xml
+*.lcov
+
+# Flutter/Dart testing
+flutter_test/
+test_driver/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Analysis and debugging
+analysis_results.txt
+*.log
+*.tmp
+*.temp
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 .DS_Store
 *.pem
+Thumbs.db
 
-# local env files
-.env*.local
+# Cache and temporary files
+.cache/
+tmp/
+temp/
+*.pid
+*.seed
+*.pid.lock
 
-# typescript
+# TypeScript
 *.tsbuildinfo
+
+# Documentation generation
+doc/
+docs/build/
+site/
+
+# Vibe Tools
+.vibe-tools/
+.vibe-tools.env
+vibe-tools.env
+.vibe-tools.config.json
+vibe-tools.config.json
+.vibe-tools.mdc
+vibe-tools.env.mdc
+
+# Repomix output
+repomix-output.xml

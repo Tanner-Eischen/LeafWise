@@ -1,0 +1,83 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# Environment and configuration
+.env
+/backend/venv/*
+
+# Testing
+test/
+tests/
+*_test.dart
+test_*.dart
+integration_test/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+flutter_test/
+test_driver/
+coverage/
+.coverage
+*.lcov
+
+# Analysis and debugging
+analysis_results.txt
+*.tmp
+*.temp
+
+# Cache and temporary files
+.cache/
+tmp/
+temp/
+
+# Vibe Tools
+.vibe-tools/
+.vibe-tools.env
+vibe-tools.env
+.vibe-tools.config.json
+vibe-tools.config.json
+vibe-tools.mdc
+vibe-tools.env.mdc
