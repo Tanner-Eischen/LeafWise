@@ -23,7 +23,7 @@ class ARMeasurementRequest(BaseModel):
     calibration_data: Dict[str, Any] = {}
     device_info: Dict[str, Any] = {}
 
-def get_measurement_service() -> PlantMeasurementService:
+def get_measurement_service():
     return PlantMeasurementService()
 
 @router.post("/ar/{plant_id}")

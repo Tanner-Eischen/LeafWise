@@ -1,0 +1,304 @@
+# Species Care Rules Configuration
+# This file defines care rules for common plant species with environmental modifiers
+# Used by the rule engine service for generating context-aware care plans
+
+# Base species profiles
+species_profiles:
+  ficus_lyrata:
+    common_name: "Fiddle Leaf Fig"
+    base_care:
+      watering:
+        interval_days: 7
+        amount_ml: 300
+        soil_moisture_threshold: 0.3
+      fertilizer:
+        interval_days: 30
+        type: "balanced_10_10_10"
+        amount_ml: 50
+      light:
+        ppfd_min: 150
+        ppfd_max: 400
+        recommendation: "bright_indirect"
+        daily_hours: 8
+    environmental_modifiers:
+      temperature:
+        - condition: "temp_max > 30"
+          adjustments:
+            watering_interval: -1
+            watering_amount: +50
+        - condition: "temp_min < 15"
+          adjustments:
+            watering_interval: +2
+            fertilizer_interval: +14
+      humidity:
+        - condition: "humidity < 40"
+          alerts: ["increase_humidity", "mist_leaves"]
+        - condition: "humidity > 70"
+          adjustments:
+            watering_interval: +1
+      season:
+        winter:
+          watering_interval: +2
+          fertilizer_interval: +14
+        summer:
+          watering_interval: -1
+          watering_amount: +25
+
+  monstera_deliciosa:
+    common_name: "Swiss Cheese Plant"
+    base_care:
+      watering:
+        interval_days: 5
+        amount_ml: 250
+        soil_moisture_threshold: 0.4
+      fertilizer:
+        interval_days: 21
+        type: "balanced_20_20_20"
+        amount_ml: 30
+      light:
+        ppfd_min: 100
+        ppfd_max: 300
+        recommendation: "medium_indirect"
+        daily_hours: 6
+    environmental_modifiers:
+      temperature:
+        - condition: "temp_max > 28"
+          adjustments:
+            watering_interval: -1
+        - condition: "temp_min < 18"
+          adjustments:
+            watering_interval: +1
+            fertilizer_interval: +7
+      humidity:
+        - condition: "humidity < 50"
+          alerts: ["increase_humidity"]
+      season:
+        winter:
+          watering_interval: +1
+          fertilizer_interval: +7
+        growing_season:
+          fertilizer_interval: -7
+
+  epipremnum_aureum:
+    common_name: "Golden Pothos"
+    base_care:
+      watering:
+        interval_days: 4
+        amount_ml: 150
+        soil_moisture_threshold: 0.5
+      fertilizer:
+        interval_days: 28
+        type: "liquid_houseplant"
+        amount_ml: 20
+      light:
+        ppfd_min: 50
+        ppfd_max: 200
+        recommendation: "low_to_medium"
+        daily_hours: 4
+    environmental_modifiers:
+      temperature:
+        - condition: "temp_max > 26"
+          adjustments:
+            watering_interval: -1
+      season:
+        winter:
+          watering_interval: +1
+          fertilizer_interval: +14
+
+  sansevieria_trifasciata:
+    common_name: "Snake Plant"
+    base_care:
+      watering:
+        interval_days: 14
+        amount_ml: 100
+        soil_moisture_threshold: 0.2
+      fertilizer:
+        interval_days: 60
+        type: "cactus_succulent"
+        amount_ml: 25
+      light:
+        ppfd_min: 25
+        ppfd_max: 150
+        recommendation: "low_light_tolerant"
+        daily_hours: 2
+    environmental_modifiers:
+      temperature:
+        - condition: "temp_min < 10"
+          adjustments:
+            watering_interval: +7
+      humidity:
+        - condition: "humidity > 60"
+          adjustments:
+            watering_interval: +3
+      season:
+        winter:
+          watering_interval: +7
+          fertilizer_interval: +30
+
+  spathiphyllum_wallisii:
+    common_name: "Peace Lily"
+    base_care:
+      watering:
+        interval_days: 3
+        amount_ml: 200
+        soil_moisture_threshold: 0.6
+      fertilizer:
+        interval_days: 21
+        type: "balanced_10_10_10"
+        amount_ml: 40
+      light:
+        ppfd_min: 75
+        ppfd_max: 250
+        recommendation: "medium_indirect"
+        daily_hours: 6
+    environmental_modifiers:
+      temperature:
+        - condition: "temp_max > 27"
+          adjustments:
+            watering_interval: -1
+            watering_amount: +25
+      humidity:
+        - condition: "humidity < 45"
+          alerts: ["increase_humidity", "brown_leaf_tips"]
+      season:
+        winter:
+          watering_interval: +1
+          fertilizer_interval: +14
+
+# Global environmental modifiers
+global_modifiers:
+  climate_events:
+    heatwave:
+      condition: "temp_7d_avg > species_temp_max + 5"
+      adjustments:
+        watering_interval: -1
+        watering_amount: +20
+      alerts: ["heatwave_adjust_-1day", "monitor_closely"]
+    
+    cold_snap:
+      condition: "temp_7d_avg < species_temp_min - 3"
+      adjustments:
+        watering_interval: +2
+        fertilizer_interval: +14
+      alerts: ["cold_protection", "reduce_watering"]
+    
+    dry_season:
+      condition: "humidity_7d_avg < 30"
+      adjustments:
+        watering_amount: +15
+      alerts: ["increase_humidity", "monitor_soil"]
+    
+    rainy_season:
+      condition: "humidity_7d_avg > 75"
+      adjustments:
+        watering_interval: +1
+      alerts: ["check_drainage", "fungal_watch"]
+
+  container_modifiers:
+    small_pot:
+      condition: "pot_volume_ml < 500"
+      adjustments:
+        watering_interval: -1
+        watering_amount: -25
+    
+    large_pot:
+      condition: "pot_volume_ml > 2000"
+      adjustments:
+        watering_interval: +1
+        watering_amount: +50
+    
+    terracotta:
+      condition: "pot_material == 'terracotta'"
+      adjustments:
+        watering_interval: -1
+        watering_amount: +10
+    
+    plastic:
+      condition: "pot_material == 'plastic'"
+      adjustments:
+        watering_interval: +1
+
+  growth_stage_modifiers:
+    young_plant:
+      condition: "plant_age_months < 6"
+      adjustments:
+        fertilizer_interval: +7
+        watering_amount: -20
+      alerts: ["gentle_care", "monitor_growth"]
+    
+    mature_plant:
+      condition: "plant_age_months > 24"
+      adjustments:
+        fertilizer_interval: +7
+      alerts: ["consider_repotting"]
+
+# Alert definitions
+alert_definitions:
+  heatwave_adjust_-1day:
+    message: "Heatwave detected - water 1 day earlier than scheduled"
+    priority: "high"
+    category: "environmental"
+  
+  repot_if_rootbound:
+    message: "Check if plant needs repotting - roots may be bound"
+    priority: "medium"
+    category: "maintenance"
+  
+  increase_humidity:
+    message: "Low humidity detected - consider humidifier or pebble tray"
+    priority: "medium"
+    category: "environmental"
+  
+  cold_protection:
+    message: "Cold temperatures - move away from windows and drafts"
+    priority: "high"
+    category: "environmental"
+  
+  check_drainage:
+    message: "High humidity period - ensure proper drainage"
+    priority: "medium"
+    category: "maintenance"
+  
+  fungal_watch:
+    message: "Monitor for fungal issues due to high humidity"
+    priority: "medium"
+    category: "health"
+  
+  monitor_closely:
+    message: "Environmental stress detected - monitor plant closely"
+    priority: "high"
+    category: "general"
+
+# Rule evaluation order
+rule_priority:
+  1. species_base_profile
+  2. container_modifiers
+  3. growth_stage_modifiers
+  4. climate_events
+  5. seasonal_adjustments
+  6. temperature_modifiers
+  7. humidity_modifiers
+
+# ML adjustment bounds
+ml_bounds:
+  watering_interval:
+    min_adjustment: -3  # days
+    max_adjustment: +5  # days
+    max_percentage: 30  # ±30%
+  
+  fertilizer_interval:
+    min_adjustment: -14  # days
+    max_adjustment: +21  # days
+    max_percentage: 30  # ±30%
+  
+  watering_amount:
+    min_adjustment: -50  # ml
+    max_adjustment: +100  # ml
+    max_percentage: 30  # ±30%
+
+# Confidence thresholds
+confidence_thresholds:
+  high: 0.8
+  medium: 0.6
+  low: 0.4
+  minimum_acceptable: 0.3

@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
     
     # Basic app settings
-    PROJECT_NAME: str = "Plant Social API"
+    PROJECT_NAME: str = "LeafWise API"
     VERSION: str = "1.0.0"
     API_V1_STR: str = "/api/v1"
     SECRET_KEY: str = secrets.token_urlsafe(32)
@@ -46,7 +46,7 @@ class Settings(BaseSettings):
     POSTGRES_SERVER: str = "postgres"
     POSTGRES_USER: str = "postgres"
     POSTGRES_PASSWORD: str = "admin"
-    POSTGRES_DB: str = "plant_social_db"
+    POSTGRES_DB: str = "leafwise_db"
     POSTGRES_PORT: str = "5432"
     SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn] = None
     
@@ -62,7 +62,7 @@ class Settings(BaseSettings):
         password = values.get("POSTGRES_PASSWORD", "admin")
         host = values.get("POSTGRES_SERVER", "localhost")
         port = values.get("POSTGRES_PORT", "5432")
-        db = values.get("POSTGRES_DB", "plant_social_db")
+        db = values.get("POSTGRES_DB", "leafwise_db")
         return f"postgresql+asyncpg://{user}:{password}@{host}:{port}/{db}"
     
     # Redis settings

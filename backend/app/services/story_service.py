@@ -1046,6 +1046,6 @@ async def get_story_views(
     return await story_service.get_story_views(story_id, user_id, session)
 
 
-async def get_story_service() -> StoryService:
+async def get_story_service():
     """Get story service dependency."""
     return story_service

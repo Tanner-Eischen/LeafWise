@@ -1,7 +1,7 @@
 #!/usr/bin/env pwsh
-# Development startup script for Plant Social platform
+# Development startup script for LeafWise platform
 
-Write-Host "Starting Plant Social Development Environment" -ForegroundColor Green
+Write-Host "Starting LeafWise Development Environment" -ForegroundColor Green
 Write-Host "=========================================" -ForegroundColor Green
 
 # Check if Docker is running

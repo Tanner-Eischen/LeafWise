@@ -31,10 +31,28 @@ from app.models.seasonal_ai import (
 )
 from app.models.timelapse import (
     TimelapseSession,
-    GrowthPhoto,
+    TimelapsePhoto,
     GrowthMilestone,
     GrowthAnalytics
 )
+from app.models.care_plan import CarePlanV2
+from app.models.task_management import (
+    Task,
+    TaskCategory,
+    TaskProgress,
+    TaskComment,
+    TaskStatus,
+    TaskPriority
+)
+from app.models.light_reading import (
+    LightReading,
+    CalibrationProfile,
+    BLEDevice,
+    LightSource,
+    CalibrationStatus,
+    BLEDeviceStatus
+)
+from app.models.growth_photo import GrowthPhoto
 
 __all__ = [
     "User",
@@ -70,7 +88,21 @@ __all__ = [
     "EnvironmentalDataCache",
     "SeasonalTransition",
     "TimelapseSession",
-    "GrowthPhoto",
+    "TimelapsePhoto",
     "GrowthMilestone",
-    "GrowthAnalytics"
+    "GrowthAnalytics",
+    "CarePlanV2",
+    "Task",
+    "TaskCategory",
+    "TaskProgress",
+    "TaskComment",
+    "TaskStatus",
+    "TaskPriority",
+    "LightReading",
+    "GrowthPhoto",
+    "CalibrationProfile",
+    "BLEDevice",
+    "LightSource",
+    "CalibrationStatus",
+    "BLEDeviceStatus"
 ]

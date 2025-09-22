@@ -20,7 +20,7 @@ class User(SQLAlchemyBaseUserTableUUID, Base):
     """User model with authentication and profile information.
     
     Extends FastAPI-Users base user table with additional fields
-    for the plant social platform.
+    for the leafwise platform.
     """
     
     __tablename__ = "users"

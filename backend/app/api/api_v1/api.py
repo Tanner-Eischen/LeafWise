@@ -7,7 +7,8 @@ from app.api.api_v1.endpoints import(
     plant_trades, plant_questions, achievements, nurseries, smart_community,
     content_generation, discovery_feed, ml_enhanced_community,
     ml_plant_health, ml_trending_topics,
-    seasonal_ai, timelapse_management, growth_analytics, community_challenges)
+    seasonal_ai, timelapse_management, growth_analytics, community_challenges,
+    care_plans, telemetry)
 
 api_router = APIRouter()
 
@@ -28,6 +29,7 @@ api_router.include_router(plant_trades.router, prefix="/marketplace", tags=["pla
 api_router.include_router(plant_questions.router, prefix="/plant-qa", tags=["plant-community"])
 api_router.include_router(achievements.router, prefix="/achievements", tags=["achievements"])
 api_router.include_router(nurseries.router, prefix="/nurseries", tags=["local-nurseries"])
+api_router.include_router(care_plans.router, prefix="/care-plans", tags=["care-plans"])
 
 # RAG and AI-powered endpoints
 api_router.include_router(smart_community.router, prefix="/smart-community", tags=["smart-community"])
@@ -47,6 +49,9 @@ api_router.include_router(ml_trending_topics.router, prefix="/ml-trending", tags
 
 # Plant Measurement endpoints - temporarily disabled due to FastAPI response model issues
 # api_router.include_router(plant_measurements.router, prefix="/measurements", tags=["plant-measurements"])
+
+# Telemetry endpoints
+api_router.include_router(telemetry.router, prefix="/telemetry", tags=["telemetry"])
 
 # Seasonal AI and Time-lapse endpoints
 api_router.include_router(seasonal_ai.router, prefix="/seasonal-ai", tags=["seasonal-ai"])

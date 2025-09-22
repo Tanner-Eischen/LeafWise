@@ -17,7 +17,8 @@ from sqlalchemy.orm import selectinload
 from app.models.plant_care_log import PlantCareLog
 from app.models.user_plant import UserPlant
 from app.models.seasonal_ai import SeasonalPrediction
-from app.models.timelapse import TimelapseSession, GrowthPhoto
+from app.models.timelapse import TimelapseSession
+from app.models.growth_photo import GrowthPhoto
 from app.schemas.plant_care_log import PlantCareLogCreate, PlantCareLogUpdate
 
 

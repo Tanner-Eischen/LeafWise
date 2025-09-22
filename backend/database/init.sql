@@ -1,4 +1,4 @@
--- Database initialization script for Plant Social platform
+-- Database initialization script for LeafWise platform
 -- This script sets up the database with necessary extensions
 
 -- Enable UUID extension
@@ -11,7 +11,7 @@ CREATE EXTENSION IF NOT EXISTS vector;
 -- This file serves as documentation for manual setup if needed
 
 -- Grant necessary permissions
-GRANT ALL PRIVILEGES ON DATABASE plant_social_db TO postgres;
+GRANT ALL PRIVILEGES ON DATABASE leafwise_db TO postgres;
 
 -- Set timezone
 SET timezone = 'UTC';

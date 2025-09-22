@@ -1,5 +1,5 @@
 """
-Advanced Analytics Service for Plant Social Platform
+Advanced Analytics Service for LeafWise Platform
 Provides comprehensive insights and analytics for plant care, community engagement, and user behavior.
 """
 

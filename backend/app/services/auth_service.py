@@ -773,7 +773,7 @@ class AuthService:
 auth_service = AuthService()
 
 
-async def get_auth_service() -> AuthService:
+async def get_auth_service():
     """Get auth service dependency."""
     return auth_service
 

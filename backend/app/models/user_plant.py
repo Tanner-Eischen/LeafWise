@@ -47,5 +47,8 @@ class UserPlant(Base):
     timelapse_sessions = relationship("TimelapseSession", back_populates="plant", cascade="all, delete-orphan")
     growth_analytics = relationship("GrowthAnalytics", back_populates="plant", cascade="all, delete-orphan")
     
+    # Care plan relationships
+    care_plans = relationship("CarePlanV2", back_populates="plant", cascade="all, delete-orphan")
+    
     def __repr__(self) -> str:
         return f"<UserPlant(id={self.id}, nickname='{self.nickname}', user_id={self.user_id})>"

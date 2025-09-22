@@ -1,6 +1,6 @@
-# Plant Social API Backend
+# LeafWise API Backend
 
-FastAPI-based backend for the Plant Social platform with real-time messaging, stories, and AI-enhanced plant care features.
+FastAPI-based backend for the LeafWise platform with real-time messaging, stories, and AI-enhanced plant care features.
 
 ## Features
 
@@ -230,7 +230,7 @@ Key environment variables (see `.env.example`):
 POSTGRES_SERVER=localhost
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=password
-POSTGRES_DB=plant_social_db
+POSTGRES_DB=leafwise_db
 
 # Redis
 REDIS_HOST=localhost
@@ -362,4 +362,4 @@ docker-compose logs redis
 
 ## License
 
-This project is part of the Plant Social platform development challenge.
+This project is part of the LeafWise platform development challenge.

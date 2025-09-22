@@ -18,12 +18,57 @@ dist/
 build/
 *.egg-info/
 
-# Vibe Tools
-.vibe-tools/
-.vibe-tools.env
-vibe-tools.env
-.vibe-tools.config.json
-vibe-tools.config.json
+# Testing
+test/
+tests/
+*_test.py
+test_*.py
+*_test.dart
+test_*.dart
+integration_test/
+.pytest_cache/
+.coverage
+coverage/
+htmlcov/
+*.cover
+.nyc_output
+coverage.xml
+*.lcov
+
+# Flutter/Dart testing
+flutter_test/
+test_driver/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Analysis and debugging
+analysis_results.txt
+*.log
+*.tmp
+*.temp
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Cache and temporary files
+.cache/
+tmp/
+temp/
+*.pid
+*.seed
+*.pid.lock
+
+# Documentation generation
+doc/
+docs/build/
+site/
 
 # Vibe Tools
 .vibe-tools/
@@ -31,3 +76,8 @@ vibe-tools.config.json
 vibe-tools.env
 .vibe-tools.config.json
 vibe-tools.config.json
+.vibe-tools.mdc
+vibe-tools.env.mdc
+
+# Repomix output
+repomix-output.xml

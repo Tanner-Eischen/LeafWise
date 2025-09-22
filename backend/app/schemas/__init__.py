@@ -183,6 +183,24 @@ from .timelapse import (
     GrowthMilestoneListResponse,
 )
 
+from .telemetry import (
+    LightReadingCreate,
+    BatchLightReadingRequest,
+    LightReadingResponse,
+    GrowthPhotoCreate,
+    GrowthMetricsSchema,
+    GrowthPhotoResponse,
+    CalibrationProfileCreate,
+    CalibrationProfileUpdate,
+    CalibrationProfileResponse,
+    BLEDeviceCreate,
+    BLEDeviceUpdate,
+    BLEDeviceResponse,
+    TelemetryQueryParams,
+    TelemetryStatsResponse,
+    TelemetryErrorResponse,
+)
+
 __all__ = [
     # Auth schemas
     "UserBase",
@@ -351,4 +369,21 @@ __all__ = [
     "TimelapseSessionListResponse",
     "GrowthPhotoListResponse",
     "GrowthMilestoneListResponse",
+    
+    # Telemetry schemas
+    "LightReadingCreate",
+    "BatchLightReadingRequest",
+    "LightReadingResponse",
+    "GrowthPhotoCreate",
+    "GrowthMetricsSchema",
+    "GrowthPhotoResponse",
+    "CalibrationProfileCreate",
+    "CalibrationProfileUpdate",
+    "CalibrationProfileResponse",
+    "BLEDeviceCreate",
+    "BLEDeviceUpdate",
+    "BLEDeviceResponse",
+    "TelemetryQueryParams",
+    "TelemetryStatsResponse",
+    "TelemetryErrorResponse",
 ]

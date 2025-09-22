@@ -1,0 +1,1 @@
+-Always check the current prjects convebtions, vaariable names, class names, method names, file names, folder names, etc., before you satrt a task so that you match the existing conventions and implementation when building.

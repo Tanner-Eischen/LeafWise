@@ -55,17 +55,17 @@ class TimelapseSession(Base):
     # Relationships
     plant = relationship("UserPlant", back_populates="timelapse_sessions")
     user = relationship("User", back_populates="timelapse_sessions")
-    photos = relationship("GrowthPhoto", back_populates="session", cascade="all, delete-orphan")
+    photos = relationship("TimelapsePhoto", back_populates="session", cascade="all, delete-orphan")
     milestones = relationship("GrowthMilestone", back_populates="session", cascade="all, delete-orphan")
     
     def __repr__(self) -> str:
         return f"<TimelapseSession(id={self.id}, name='{self.session_name}', status={self.status})>"
 
 
-class GrowthPhoto(Base):
+class TimelapsePhoto(Base):
     """Model for individual photos in a time-lapse session."""
     
-    __tablename__ = "growth_photos"
+    __tablename__ = "timelapse_photos"
     
     id = Column(PostgresUUID(as_uuid=True), primary_key=True, default=uuid4)
     session_id = Column(PostgresUUID(as_uuid=True), ForeignKey("timelapse_sessions.id"), nullable=False)
@@ -98,7 +98,7 @@ class GrowthPhoto(Base):
     session = relationship("TimelapseSession", back_populates="photos")
     
     def __repr__(self) -> str:
-        return f"<GrowthPhoto(id={self.id}, session_id={self.session_id}, sequence={self.sequence_number})>"
+        return f"<TimelapsePhoto(id={self.id}, session_id={self.session_id}, sequence={self.sequence_number})>"
 
 
 class GrowthMilestone(Base):
@@ -108,7 +108,7 @@ class GrowthMilestone(Base):
     
     id = Column(PostgresUUID(as_uuid=True), primary_key=True, default=uuid4)
     session_id = Column(PostgresUUID(as_uuid=True), ForeignKey("timelapse_sessions.id"), nullable=False)
-    photo_id = Column(PostgresUUID(as_uuid=True), ForeignKey("growth_photos.id"), nullable=True)
+    photo_id = Column(PostgresUUID(as_uuid=True), ForeignKey("timelapse_photos.id"), nullable=True)
     
     # Milestone details
     milestone_type = Column(String(100), nullable=False)  # new_leaf, flowering, height_increase, etc.
@@ -134,7 +134,7 @@ class GrowthMilestone(Base):
     
     # Relationships
     session = relationship("TimelapseSession", back_populates="milestones")
-    photo = relationship("GrowthPhoto")
+    photo = relationship("TimelapsePhoto")
     
     def __repr__(self) -> str:
         return f"<GrowthMilestone(id={self.id}, type={self.milestone_type}, date={self.achievement_date})>"

@@ -1,4 +1,4 @@
-# 🌱 Plant Social - AI-Enhanced Plant Care Community
+# 🌱 LeafWise - AI-Enhanced Plant Care Community
 
 > A revolutionary plant-focused social platform that combines Snapchat-like features with advanced AI capabilities to create the ultimate gardening community experience.
 
@@ -11,7 +11,7 @@
 
 ## 🎯 Project Overview
 
-Plant Social is a modern social messaging platform focused on plant enthusiasts, built with Flutter and FastAPI. This project implements core Snapchat features with plant-specific enhancements and AI-powered recommendations.
+LeafWise is a modern social messaging platform focused on plant enthusiasts, built with Flutter and FastAPI. This project implements core Snapchat features with plant-specific enhancements and AI-powered recommendations.
 
 ## 🚀 Phase 1: Core MVP - COMPLETED
 
@@ -115,7 +115,7 @@ Plant Social is a modern social messaging platform focused on plant enthusiasts,
 3. **Database Setup**
    ```bash
    # Create PostgreSQL database
-   createdb plant_social_db
+   createdb leafwise_db
    
    # Run migrations
    alembic upgrade head

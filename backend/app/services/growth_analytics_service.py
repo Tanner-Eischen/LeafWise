@@ -1,5 +1,5 @@
 """
-Growth Analytics Service for Plant Social Platform
+Growth Analytics Service for LeafWise Platform
 
 This service provides comprehensive growth analytics and insights for time-lapse tracking,
 including pattern recognition, comparative analytics, and community insights.

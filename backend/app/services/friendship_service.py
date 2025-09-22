@@ -867,6 +867,6 @@ async def get_close_friends(
     return await friendship_service.get_close_friends(user_id, session)
 
 
-async def get_friendship_service() -> FriendshipService:
+async def get_friendship_service():
     """Get friendship service dependency."""
     return friendship_service

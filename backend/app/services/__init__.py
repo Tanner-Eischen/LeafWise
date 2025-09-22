@@ -64,6 +64,60 @@ from .plant_question_service import (
     mark_question_solved
 )
 
+# Context-Aware Care Plans v2 services
+# Note: These are the new services we've implemented
+from .context_aggregation import (
+    ContextAggregationService,
+    get_context_aggregation_service
+)
+
+from .rule_engine import (
+    RuleEngineService,
+    get_rule_engine_service
+)
+
+from .ml_adjustment import (
+    MLAdjustmentService,
+    get_ml_adjustment_service
+)
+
+from .rationale_builder import (
+    RationaleBuilderService,
+    get_rationale_builder_service
+)
+
+from .care_plan import (
+    CarePlanService,
+    get_care_plan_service
+)
+
+from .environmental_data import (
+    EnvironmentalDataService,
+    get_environmental_data_service
+)
+
+from .cache_layer import (
+    CacheLayerService,
+    get_cache_service
+)
+
+# Telemetry services
+from .light_reading_service import (
+    LightReadingService
+)
+
+from .growth_photo_service import (
+    GrowthPhotoService
+)
+
+from .telemetry_service import (
+    TelemetryService
+)
+
+from .metrics_service import (
+    MetricsService
+)
+
 __all__ = [
     # Plant species
     "PlantSpeciesService",
@@ -118,4 +172,26 @@ __all__ = [
     "create_answer",
     "vote_answer",
     "mark_question_solved",
+    
+    # Context-Aware Care Plans v2 services
+    "ContextAggregationService",
+    "get_context_aggregation_service",
+    "RuleEngineService",
+    "get_rule_engine_service",
+    "MLAdjustmentService",
+    "get_ml_adjustment_service",
+    "RationaleBuilderService",
+    "get_rationale_builder_service",
+    "CarePlanService",
+    "get_care_plan_service",
+    "EnvironmentalDataService",
+    "get_environmental_data_service",
+    "CacheLayerService",
+    "get_cache_service",
+    
+    # Telemetry services
+    "LightReadingService",
+    "GrowthPhotoService",
+    "TelemetryService",
+    "MetricsService",
 ]

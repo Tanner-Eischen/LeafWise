@@ -19,7 +19,7 @@ router = APIRouter()
 
 def get_analytics_service(
     db: AsyncSession = Depends(get_db)
-) -> AnalyticsService:
+):
     """Get analytics service instance with dependencies."""
     ml_health_service = MLPlantHealthService()
     ml_trending_service = MLTrendingTopicsService()

@@ -1,7 +1,7 @@
 """Main FastAPI application entry point.
 
 This module initializes the FastAPI app with all necessary middleware,
-routers, and configurations for the plant social platform.
+routers, and configurations for the leafwise platform.
 """
 
 from fastapi import FastAPI
@@ -21,7 +21,7 @@ from app.core.websocket import websocket_manager
 async def lifespan(app: FastAPI):
     """Application lifespan manager for startup and shutdown events."""
     # Startup
-    print("Starting Plant Social API...")
+    print("Starting LeafWise API...")
     
     # Initialize database tables
     from app.core.database import init_db
@@ -31,7 +31,7 @@ async def lifespan(app: FastAPI):
     yield
     
     # Shutdown
-    print("Shutting down Plant Social API...")
+    print("Shutting down LeafWise API...")
     from app.core.database import close_db
     await close_db()
 
@@ -85,7 +85,7 @@ app = create_application()
 async def root():
     """Root endpoint for health check."""
     return {
-        "message": "Plant Social API",
+        "message": "LeafWise API",
         "version": settings.VERSION,
         "status": "healthy"
     }

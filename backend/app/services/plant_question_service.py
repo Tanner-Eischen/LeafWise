@@ -581,11 +581,11 @@ async def mark_question_solved(
     )
 
 
-def get_plant_question_service() -> PlantQuestionService:
+def get_plant_question_service():
     """Get plant question service instance."""
     return PlantQuestionService()
 
 
-def get_plant_answer_service() -> PlantAnswerService:
+def get_plant_answer_service():
     """Get plant answer service instance."""
     return PlantAnswerService()

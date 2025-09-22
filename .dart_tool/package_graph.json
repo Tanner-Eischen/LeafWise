@@ -1,10 +1,10 @@
 {
   "roots": [
-    "plant_social"
+    "leafwise"
   ],
   "packages": [
     {
-      "name": "plant_social",
+      "name": "leafwise",
       "version": "1.0.0+1",
       "dependencies": [
         "cached_network_image",

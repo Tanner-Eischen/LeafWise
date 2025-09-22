@@ -698,6 +698,6 @@ async def get_user_stats(
     return await user_service.get_user_stats(user_id, session)
 
 
-async def get_user_service() -> UserService:
+async def get_user_service():
     """Get user service dependency."""
     return user_service

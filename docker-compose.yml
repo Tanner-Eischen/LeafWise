@@ -6,11 +6,11 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile.postgres
-    container_name: plant_social_db
+    container_name: leafwise_db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin
-      POSTGRES_DB: plant_social_db
+      POSTGRES_DB: leafwise_db
     ports:
       - "5432:5432"
     volumes:
@@ -25,7 +25,7 @@ services:
   # Redis for caching and real-time messaging
   redis:
     image: redis:7
-    container_name: plant_social_redis
+    container_name: leafwise_redis
     ports:
       - "6379:6379"
     volumes:
@@ -39,7 +39,7 @@ services:
   # LocalStack for AWS S3 simulation (development only)
   localstack:
     image: localstack/localstack:latest
-    container_name: plant_social_localstack
+    container_name: leafwise_localstack
     ports:
       - "4566:4566"
     environment:
@@ -61,9 +61,9 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: plant_social_backend
+    container_name: leafwise_backend
     environment:
-      - DATABASE_URL=postgresql+asyncpg://postgres:password@postgres:5432/plant_social_db
+      - DATABASE_URL=postgresql+asyncpg://postgres:password@postgres:5432/leafwise_db
       - REDIS_URL=redis://redis:6379/0
     ports:
       - "8000:8000"
@@ -83,4 +83,4 @@ volumes:
 
 networks:
   default:
-    name: plant_social_network
+    name: leafwise_network

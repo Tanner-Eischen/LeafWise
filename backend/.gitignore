@@ -30,6 +30,10 @@ ENV/
 .DS_Store
 
 # Testing
+test/
+tests/
+*_test.py
+test_*.py
 .coverage
 htmlcov/
 .pytest_cache/
@@ -87,4 +91,4 @@ Thumbs.db
 .vibe-tools.env
 vibe-tools.env
 .vibe-tools.config.json
-vibe-tools.config.json 
+vibe-tools.config.json

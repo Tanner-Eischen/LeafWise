@@ -1,7 +1,7 @@
 #!/bin/bash
-# Development startup script for Plant Social platform
+# Development startup script for LeafWise platform
 
-echo "🌱 Starting Plant Social Development Environment"
+echo "🌱 Starting LeafWise Development Environment"
 echo "========================================="
 
 # Check if Docker is running

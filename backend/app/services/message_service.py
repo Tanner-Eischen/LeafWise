@@ -643,6 +643,6 @@ async def get_message_by_id(
     return await message_service.get_message_by_id(message_id, user_id, session)
 
 
-async def get_message_service() -> MessageService:
+async def get_message_service():
     """Get message service dependency."""
     return message_service

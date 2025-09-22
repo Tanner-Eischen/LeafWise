@@ -4,6 +4,7 @@ This module sets up the SQLAlchemy async engine, session factory,
 and base model class for the application.
 """
 
+from typing import AsyncGenerator
 from sqlalchemy import MetaData, text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -41,7 +42,7 @@ AsyncSessionLocal = sessionmaker(
 )
 
 
-async def get_db() -> AsyncSession:
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """Dependency to get database session.
     
     Yields:
