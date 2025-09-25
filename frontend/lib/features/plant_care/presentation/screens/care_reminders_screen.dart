@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Screen for managing plant care reminders
 class CareRemindersScreen extends ConsumerStatefulWidget {
-  const CareRemindersScreen({super.key});
+  final String plantId;
+  
+  const CareRemindersScreen({super.key, required this.plantId});
 
   @override
   ConsumerState<CareRemindersScreen> createState() => _CareRemindersScreenState();

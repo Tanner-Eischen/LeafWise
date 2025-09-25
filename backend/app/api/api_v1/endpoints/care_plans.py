@@ -12,11 +12,11 @@ from fastapi import APIRouter, Depends, HTTPException, Header, Query, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user, get_db
 from app.core.database import get_db
+from app.api.api_v1.endpoints.auth import get_current_user
 from app.models.user import User
 from app.models.user_plant import UserPlant
-from app.models.care_plan import CarePlan
+from app.models.care_plan import CarePlanV2 as CarePlan
 from app.schemas.care_plan import (
     CarePlanRequest,
     CarePlanResponse,
@@ -31,7 +31,6 @@ from app.core.config import settings
 
 
 router = APIRouter()
-care_plan_service = CarePlanService()
 metrics_service = CarePlanMetricsService()
 
 
@@ -69,6 +68,9 @@ async def generate_care_plan(
     start_time = time.time()
     
     try:
+        # Initialize care plan service with database session
+        care_plan_service = CarePlanService(db)
+        
         # Verify plant ownership
         plant = db.query(UserPlant).filter(
             UserPlant.id == plant_id,
@@ -244,6 +246,9 @@ async def acknowledge_care_plan(
         )
     
     try:
+        # Initialize care plan service with database session
+        care_plan_service = CarePlanService(db)
+        
         care_plan = await care_plan_service.acknowledge_plan(
             db=db,
             plant_id=plant_id,
@@ -312,6 +317,9 @@ async def get_care_plan_history(
         )
     
     try:
+        # Initialize care plan service with database session
+        care_plan_service = CarePlanService(db)
+        
         history = await care_plan_service.get_plan_history(
             db=db,
             plant_id=plant_id,
@@ -425,6 +433,9 @@ async def delete_care_plan_version(
         )
     
     try:
+        # Initialize care plan service with database session
+        care_plan_service = CarePlanService(db)
+        
         success = await care_plan_service.delete_plan_version(
             db=db,
             plant_id=plant_id,

@@ -47,15 +47,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   }
 
   void _navigateToNextScreen(bool isAuthenticated) {
-    Future.delayed(const Duration(milliseconds: 1500), () {
-      if (mounted) {
-        if (isAuthenticated) {
-          context.go(AppRoutes.home);
-        } else {
-          context.go(AppRoutes.login);
-        }
-      }
-    });
+    print('🚀 Attempting navigation: isAuthenticated=$isAuthenticated');
+    // Let the router handle navigation via redirect logic
+    print('📱 Letting router handle navigation via redirect logic');
   }
 
   @override
@@ -67,10 +61,16 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final authState = ref.watch(authProvider);
+
+    // Debug logging
+    print('🔍 Splash Screen - Auth State: isInitialized=${authState.isInitialized}, isAuthenticated=${authState.isAuthenticated}, isLoading=${authState.isLoading}, error=${authState.error}');
 
     // Listen to auth state changes within build method
     ref.listen<AuthState>(authProvider, (previous, next) {
+      print('🔄 Auth state changed: isInitialized=${next.isInitialized}, isAuthenticated=${next.isAuthenticated}, error=${next.error}');
       if (next.isInitialized) {
+        print('✅ Auth initialized, navigating to ${next.isAuthenticated ? 'home' : 'login'}');
         _navigateToNextScreen(next.isAuthenticated);
       }
     });

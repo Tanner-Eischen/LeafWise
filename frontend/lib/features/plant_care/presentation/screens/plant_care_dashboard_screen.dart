@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:leafwise/features/plant_care/models/plant_care_models.dart';
 import 'package:leafwise/features/plant_care/providers/plant_care_provider.dart';
 import 'package:leafwise/features/plant_care/presentation/screens/add_plant_screen.dart';
@@ -59,18 +60,74 @@ class _PlantCareDashboardScreenState
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
-              // Navigate to plant search
+              context.push('/home/plants/identify/search');
             },
           ),
           IconButton(
             icon: const Icon(Icons.notifications),
             onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const CareRemindersScreen(),
-                ),
-              );
+              context.push('/home/plants/care/default/reminders');
             },
+          ),
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              switch (value) {
+                case 'add_plant':
+                  context.push('/home/plants/care/add');
+                  break;
+                case 'care_plans':
+                  context.push('/home/plants/care-plans');
+                  break;
+                case 'identify':
+                  context.push('/home/plants/identify');
+                  break;
+                case 'community':
+                  context.push('/home/plants/community');
+                  break;
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'add_plant',
+                child: Row(
+                  children: [
+                    Icon(Icons.add_circle),
+                    SizedBox(width: 8),
+                    Text('Add Plant'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'care_plans',
+                child: Row(
+                  children: [
+                    Icon(Icons.schedule),
+                    SizedBox(width: 8),
+                    Text('Care Plans'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'identify',
+                child: Row(
+                  children: [
+                    Icon(Icons.camera_alt),
+                    SizedBox(width: 8),
+                    Text('Identify Plant'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'community',
+                child: Row(
+                  children: [
+                    Icon(Icons.groups),
+                    SizedBox(width: 8),
+                    Text('Community'),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
         bottom: TabBar(
@@ -214,12 +271,11 @@ class _PlantCareDashboardScreenState
   }
 
   Widget _buildCareLogTab(PlantCareState state, ThemeData theme) {
-    return const CareLogsScreen();
+    return const CareLogsScreen(plantId: 'default');
   }
 
   Widget _buildQuickStats(PlantCareState state, ThemeData theme) {
     final totalPlants = state.userPlants.length;
-    final upcomingReminders = state.upcomingReminders.length;
     final overdueReminders = state.upcomingReminders
         .where((r) => r.nextDueDate.isBefore(DateTime.now()))
         .length;

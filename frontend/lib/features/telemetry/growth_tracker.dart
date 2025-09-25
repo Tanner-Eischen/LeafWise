@@ -13,11 +13,11 @@ import 'package:uuid/uuid.dart';
 
 // Core imports
 import '../../modules/growth_tracker/growth_tracker.dart';
-import '../../modules/growth_tracker/types.dart';
 
 // Telemetry imports
 import 'models/telemetry_data_models.dart' as telemetry_models;
-import 'providers/telemetry_providers.dart';
+import 'providers/telemetry_notifier.dart';
+import 'providers/growth_tracker_notifier.dart';
 
 /// Extension class that integrates GrowthTracker with telemetry system
 /// Provides automatic telemetry data creation and enhanced tracking capabilities
@@ -110,7 +110,7 @@ class GrowthTrackerTelemetryIntegration {
     try {
       // Create a growth record for analysis
       final growthRecord = GrowthRecord(
-        id: growthPhotoData.id,
+        id: growthPhotoData.id ?? const Uuid().v4(),
         timestamp: growthPhotoData.capturedAt,
         photoPath: growthPhotoData.filePath,
         notes: growthPhotoData.notes,
@@ -120,15 +120,19 @@ class GrowthTrackerTelemetryIntegration {
       final analyzedRecord = await _growthTracker.analyzeGrowthRecord(growthRecord);
       
       // Convert metrics to telemetry format if available
-      telemetry_models.GrowthMetricsData? metricsData;
+      telemetry_models.GrowthMetrics? metricsData;
       if (analyzedRecord.metrics != null) {
-        metricsData = telemetry_models.GrowthMetricsData(
-          heightCm: analyzedRecord.metrics!.heightCm,
-          widthCm: analyzedRecord.metrics!.widthCm,
+        metricsData = telemetry_models.GrowthMetrics(
+          heightCm: analyzedRecord.metrics!.height,
+          widthCm: analyzedRecord.metrics!.width,
           leafCount: analyzedRecord.metrics!.leafCount,
           healthScore: analyzedRecord.metrics!.healthScore,
-          colorAnalysis: analyzedRecord.metrics!.colorAnalysis,
-          extractedAt: DateTime.now(),
+          colorAnalysis: analyzedRecord.metrics!.customMetrics?['colorAnalysis'] as String?,
+          leafAreaCm2: analyzedRecord.metrics!.customMetrics?['leafAreaCm2'] as double?,
+          plantHeightCm: analyzedRecord.metrics!.height,
+          stemWidthMm: analyzedRecord.metrics!.customMetrics?['stemWidthMm'] as double?,
+          chlorophyllIndex: analyzedRecord.metrics!.customMetrics?['chlorophyllIndex'] as double?,
+          diseaseIndicators: analyzedRecord.metrics!.customMetrics?['diseaseIndicators'] as List<String>? ?? [],
         );
       }
       
@@ -252,7 +256,7 @@ class GrowthTrackerTelemetryIntegration {
         final lastWithMetrics = photoList.lastWhere((p) => p.metrics != null);
         
         if (firstWithMetrics.metrics != null && lastWithMetrics.metrics != null) {
-          final heightDiff = lastWithMetrics.metrics!.heightCm - firstWithMetrics.metrics!.heightCm;
+          final heightDiff = (lastWithMetrics.metrics!.heightCm ?? 0.0) - (firstWithMetrics.metrics!.heightCm ?? 0.0);
           final daysDiff = lastWithMetrics.capturedAt.difference(firstWithMetrics.capturedAt).inDays;
           
           if (daysDiff > 0) {
@@ -300,6 +304,7 @@ class GrowthTrackingStats {
   final DateTime? lastPhotoDate;
   final bool isContinuousTracking;
   final String? currentSessionId;
+  final int currentStreak; // days of continuous tracking
   
   const GrowthTrackingStats({
     required this.plantId,
@@ -311,6 +316,7 @@ class GrowthTrackingStats {
     this.lastPhotoDate,
     required this.isContinuousTracking,
     this.currentSessionId,
+    this.currentStreak = 0,
   });
 }
 

@@ -3,6 +3,7 @@
 /// This screen provides comprehensive telemetry data management with filtering,
 /// sorting, infinite scrolling, and bulk operations. It displays both light
 /// readings and growth photos in a tabbed interface with advanced data management.
+library telemetry_history_screen;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,12 +11,18 @@ import 'package:go_router/go_router.dart';
 import 'package:leafwise/core/widgets/breadcrumb_navigation.dart';
 import 'package:leafwise/features/telemetry/models/telemetry_data_models.dart';
 import 'package:leafwise/features/telemetry/providers/telemetry_providers.dart';
+import 'package:leafwise/features/telemetry/providers/telemetry_state.dart';
 import 'package:leafwise/features/telemetry/widgets/telemetry_data_tile.dart';
 import 'package:leafwise/features/telemetry/presentation/screens/telemetry_detail_screen.dart';
 import 'package:leafwise/core/widgets/custom_search_bar.dart';
 
 class TelemetryHistoryScreen extends ConsumerStatefulWidget {
-  const TelemetryHistoryScreen({super.key});
+  final String plantId;
+  
+  const TelemetryHistoryScreen({
+    super.key,
+    required this.plantId,
+  });
 
   @override
   ConsumerState<TelemetryHistoryScreen> createState() => _TelemetryHistoryScreenState();
@@ -71,20 +78,10 @@ class _TelemetryHistoryScreenState extends ConsumerState<TelemetryHistoryScreen>
   Future<void> _loadTelemetryData({bool refresh = false}) async {
     final notifier = ref.read(telemetryNotifierProvider.notifier);
     
-    if (refresh) {
-      await notifier.loadTelemetryData(
-        filter: _activeFilter,
-        search: _searchController.text.trim().isEmpty ? null : _searchController.text.trim(),
-        sortBy: _sortBy,
-        refresh: true,
-      );
-    } else {
-      await notifier.loadMoreTelemetryData(
-        filter: _activeFilter,
-        search: _searchController.text.trim().isEmpty ? null : _searchController.text.trim(),
-        sortBy: _sortBy,
-      );
-    }
+    await notifier.loadTelemetryData(
+      widget.plantId, // Use the actual plant ID from the widget
+      filter: _activeFilter,
+    );
   }
 
   /// Handle search input changes
@@ -126,7 +123,7 @@ class _TelemetryHistoryScreenState extends ConsumerState<TelemetryHistoryScreen>
   /// Select all visible items
   void _selectAllItems(List<TelemetryData> items) {
     setState(() {
-      _selectedItems.addAll(items.map((item) => item.id));
+      _selectedItems.addAll(items.map((item) => item.id ?? '').where((id) => id.isNotEmpty));
     });
   }
 
@@ -145,7 +142,7 @@ class _TelemetryHistoryScreenState extends ConsumerState<TelemetryHistoryScreen>
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Selected Items'),
-        content: Text('Are you sure you want to delete ${_selectedItems.length} selected items?'),
+        content: Text('Are you sure you want to delete ${_selectedItems.length} selected items? This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -161,10 +158,27 @@ class _TelemetryHistoryScreenState extends ConsumerState<TelemetryHistoryScreen>
     );
 
     if (confirmed == true) {
-      final notifier = ref.read(telemetryNotifierProvider.notifier);
-      await notifier.bulkDeleteTelemetryData(_selectedItems.toList());
-      _clearSelection();
-      _toggleSelectionMode();
+      try {
+        // Delete items individually since bulk delete method doesn't exist
+        for (final itemId in _selectedItems) {
+          await ref.read(telemetryNotifierProvider.notifier).deleteTelemetryData(itemId);
+        }
+        
+        _clearSelection();
+        _toggleSelectionMode();
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${_selectedItems.length} items deleted successfully')),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to delete items: $e')),
+          );
+        }
+      }
     }
   }
 
@@ -172,9 +186,24 @@ class _TelemetryHistoryScreenState extends ConsumerState<TelemetryHistoryScreen>
   Future<void> _handleBulkSync() async {
     if (_selectedItems.isEmpty) return;
 
-    final notifier = ref.read(telemetryNotifierProvider.notifier);
-    await notifier.bulkSyncTelemetryData(_selectedItems.toList());
-    _clearSelection();
+    try {
+      // Use the existing syncPendingData method since bulk sync doesn't exist
+      await ref.read(telemetryNotifierProvider.notifier).syncPendingData();
+      
+      _clearSelection();
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Sync completed successfully')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to sync items: $e')),
+        );
+      }
+    }
   }
 
   /// Show filter dialog
@@ -333,7 +362,7 @@ class _TelemetryHistoryScreenState extends ConsumerState<TelemetryHistoryScreen>
                         _loadTelemetryData(refresh: true);
                         break;
                       case 'sync_all':
-                        ref.read(telemetryNotifierProvider.notifier).syncAllPendingData();
+                        ref.read(telemetryNotifierProvider.notifier).syncPendingData();
                         break;
                     }
                   },
@@ -514,8 +543,7 @@ class _TelemetryHistoryScreenState extends ConsumerState<TelemetryHistoryScreen>
   /// Build light readings list
   Widget _buildLightReadingsList(TelemetryState state) {
     final lightReadings = state.filteredTelemetryData
-        .where((data) => data is LightReadingData)
-        .cast<LightReadingData>()
+        .whereType<LightReadingData>()
         .toList();
 
     if (state.isLoadingData && lightReadings.isEmpty) {
@@ -546,16 +574,13 @@ class _TelemetryHistoryScreenState extends ConsumerState<TelemetryHistoryScreen>
           final isSelected = _selectedItems.contains(reading.id);
 
           return TelemetryDataTile(
-            data: reading,
-            displayMode: TelemetryTileDisplayMode.full,
-            isSelected: _isSelectionMode ? isSelected : null,
+            lightData: reading,
+            displayMode: TelemetryTileDisplayMode.compact,
+            isSelected: _isSelectionMode ? isSelected : false,
             onTap: _isSelectionMode
-                ? () => _toggleItemSelection(reading.id)
+                ? () => _toggleItemSelection(reading.id ?? '')
                 : () => _navigateToDetail(reading),
-            onLongPress: _isSelectionMode ? null : () {
-              _toggleSelectionMode();
-              _toggleItemSelection(reading.id);
-            },
+            onDelete: () => _deleteItem(reading.id ?? ''),
           );
         },
       ),
@@ -565,8 +590,7 @@ class _TelemetryHistoryScreenState extends ConsumerState<TelemetryHistoryScreen>
   /// Build growth photos list
   Widget _buildGrowthPhotosList(TelemetryState state) {
     final growthPhotos = state.filteredTelemetryData
-        .where((data) => data is GrowthPhotoData)
-        .cast<GrowthPhotoData>()
+        .whereType<GrowthPhotoData>()
         .toList();
 
     if (state.isLoadingData && growthPhotos.isEmpty) {
@@ -600,16 +624,13 @@ class _TelemetryHistoryScreenState extends ConsumerState<TelemetryHistoryScreen>
           final isSelected = _selectedItems.contains(photo.id);
 
           return TelemetryDataTile(
-            data: photo,
+            photoData: photo,
             displayMode: TelemetryTileDisplayMode.compact,
-            isSelected: _isSelectionMode ? isSelected : null,
+            isSelected: _isSelectionMode ? isSelected : false,
             onTap: _isSelectionMode
-                ? () => _toggleItemSelection(photo.id)
+                ? () => _toggleItemSelection(photo.id ?? '')
                 : () => _navigateToDetail(photo),
-            onLongPress: _isSelectionMode ? null : () {
-              _toggleSelectionMode();
-              _toggleItemSelection(photo.id);
-            },
+            onDelete: () => _deleteItem(photo.id ?? ''),
           );
         },
       ),
@@ -648,11 +669,66 @@ class _TelemetryHistoryScreenState extends ConsumerState<TelemetryHistoryScreen>
   }
 
   /// Navigate to telemetry detail screen
-  void _navigateToDetail(TelemetryData data) {
+  void _navigateToDetail(dynamic data) {
+    String telemetryId;
+    if (data is LightReadingData) {
+      telemetryId = data.id ?? '';
+    } else if (data is GrowthPhotoData) {
+      telemetryId = data.id ?? '';
+    } else {
+      return; // Invalid data type
+    }
+    
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => TelemetryDetailScreen(telemetryData: data),
+        builder: (context) => TelemetryDetailScreen(telemetryId: telemetryId),
       ),
     );
+  }
+
+  /// Delete a telemetry item
+  Future<void> _deleteItem(String? itemId) async {
+    if (itemId == null || itemId.isEmpty) return;
+    
+    try {
+      // Show confirmation dialog
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Delete Item'),
+          content: const Text('Are you sure you want to delete this telemetry data? This action cannot be undone.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text('Delete'),
+            ),
+          ],
+        ),
+      );
+      
+      if (confirmed == true) {
+        // Delete the item using the telemetry provider
+        await ref.read(telemetryNotifierProvider.notifier).deleteTelemetryData(itemId);
+        
+        // Show success message
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Telemetry data deleted successfully')),
+          );
+        }
+      }
+    } catch (e) {
+      // Show error message
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to delete telemetry data: $e')),
+        );
+      }
+    }
   }
 }

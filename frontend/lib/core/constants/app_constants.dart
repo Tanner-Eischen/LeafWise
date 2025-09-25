@@ -6,10 +6,10 @@ class AppConstants {
       'A plant-focused social messaging platform';
 
   // API Configuration
-  static const String baseUrl = 'http://localhost:8000';
+  static const String baseUrl = 'http://127.0.0.1:8000';
   static const String apiVersion = 'v1';
   static const String apiBaseUrl = '$baseUrl/api/$apiVersion';
-  static const String wsBaseUrl = 'ws://localhost:8000/api/$apiVersion/ws';
+  static const String wsBaseUrl = 'ws://127.0.0.1:8000/api/$apiVersion/ws';
 
   // Storage Keys
   static const String accessTokenKey = 'access_token';

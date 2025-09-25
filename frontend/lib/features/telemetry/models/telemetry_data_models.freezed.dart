@@ -755,7 +755,11 @@ mixin _$GrowthMetrics {
   double? get stemWidthMm => throw _privateConstructorUsedError;
   double? get healthScore => throw _privateConstructorUsedError;
   double? get chlorophyllIndex => throw _privateConstructorUsedError;
-  List<String> get diseaseIndicators => throw _privateConstructorUsedError;
+  List<String> get diseaseIndicators =>
+      throw _privateConstructorUsedError; // Additional properties for compatibility
+  double? get heightCm => throw _privateConstructorUsedError;
+  double? get widthCm => throw _privateConstructorUsedError;
+  String? get colorAnalysis => throw _privateConstructorUsedError;
 
   /// Serializes this GrowthMetrics to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -780,7 +784,10 @@ abstract class $GrowthMetricsCopyWith<$Res> {
       double? stemWidthMm,
       double? healthScore,
       double? chlorophyllIndex,
-      List<String> diseaseIndicators});
+      List<String> diseaseIndicators,
+      double? heightCm,
+      double? widthCm,
+      String? colorAnalysis});
 }
 
 /// @nodoc
@@ -805,6 +812,9 @@ class _$GrowthMetricsCopyWithImpl<$Res, $Val extends GrowthMetrics>
     Object? healthScore = freezed,
     Object? chlorophyllIndex = freezed,
     Object? diseaseIndicators = null,
+    Object? heightCm = freezed,
+    Object? widthCm = freezed,
+    Object? colorAnalysis = freezed,
   }) {
     return _then(_value.copyWith(
       leafAreaCm2: freezed == leafAreaCm2
@@ -835,6 +845,18 @@ class _$GrowthMetricsCopyWithImpl<$Res, $Val extends GrowthMetrics>
           ? _value.diseaseIndicators
           : diseaseIndicators // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      heightCm: freezed == heightCm
+          ? _value.heightCm
+          : heightCm // ignore: cast_nullable_to_non_nullable
+              as double?,
+      widthCm: freezed == widthCm
+          ? _value.widthCm
+          : widthCm // ignore: cast_nullable_to_non_nullable
+              as double?,
+      colorAnalysis: freezed == colorAnalysis
+          ? _value.colorAnalysis
+          : colorAnalysis // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -854,7 +876,10 @@ abstract class _$$GrowthMetricsImplCopyWith<$Res>
       double? stemWidthMm,
       double? healthScore,
       double? chlorophyllIndex,
-      List<String> diseaseIndicators});
+      List<String> diseaseIndicators,
+      double? heightCm,
+      double? widthCm,
+      String? colorAnalysis});
 }
 
 /// @nodoc
@@ -877,6 +902,9 @@ class __$$GrowthMetricsImplCopyWithImpl<$Res>
     Object? healthScore = freezed,
     Object? chlorophyllIndex = freezed,
     Object? diseaseIndicators = null,
+    Object? heightCm = freezed,
+    Object? widthCm = freezed,
+    Object? colorAnalysis = freezed,
   }) {
     return _then(_$GrowthMetricsImpl(
       leafAreaCm2: freezed == leafAreaCm2
@@ -907,6 +935,18 @@ class __$$GrowthMetricsImplCopyWithImpl<$Res>
           ? _value._diseaseIndicators
           : diseaseIndicators // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      heightCm: freezed == heightCm
+          ? _value.heightCm
+          : heightCm // ignore: cast_nullable_to_non_nullable
+              as double?,
+      widthCm: freezed == widthCm
+          ? _value.widthCm
+          : widthCm // ignore: cast_nullable_to_non_nullable
+              as double?,
+      colorAnalysis: freezed == colorAnalysis
+          ? _value.colorAnalysis
+          : colorAnalysis // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -921,7 +961,10 @@ class _$GrowthMetricsImpl implements _GrowthMetrics {
       this.stemWidthMm,
       this.healthScore,
       this.chlorophyllIndex,
-      final List<String> diseaseIndicators = const []})
+      final List<String> diseaseIndicators = const [],
+      this.heightCm,
+      this.widthCm,
+      this.colorAnalysis})
       : _diseaseIndicators = diseaseIndicators;
 
   factory _$GrowthMetricsImpl.fromJson(Map<String, dynamic> json) =>
@@ -949,9 +992,17 @@ class _$GrowthMetricsImpl implements _GrowthMetrics {
     return EqualUnmodifiableListView(_diseaseIndicators);
   }
 
+// Additional properties for compatibility
+  @override
+  final double? heightCm;
+  @override
+  final double? widthCm;
+  @override
+  final String? colorAnalysis;
+
   @override
   String toString() {
-    return 'GrowthMetrics(leafAreaCm2: $leafAreaCm2, plantHeightCm: $plantHeightCm, leafCount: $leafCount, stemWidthMm: $stemWidthMm, healthScore: $healthScore, chlorophyllIndex: $chlorophyllIndex, diseaseIndicators: $diseaseIndicators)';
+    return 'GrowthMetrics(leafAreaCm2: $leafAreaCm2, plantHeightCm: $plantHeightCm, leafCount: $leafCount, stemWidthMm: $stemWidthMm, healthScore: $healthScore, chlorophyllIndex: $chlorophyllIndex, diseaseIndicators: $diseaseIndicators, heightCm: $heightCm, widthCm: $widthCm, colorAnalysis: $colorAnalysis)';
   }
 
   @override
@@ -972,7 +1023,12 @@ class _$GrowthMetricsImpl implements _GrowthMetrics {
             (identical(other.chlorophyllIndex, chlorophyllIndex) ||
                 other.chlorophyllIndex == chlorophyllIndex) &&
             const DeepCollectionEquality()
-                .equals(other._diseaseIndicators, _diseaseIndicators));
+                .equals(other._diseaseIndicators, _diseaseIndicators) &&
+            (identical(other.heightCm, heightCm) ||
+                other.heightCm == heightCm) &&
+            (identical(other.widthCm, widthCm) || other.widthCm == widthCm) &&
+            (identical(other.colorAnalysis, colorAnalysis) ||
+                other.colorAnalysis == colorAnalysis));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -985,7 +1041,10 @@ class _$GrowthMetricsImpl implements _GrowthMetrics {
       stemWidthMm,
       healthScore,
       chlorophyllIndex,
-      const DeepCollectionEquality().hash(_diseaseIndicators));
+      const DeepCollectionEquality().hash(_diseaseIndicators),
+      heightCm,
+      widthCm,
+      colorAnalysis);
 
   /// Create a copy of GrowthMetrics
   /// with the given fields replaced by the non-null parameter values.
@@ -1011,7 +1070,10 @@ abstract class _GrowthMetrics implements GrowthMetrics {
       final double? stemWidthMm,
       final double? healthScore,
       final double? chlorophyllIndex,
-      final List<String> diseaseIndicators}) = _$GrowthMetricsImpl;
+      final List<String> diseaseIndicators,
+      final double? heightCm,
+      final double? widthCm,
+      final String? colorAnalysis}) = _$GrowthMetricsImpl;
 
   factory _GrowthMetrics.fromJson(Map<String, dynamic> json) =
       _$GrowthMetricsImpl.fromJson;
@@ -1029,13 +1091,317 @@ abstract class _GrowthMetrics implements GrowthMetrics {
   @override
   double? get chlorophyllIndex;
   @override
-  List<String> get diseaseIndicators;
+  List<String> get diseaseIndicators; // Additional properties for compatibility
+  @override
+  double? get heightCm;
+  @override
+  double? get widthCm;
+  @override
+  String? get colorAnalysis;
 
   /// Create a copy of GrowthMetrics
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$GrowthMetricsImplCopyWith<_$GrowthMetricsImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+GrowthMetricsData _$GrowthMetricsDataFromJson(Map<String, dynamic> json) {
+  return _GrowthMetricsData.fromJson(json);
+}
+
+/// @nodoc
+mixin _$GrowthMetricsData {
+  double? get heightCm => throw _privateConstructorUsedError;
+  double? get widthCm => throw _privateConstructorUsedError;
+  int? get leafCount => throw _privateConstructorUsedError;
+  double? get healthScore => throw _privateConstructorUsedError;
+  String? get colorAnalysis => throw _privateConstructorUsedError;
+  DateTime get extractedAt => throw _privateConstructorUsedError;
+  Map<String, dynamic>? get additionalMetrics =>
+      throw _privateConstructorUsedError;
+
+  /// Serializes this GrowthMetricsData to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of GrowthMetricsData
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $GrowthMetricsDataCopyWith<GrowthMetricsData> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $GrowthMetricsDataCopyWith<$Res> {
+  factory $GrowthMetricsDataCopyWith(
+          GrowthMetricsData value, $Res Function(GrowthMetricsData) then) =
+      _$GrowthMetricsDataCopyWithImpl<$Res, GrowthMetricsData>;
+  @useResult
+  $Res call(
+      {double? heightCm,
+      double? widthCm,
+      int? leafCount,
+      double? healthScore,
+      String? colorAnalysis,
+      DateTime extractedAt,
+      Map<String, dynamic>? additionalMetrics});
+}
+
+/// @nodoc
+class _$GrowthMetricsDataCopyWithImpl<$Res, $Val extends GrowthMetricsData>
+    implements $GrowthMetricsDataCopyWith<$Res> {
+  _$GrowthMetricsDataCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of GrowthMetricsData
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? heightCm = freezed,
+    Object? widthCm = freezed,
+    Object? leafCount = freezed,
+    Object? healthScore = freezed,
+    Object? colorAnalysis = freezed,
+    Object? extractedAt = null,
+    Object? additionalMetrics = freezed,
+  }) {
+    return _then(_value.copyWith(
+      heightCm: freezed == heightCm
+          ? _value.heightCm
+          : heightCm // ignore: cast_nullable_to_non_nullable
+              as double?,
+      widthCm: freezed == widthCm
+          ? _value.widthCm
+          : widthCm // ignore: cast_nullable_to_non_nullable
+              as double?,
+      leafCount: freezed == leafCount
+          ? _value.leafCount
+          : leafCount // ignore: cast_nullable_to_non_nullable
+              as int?,
+      healthScore: freezed == healthScore
+          ? _value.healthScore
+          : healthScore // ignore: cast_nullable_to_non_nullable
+              as double?,
+      colorAnalysis: freezed == colorAnalysis
+          ? _value.colorAnalysis
+          : colorAnalysis // ignore: cast_nullable_to_non_nullable
+              as String?,
+      extractedAt: null == extractedAt
+          ? _value.extractedAt
+          : extractedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      additionalMetrics: freezed == additionalMetrics
+          ? _value.additionalMetrics
+          : additionalMetrics // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$GrowthMetricsDataImplCopyWith<$Res>
+    implements $GrowthMetricsDataCopyWith<$Res> {
+  factory _$$GrowthMetricsDataImplCopyWith(_$GrowthMetricsDataImpl value,
+          $Res Function(_$GrowthMetricsDataImpl) then) =
+      __$$GrowthMetricsDataImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {double? heightCm,
+      double? widthCm,
+      int? leafCount,
+      double? healthScore,
+      String? colorAnalysis,
+      DateTime extractedAt,
+      Map<String, dynamic>? additionalMetrics});
+}
+
+/// @nodoc
+class __$$GrowthMetricsDataImplCopyWithImpl<$Res>
+    extends _$GrowthMetricsDataCopyWithImpl<$Res, _$GrowthMetricsDataImpl>
+    implements _$$GrowthMetricsDataImplCopyWith<$Res> {
+  __$$GrowthMetricsDataImplCopyWithImpl(_$GrowthMetricsDataImpl _value,
+      $Res Function(_$GrowthMetricsDataImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of GrowthMetricsData
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? heightCm = freezed,
+    Object? widthCm = freezed,
+    Object? leafCount = freezed,
+    Object? healthScore = freezed,
+    Object? colorAnalysis = freezed,
+    Object? extractedAt = null,
+    Object? additionalMetrics = freezed,
+  }) {
+    return _then(_$GrowthMetricsDataImpl(
+      heightCm: freezed == heightCm
+          ? _value.heightCm
+          : heightCm // ignore: cast_nullable_to_non_nullable
+              as double?,
+      widthCm: freezed == widthCm
+          ? _value.widthCm
+          : widthCm // ignore: cast_nullable_to_non_nullable
+              as double?,
+      leafCount: freezed == leafCount
+          ? _value.leafCount
+          : leafCount // ignore: cast_nullable_to_non_nullable
+              as int?,
+      healthScore: freezed == healthScore
+          ? _value.healthScore
+          : healthScore // ignore: cast_nullable_to_non_nullable
+              as double?,
+      colorAnalysis: freezed == colorAnalysis
+          ? _value.colorAnalysis
+          : colorAnalysis // ignore: cast_nullable_to_non_nullable
+              as String?,
+      extractedAt: null == extractedAt
+          ? _value.extractedAt
+          : extractedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      additionalMetrics: freezed == additionalMetrics
+          ? _value._additionalMetrics
+          : additionalMetrics // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$GrowthMetricsDataImpl implements _GrowthMetricsData {
+  const _$GrowthMetricsDataImpl(
+      {this.heightCm,
+      this.widthCm,
+      this.leafCount,
+      this.healthScore,
+      this.colorAnalysis,
+      required this.extractedAt,
+      final Map<String, dynamic>? additionalMetrics})
+      : _additionalMetrics = additionalMetrics;
+
+  factory _$GrowthMetricsDataImpl.fromJson(Map<String, dynamic> json) =>
+      _$$GrowthMetricsDataImplFromJson(json);
+
+  @override
+  final double? heightCm;
+  @override
+  final double? widthCm;
+  @override
+  final int? leafCount;
+  @override
+  final double? healthScore;
+  @override
+  final String? colorAnalysis;
+  @override
+  final DateTime extractedAt;
+  final Map<String, dynamic>? _additionalMetrics;
+  @override
+  Map<String, dynamic>? get additionalMetrics {
+    final value = _additionalMetrics;
+    if (value == null) return null;
+    if (_additionalMetrics is EqualUnmodifiableMapView)
+      return _additionalMetrics;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
+
+  @override
+  String toString() {
+    return 'GrowthMetricsData(heightCm: $heightCm, widthCm: $widthCm, leafCount: $leafCount, healthScore: $healthScore, colorAnalysis: $colorAnalysis, extractedAt: $extractedAt, additionalMetrics: $additionalMetrics)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$GrowthMetricsDataImpl &&
+            (identical(other.heightCm, heightCm) ||
+                other.heightCm == heightCm) &&
+            (identical(other.widthCm, widthCm) || other.widthCm == widthCm) &&
+            (identical(other.leafCount, leafCount) ||
+                other.leafCount == leafCount) &&
+            (identical(other.healthScore, healthScore) ||
+                other.healthScore == healthScore) &&
+            (identical(other.colorAnalysis, colorAnalysis) ||
+                other.colorAnalysis == colorAnalysis) &&
+            (identical(other.extractedAt, extractedAt) ||
+                other.extractedAt == extractedAt) &&
+            const DeepCollectionEquality()
+                .equals(other._additionalMetrics, _additionalMetrics));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      heightCm,
+      widthCm,
+      leafCount,
+      healthScore,
+      colorAnalysis,
+      extractedAt,
+      const DeepCollectionEquality().hash(_additionalMetrics));
+
+  /// Create a copy of GrowthMetricsData
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$GrowthMetricsDataImplCopyWith<_$GrowthMetricsDataImpl> get copyWith =>
+      __$$GrowthMetricsDataImplCopyWithImpl<_$GrowthMetricsDataImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$GrowthMetricsDataImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _GrowthMetricsData implements GrowthMetricsData {
+  const factory _GrowthMetricsData(
+      {final double? heightCm,
+      final double? widthCm,
+      final int? leafCount,
+      final double? healthScore,
+      final String? colorAnalysis,
+      required final DateTime extractedAt,
+      final Map<String, dynamic>? additionalMetrics}) = _$GrowthMetricsDataImpl;
+
+  factory _GrowthMetricsData.fromJson(Map<String, dynamic> json) =
+      _$GrowthMetricsDataImpl.fromJson;
+
+  @override
+  double? get heightCm;
+  @override
+  double? get widthCm;
+  @override
+  int? get leafCount;
+  @override
+  double? get healthScore;
+  @override
+  String? get colorAnalysis;
+  @override
+  DateTime get extractedAt;
+  @override
+  Map<String, dynamic>? get additionalMetrics;
+
+  /// Create a copy of GrowthMetricsData
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$GrowthMetricsDataImplCopyWith<_$GrowthMetricsDataImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -2613,8 +2979,7 @@ mixin _$TelemetryData {
   String get userId => throw _privateConstructorUsedError;
   String? get plantId =>
       throw _privateConstructorUsedError; // Light reading data
-  LightReadingData? get lightReading =>
-      throw _privateConstructorUsedError; // Growth photo data
+  LightReadingData? get lightReading => throw _privateConstructorUsedError;
   GrowthPhotoData? get growthPhoto =>
       throw _privateConstructorUsedError; // Batch data
   TelemetryBatchData? get batchData =>
@@ -2970,7 +3335,6 @@ class _$TelemetryDataImpl implements _TelemetryData {
 // Light reading data
   @override
   final LightReadingData? lightReading;
-// Growth photo data
   @override
   final GrowthPhotoData? growthPhoto;
 // Batch data
@@ -3102,7 +3466,7 @@ abstract class _TelemetryData implements TelemetryData {
   @override
   String? get plantId; // Light reading data
   @override
-  LightReadingData? get lightReading; // Growth photo data
+  LightReadingData? get lightReading;
   @override
   GrowthPhotoData? get growthPhoto; // Batch data
   @override

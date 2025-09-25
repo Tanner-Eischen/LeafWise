@@ -105,6 +105,9 @@ _$GrowthMetricsImpl _$$GrowthMetricsImplFromJson(Map<String, dynamic> json) =>
               ?.map((e) => e as String)
               .toList() ??
           const [],
+      heightCm: (json['heightCm'] as num?)?.toDouble(),
+      widthCm: (json['widthCm'] as num?)?.toDouble(),
+      colorAnalysis: json['colorAnalysis'] as String?,
     );
 
 Map<String, dynamic> _$$GrowthMetricsImplToJson(_$GrowthMetricsImpl instance) =>
@@ -116,6 +119,33 @@ Map<String, dynamic> _$$GrowthMetricsImplToJson(_$GrowthMetricsImpl instance) =>
       'healthScore': instance.healthScore,
       'chlorophyllIndex': instance.chlorophyllIndex,
       'diseaseIndicators': instance.diseaseIndicators,
+      'heightCm': instance.heightCm,
+      'widthCm': instance.widthCm,
+      'colorAnalysis': instance.colorAnalysis,
+    };
+
+_$GrowthMetricsDataImpl _$$GrowthMetricsDataImplFromJson(
+        Map<String, dynamic> json) =>
+    _$GrowthMetricsDataImpl(
+      heightCm: (json['heightCm'] as num?)?.toDouble(),
+      widthCm: (json['widthCm'] as num?)?.toDouble(),
+      leafCount: (json['leafCount'] as num?)?.toInt(),
+      healthScore: (json['healthScore'] as num?)?.toDouble(),
+      colorAnalysis: json['colorAnalysis'] as String?,
+      extractedAt: DateTime.parse(json['extractedAt'] as String),
+      additionalMetrics: json['additionalMetrics'] as Map<String, dynamic>?,
+    );
+
+Map<String, dynamic> _$$GrowthMetricsDataImplToJson(
+        _$GrowthMetricsDataImpl instance) =>
+    <String, dynamic>{
+      'heightCm': instance.heightCm,
+      'widthCm': instance.widthCm,
+      'leafCount': instance.leafCount,
+      'healthScore': instance.healthScore,
+      'colorAnalysis': instance.colorAnalysis,
+      'extractedAt': instance.extractedAt.toIso8601String(),
+      'additionalMetrics': instance.additionalMetrics,
     };
 
 _$GrowthPhotoDataImpl _$$GrowthPhotoDataImplFromJson(

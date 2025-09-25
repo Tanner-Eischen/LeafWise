@@ -49,7 +49,8 @@ def run_migrations_offline() -> None:
 
     with context.begin_transaction():
         # Enable vector extension
-        context.execute('CREATE EXTENSION IF NOT EXISTS vector;')
+        # TODO: Install pgvector extension first before enabling
+        # context.execute('CREATE EXTENSION IF NOT EXISTS vector;')
         # Run migrations
         context.run_migrations()
 

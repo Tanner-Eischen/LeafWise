@@ -3,9 +3,10 @@
 This module defines Pydantic schemas for seasonal AI predictions,
 care adjustments, and growth forecasting functionality.
 """
+from __future__ import annotations
 
 from datetime import datetime, date
-from typing import Optional, List, Dict, Any
+from typing import Optional, Any
 from uuid import UUID
 from enum import Enum
 
@@ -64,7 +65,7 @@ class SizeProjection(BaseModel):
     """Size projection for a specific date."""
     model_config = ConfigDict(from_attributes=True)
     
-    date: date = Field(..., description="Projection date")
+    projection_date: date = Field(..., description="Projection date")
     height_cm: Optional[float] = Field(None, description="Projected height in cm")
     width_cm: Optional[float] = Field(None, description="Projected width in cm")
     leaf_count: Optional[int] = Field(None, description="Projected leaf count")
@@ -77,8 +78,7 @@ class FloweringPeriod(BaseModel):
     
     start_date: date = Field(..., description="Expected flowering start")
     end_date: date = Field(..., description="Expected flowering end")
-    intensity: str = Field(..., description="Expected flowering intensity")
-    flower_count_estimate: Optional[int] = Field(None, description="Estimated flower count")
+    peak_bloom_date: Optional[date] = Field(None, description="Peak bloom date")
     confidence: float = Field(..., ge=0, le=1, description="Prediction confidence")
 
 
@@ -89,7 +89,7 @@ class DormancyPeriod(BaseModel):
     start_date: date = Field(..., description="Expected dormancy start")
     end_date: date = Field(..., description="Expected dormancy end")
     dormancy_type: str = Field(..., description="Type of dormancy")
-    care_adjustments: List[str] = Field(..., description="Required care adjustments")
+    care_adjustments: list[str] = Field(default_factory=list, description="Required care adjustments")
     confidence: float = Field(..., ge=0, le=1, description="Prediction confidence")
 
 
@@ -98,9 +98,9 @@ class GrowthForecast(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     
     expected_growth_rate: float = Field(..., description="Expected growth rate (cm/month)")
-    size_projections: List[SizeProjection] = Field(..., description="Size projections over time")
-    flowering_predictions: List[FloweringPeriod] = Field(default_factory=list, description="Flowering predictions")
-    dormancy_periods: List[DormancyPeriod] = Field(default_factory=list, description="Dormancy predictions")
+    size_projections: list[SizeProjection] = Field(..., description="Size projections over time")
+    flowering_predictions: list[FloweringPeriod] = Field(default_factory=list, description="Flowering predictions")
+    dormancy_periods: list[DormancyPeriod] = Field(default_factory=list, description="Dormancy predictions")
     stress_likelihood: float = Field(..., ge=0, le=1, description="Likelihood of seasonal stress")
 
 
@@ -126,20 +126,18 @@ class RiskFactor(BaseModel):
     risk_level: RiskLevel = Field(..., description="Risk severity level")
     probability: float = Field(..., ge=0, le=1, description="Risk probability")
     impact_description: str = Field(..., description="Description of potential impact")
-    prevention_measures: List[str] = Field(..., description="Recommended prevention measures")
-    monitoring_indicators: List[str] = Field(..., description="Signs to monitor")
+    prevention_measures: list[str] = Field(..., description="Recommended prevention measures")
+    monitoring_indicators: list[str] = Field(..., description="Signs to monitor")
 
 
 class PlantActivity(BaseModel):
-    """Optimal plant activity recommendation."""
+    """Plant activity prediction."""
     model_config = ConfigDict(from_attributes=True)
     
-    activity_type: ActivityType = Field(..., description="Type of activity")
-    optimal_date_range: Dict[str, date] = Field(..., description="Optimal date range for activity")
-    success_probability: float = Field(..., ge=0, le=1, description="Probability of success")
-    benefits: List[str] = Field(..., description="Expected benefits")
-    requirements: List[str] = Field(..., description="Requirements for success")
-    difficulty_level: str = Field(..., description="Difficulty level")
+    activity_type: str = Field(..., description="Type of activity")
+    optimal_date_range: tuple[date, date] = Field(..., description="Optimal date range")
+    description: str = Field(..., description="Activity description")
+    required_conditions: list[str] = Field(default_factory=list, description="Required conditions")
 
 
 class GrowthPhase(BaseModel):
@@ -149,9 +147,9 @@ class GrowthPhase(BaseModel):
     phase_type: GrowthPhaseType = Field(..., description="Type of growth phase")
     start_date: date = Field(..., description="Phase start date")
     end_date: date = Field(..., description="Phase end date")
-    characteristics: List[str] = Field(..., description="Phase characteristics")
-    care_requirements: List[str] = Field(..., description="Special care requirements")
-    expected_changes: List[str] = Field(..., description="Expected plant changes")
+    characteristics: list[str] = Field(..., description="Phase characteristics")
+    care_requirements: list[str] = Field(..., description="Special care requirements")
+    expected_changes: list[str] = Field(..., description="Expected plant changes")
 
 
 # Request schemas
@@ -171,10 +169,10 @@ class CustomPredictionRequest(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     
     plant_species: str = Field(..., description="Plant species identifier")
-    location: Dict[str, float] = Field(..., description="Location coordinates")
-    current_conditions: Dict[str, Any] = Field(..., description="Current environmental conditions")
+    location: dict[str, float] = Field(..., description="Location coordinates")
+    current_conditions: dict[str, Any] = Field(..., description="Current environmental conditions")
     plant_age_days: Optional[int] = Field(None, description="Plant age in days")
-    current_size: Optional[Dict[str, float]] = Field(None, description="Current plant size")
+    current_size: Optional[dict[str, float]] = Field(None, description="Current plant size")
     prediction_days: int = Field(default=90, ge=30, le=365, description="Number of days to predict")
 
 
@@ -184,7 +182,7 @@ class CareAdjustmentRequest(BaseModel):
     
     plant_id: UUID = Field(..., description="ID of the plant")
     current_season: Optional[Season] = Field(None, description="Current season")
-    specific_concerns: Optional[List[str]] = Field(None, description="Specific care concerns")
+    specific_concerns: Optional[list[str]] = Field(None, description="Specific care concerns")
 
 
 # Response schemas
@@ -197,12 +195,12 @@ class SeasonalPrediction(BaseModel):
     prediction_period_start: date
     prediction_period_end: date
     growth_forecast: GrowthForecast
-    care_adjustments: List[CareAdjustment]
-    risk_factors: List[RiskFactor]
-    optimal_activities: List[PlantActivity]
-    growth_phases: List[GrowthPhase]
+    care_adjustments: list[CareAdjustment]
+    risk_factors: list[RiskFactor]
+    optimal_activities: list[PlantActivity]
+    growth_phases: list[GrowthPhase]
     confidence_score: float = Field(..., ge=0, le=1, description="Overall prediction confidence")
-    environmental_factors: Dict[str, Any] = Field(default_factory=dict, description="Environmental factors considered")
+    environmental_factors: dict[str, Any] = Field(default_factory=dict, description="Environmental factors considered")
     model_version: str = Field(..., description="Version of prediction model used")
 
 
@@ -213,7 +211,7 @@ class CareAdjustmentResponse(BaseModel):
     plant_id: UUID
     current_season: Season
     adjustment_date: datetime
-    care_adjustments: List[CareAdjustment]
+    care_adjustments: list[CareAdjustment]
     seasonal_summary: str = Field(..., description="Summary of seasonal conditions")
     next_review_date: date = Field(..., description="When to review adjustments again")
 
@@ -224,20 +222,20 @@ class CustomPredictionResponse(BaseModel):
     
     prediction_id: str = Field(..., description="Unique prediction identifier")
     plant_species: str
-    location: Dict[str, float]
+    location: dict[str, float]
     prediction_date: datetime
     growth_forecast: GrowthForecast
-    care_recommendations: List[CareAdjustment]
-    risk_assessment: List[RiskFactor]
+    care_recommendations: list[CareAdjustment]
+    risk_assessment: list[RiskFactor]
     confidence_score: float = Field(..., ge=0, le=1, description="Overall prediction confidence")
-    limitations: List[str] = Field(default_factory=list, description="Prediction limitations")
+    limitations: list[str] = Field(default_factory=list, description="Prediction limitations")
 
 
 class SeasonalPredictionListResponse(BaseModel):
     """Response for listing seasonal predictions."""
     model_config = ConfigDict(from_attributes=True)
     
-    predictions: List[SeasonalPrediction]
+    predictions: list[SeasonalPrediction]
     total_count: int
     plant_id: UUID
 
@@ -246,13 +244,13 @@ class SeasonalTransitionResponse(BaseModel):
     """Response for seasonal transition detection."""
     model_config = ConfigDict(from_attributes=True)
     
-    location: Dict[str, float]
+    location: dict[str, float]
     current_season: Season
     next_season: Season
     transition_date: date
     transition_confidence: float = Field(..., ge=0, le=1, description="Transition prediction confidence")
-    environmental_indicators: List[str] = Field(..., description="Environmental signs of transition")
-    plant_care_implications: List[str] = Field(..., description="Care implications of transition")
+    environmental_indicators: list[str] = Field(..., description="Environmental signs of transition")
+    plant_care_implications: list[str] = Field(..., description="Care implications of transition")
 
 
 # Error response schemas
@@ -262,6 +260,6 @@ class SeasonalAIErrorResponse(BaseModel):
     
     error: str = Field(..., description="Error type")
     message: str = Field(..., description="Error message")
-    details: Optional[Dict[str, Any]] = Field(None, description="Additional error details")
+    details: Optional[dict[str, Any]] = Field(None, description="Additional error details")
     timestamp: datetime = Field(..., description="Error timestamp")
     plant_id: Optional[UUID] = Field(None, description="Plant ID if applicable")

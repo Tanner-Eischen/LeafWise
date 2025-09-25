@@ -47,7 +47,8 @@ class PlantSpecies with _$PlantSpecies {
     DateTime? createdAt,
   }) = _PlantSpecies;
 
-  factory PlantSpecies.fromJson(Map<String, dynamic> json) => _$PlantSpeciesFromJson(json);
+  factory PlantSpecies.fromJson(Map<String, dynamic> json) =>
+      _$PlantSpeciesFromJson(json);
 }
 
 /// Plant identification result
@@ -64,7 +65,8 @@ class PlantIdentificationResult with _$PlantIdentificationResult {
     DateTime? identifiedAt,
   }) = _PlantIdentificationResult;
 
-  factory PlantIdentificationResult.fromJson(Map<String, dynamic> json) => _$PlantIdentificationResultFromJson(json);
+  factory PlantIdentificationResult.fromJson(Map<String, dynamic> json) =>
+      _$PlantIdentificationResultFromJson(json);
 }
 
 /// Plant care log entry
@@ -81,17 +83,12 @@ class PlantCareEntry with _$PlantCareEntry {
     DateTime? createdAt,
   }) = _PlantCareEntry;
 
-  factory PlantCareEntry.fromJson(Map<String, dynamic> json) => _$PlantCareEntryFromJson(json);
+  factory PlantCareEntry.fromJson(Map<String, dynamic> json) =>
+      _$PlantCareEntryFromJson(json);
 }
 
 /// Plant health status
-enum PlantHealthStatus {
-  excellent,
-  good,
-  fair,
-  poor,
-  critical,
-}
+enum PlantHealthStatus { excellent, good, fair, poor, critical }
 
 /// Plant care reminder
 @freezed
@@ -108,5 +105,6 @@ class PlantCareReminder with _$PlantCareReminder {
     DateTime? createdAt,
   }) = _PlantCareReminder;
 
-  factory PlantCareReminder.fromJson(Map<String, dynamic> json) => _$PlantCareReminderFromJson(json);
+  factory PlantCareReminder.fromJson(Map<String, dynamic> json) =>
+      _$PlantCareReminderFromJson(json);
 }

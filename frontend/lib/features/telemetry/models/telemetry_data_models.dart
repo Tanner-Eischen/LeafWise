@@ -89,10 +89,31 @@ class GrowthMetrics with _$GrowthMetrics {
     double? healthScore,
     double? chlorophyllIndex,
     @Default([]) List<String> diseaseIndicators,
+    // Additional properties for compatibility
+    double? heightCm,
+    double? widthCm,
+    String? colorAnalysis,
   }) = _GrowthMetrics;
 
   factory GrowthMetrics.fromJson(Map<String, dynamic> json) =>
       _$GrowthMetricsFromJson(json);
+}
+
+/// Telemetry-specific growth metrics data
+@freezed
+class GrowthMetricsData with _$GrowthMetricsData {
+  const factory GrowthMetricsData({
+    double? heightCm,
+    double? widthCm,
+    int? leafCount,
+    double? healthScore,
+    String? colorAnalysis,
+    required DateTime extractedAt,
+    Map<String, dynamic>? additionalMetrics,
+  }) = _GrowthMetricsData;
+
+  factory GrowthMetricsData.fromJson(Map<String, dynamic> json) =>
+      _$GrowthMetricsDataFromJson(json);
 }
 
 /// Growth photo data model
@@ -487,6 +508,12 @@ extension TelemetryDataExtensions on TelemetryData {
       return 'unknown';
     }
   }
+  
+  /// Get PPFD value from light reading data
+  double? get ppfdValue => lightReading?.ppfdValue;
+  
+  /// Check if growth photo is processed
+  bool get isProcessed => growthPhoto?.isProcessed ?? false;
 }
 
 /// Helper functions for parsing backend data

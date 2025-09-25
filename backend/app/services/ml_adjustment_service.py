@@ -18,8 +18,8 @@ from sqlalchemy.future import select
 
 from app.models.user_plant import UserPlant
 from app.models.plant_care_log import PlantCareLog
-from app.models.growth_photos import GrowthPhotos
-from app.models.environmental_data_cache import EnvironmentalDataCache
+from app.models.growth_photo import GrowthPhoto
+from app.models.seasonal_ai import EnvironmentalDataCache
 from app.services.rule_engine_service import CareRecommendation
 
 
@@ -154,15 +154,15 @@ class MLAdjustmentService:
         
         # Get health scores from photos
         health_result = await self.db.execute(
-            select(GrowthPhotos)
+            select(GrowthPhoto)
             .where(
                 and_(
-                    GrowthPhotos.plant_id == plant_id,
-                    GrowthPhotos.captured_at >= cutoff_date,
-                    GrowthPhotos.health_score.isnot(None)
+                    GrowthPhoto.plant_id == plant_id,
+                    GrowthPhoto.captured_at >= cutoff_date,
+                    GrowthPhoto.health_score.isnot(None)
                 )
             )
-            .order_by(GrowthPhotos.captured_at)
+            .order_by(GrowthPhoto.captured_at)
         )
         health_photos = health_result.scalars().all()
         
@@ -188,7 +188,7 @@ class MLAdjustmentService:
     def _calculate_care_outcome(
         self,
         care_log: PlantCareLog,
-        health_photos: List[GrowthPhotos]
+        health_photos: List[GrowthPhoto]
     ) -> float:
         """Calculate outcome score for a care action.
         

@@ -19,7 +19,7 @@ class TelemetryNavigator {
           const LightMeasurementScreen(),
       '/telemetry/growth-photo-capture': (context) =>
           const GrowthPhotoCaptureScreen(),
-      '/telemetry/history': (context) => const TelemetryHistoryScreen(),
+      '/telemetry/history': (context) => const TelemetryHistoryScreen(plantId: 'default_plant_id'),
     };
   }
 

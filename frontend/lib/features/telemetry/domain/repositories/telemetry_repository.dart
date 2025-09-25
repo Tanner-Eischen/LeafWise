@@ -8,6 +8,7 @@ library telemetry_repository;
 import 'dart:async';
 
 import '../../models/telemetry_data_models.dart';
+import '../../data/services/telemetry_api_service.dart';
 
 /// Exception thrown when telemetry repository operations fail
 class TelemetryRepositoryException implements Exception {
@@ -58,6 +59,9 @@ class TelemetryQueryParams {
   final int? offset;
   final String? orderBy;
   final bool? ascending;
+  final String? itemType;
+  final SyncStatus? syncStatus;
+  final String? sessionId;
 
   const TelemetryQueryParams({
     this.userId,
@@ -69,6 +73,9 @@ class TelemetryQueryParams {
     this.offset,
     this.orderBy,
     this.ascending,
+    this.itemType,
+    this.syncStatus,
+    this.sessionId,
   });
 }
 
@@ -161,6 +168,7 @@ class SyncResult {
 
   bool get hasFailures => failedCount > 0;
   bool get isCompleteSuccess => failedCount == 0;
+  bool get hasConflicts => failures.any((failure) => failure.type == TelemetryRepositoryErrorType.conflict);
 }
 
 /// Abstract repository interface for telemetry data operations
@@ -197,6 +205,10 @@ abstract class TelemetryRepository {
   /// Throws [TelemetryRepositoryException] on failure
   Future<TelemetryData> update(TelemetryData data);
 
+  /// Update an existing growth photo data entry
+  /// Throws [TelemetryRepositoryException] on failure
+  Future<GrowthPhotoData> updateGrowthPhoto(GrowthPhotoData data);
+
   /// Update multiple telemetry data entries in a batch operation
   /// Returns [BatchOperationResult] with success/failure details
   Future<BatchOperationResult> updateBatch(BatchOperationParams params);
@@ -232,6 +244,10 @@ abstract class TelemetryRepository {
   /// Emits telemetry data that needs to be synchronized
   Stream<List<TelemetryData>> watchPendingSync();
 
+  /// Stream of sync status changes
+  /// Emits sync status updates (pending, inProgress, synced, failed)
+  Stream<SyncStatus> get syncStatusStream;
+
   // Sync Operations
 
   /// Synchronize telemetry data with remote server
@@ -241,6 +257,10 @@ abstract class TelemetryRepository {
   /// Get telemetry data pending synchronization
   /// Throws [TelemetryRepositoryException] on failure
   Future<List<TelemetryData>> getPendingSync();
+
+  /// Synchronize all pending telemetry data with remote server
+  /// Throws [TelemetryRepositoryException] on failure
+  Future<void> syncPendingData();
 
   /// Mark telemetry data as synced
   /// Updates sync status and server metadata
@@ -266,6 +286,10 @@ abstract class TelemetryRepository {
     TelemetryData remoteData,
     ConflictResolutionStrategy strategy,
   );
+
+  /// Resolve multiple conflicts using conflict resolution data
+  /// Processes a list of conflict resolutions
+  Future<void> resolveConflicts(List<ConflictResolution> resolutions);
 
   // Utility Operations
 

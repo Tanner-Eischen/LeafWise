@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../stories/data/repositories/stories_repository.dart';
+import '../../../stories/data/models/story_model.dart';
 
 /// Story creation screen for editing and publishing captured photos
 /// Allows users to add captions and create stories from camera captures
@@ -27,7 +29,7 @@ class _StoryCreationScreenState extends ConsumerState<StoryCreationScreen> {
     super.dispose();
   }
 
-  /// Publish the story (placeholder implementation)
+  /// Publish the story using the API
   Future<void> _publishStory() async {
     if (widget.imagePath == null) return;
 
@@ -36,8 +38,14 @@ class _StoryCreationScreenState extends ConsumerState<StoryCreationScreen> {
     });
 
     try {
-      // Simulate API call delay
-      await Future.delayed(const Duration(seconds: 2));
+      final storiesRepository = ref.read(storiesRepositoryProvider);
+      
+      // Create the story using the repository method that handles upload internally
+      await storiesRepository.createStory(
+        filePath: widget.imagePath!,
+        mediaType: 'image',
+        caption: _captionController.text.trim().isEmpty ? null : _captionController.text.trim(),
+      );
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -60,9 +68,11 @@ class _StoryCreationScreenState extends ConsumerState<StoryCreationScreen> {
         );
       }
     } finally {
-      setState(() {
-        _isPublishing = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isPublishing = false;
+        });
+      }
     }
   }
 

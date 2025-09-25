@@ -10,6 +10,7 @@ from sqlalchemy.orm import relationship
 from pgvector.sqlalchemy import Vector
 
 from app.core.database import Base
+from app.utils.datetime_utils import utc_now
 
 
 class PlantContentEmbedding(Base):
@@ -21,8 +22,8 @@ class PlantContentEmbedding(Base):
     content_id = Column(PGUUID, nullable=False)  # References to specific content
     embedding = Column(Vector(1536), nullable=False)  # OpenAI embedding dimension
     meta_data = Column(JSONB, nullable=True)  # Additional context (species, difficulty, season, etc.)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
+    updated_at = Column(DateTime, default=utc_now, onupdate=utc_now)
     
     # Index for vector similarity search
     __table_args__ = (
@@ -43,8 +44,8 @@ class UserPreferenceEmbedding(Base):
     embedding = Column(Vector(1536), nullable=False)
     confidence_score = Column(DECIMAL(3, 2), nullable=True)
     meta_data = Column(JSONB, nullable=True)  # Additional preference context
-    last_updated = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    last_updated = Column(DateTime, default=utc_now, onupdate=utc_now)
+    created_at = Column(DateTime, default=utc_now)
     
     # Relationships
     user = relationship("User", back_populates="preference_embeddings")
@@ -73,7 +74,7 @@ class RAGInteraction(Base):
     response_time_ms = Column(Integer, nullable=True)
     confidence_score = Column(DECIMAL(3, 2), nullable=True)
     meta_data = Column(JSONB, nullable=True)  # Additional interaction context
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
     
     # Relationships
     user = relationship("User", back_populates="rag_interactions")
@@ -106,8 +107,8 @@ class PlantKnowledgeBase(Base):
     verified = Column(String(20), default='pending')  # pending, verified, rejected
     view_count = Column(Integer, default=0)
     helpful_count = Column(Integer, default=0)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
+    updated_at = Column(DateTime, default=utc_now, onupdate=utc_now)
     
     # Relationships
     plant_species = relationship("PlantSpecies", back_populates="knowledge_base_entries")
@@ -135,10 +136,10 @@ class SemanticSearchCache(Base):
     filters_hash = Column(String(64), nullable=True)  # Hash of applied filters
     hit_count = Column(Integer, default=0)
     expires_at = Column(DateTime, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    last_accessed = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
+    last_accessed = Column(DateTime, default=utc_now)
     
     __table_args__ = (
         Index('ix_semantic_search_cache_query_hash', 'query_hash'),
         Index('ix_semantic_search_cache_expires', 'expires_at'),
-    ) 
+    )

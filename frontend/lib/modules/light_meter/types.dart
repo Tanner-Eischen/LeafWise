@@ -1,8 +1,6 @@
 // Light meter types and data models
 // This module defines the data structures used for light measurements and telemetry
 
-import 'package:uuid/uuid.dart';
-
 /// Enum representing different light measurement sources
 enum LightSource {
   als('als'),           // Ambient Light Sensor

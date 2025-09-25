@@ -14,7 +14,7 @@ import '../../../core/router/app_router.dart';
 
 // Feature imports
 import '../../auth/providers/auth_provider.dart';
-import '../../telemetry/providers/telemetry_providers.dart';
+import '../../telemetry/providers/telemetry_notifier.dart';
 import '../../telemetry/providers/telemetry_state.dart';
 import '../../telemetry/models/telemetry_data_models.dart';
 
@@ -277,12 +277,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     }
 
     // Combine and sort recent telemetry data
-    final recentItems = <TelemetryData>[];
+    final recentItems = <dynamic>[];
     recentItems.addAll(telemetryState.lightReadings);
     recentItems.addAll(telemetryState.growthPhotos);
     
     // Sort by creation date (most recent first)
-    recentItems.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    recentItems.sort((a, b) {
+      DateTime aDate = a is LightReadingData ? a.createdAt ?? DateTime.now() : 
+                      a is GrowthPhotoData ? a.createdAt ?? DateTime.now() : DateTime.now();
+      DateTime bDate = b is LightReadingData ? b.createdAt ?? DateTime.now() : 
+                      b is GrowthPhotoData ? b.createdAt ?? DateTime.now() : DateTime.now();
+      return bDate.compareTo(aDate);
+    });
     
     // Take only the 5 most recent items
     final displayItems = recentItems.take(5).toList();
@@ -340,7 +346,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     if (item is LightReadingData) {
       icon = Icons.wb_sunny;
       title = 'Light Reading';
-      subtitle = '${item.ppfdValue.toStringAsFixed(1)} PPFD';
+      subtitle = '${item.ppfdValue?.toStringAsFixed(1) ?? 'N/A'} PPFD';
       iconColor = Colors.orange;
     } else if (item is GrowthPhotoData) {
       icon = Icons.camera_alt;

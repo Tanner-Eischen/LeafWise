@@ -11,8 +11,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/services/connectivity_service.dart';
 import '../domain/repositories/telemetry_repository.dart';
+import '../data/services/telemetry_api_service.dart';
 import '../models/telemetry_data_models.dart';
-import '../../plant_identification/models/offline_plant_identification_models.dart';
+import '../../plant_identification/models/offline_plant_identification_models.dart' as plant_id;
 import 'telemetry_state.dart';
 import 'telemetry_providers.dart';
 
@@ -29,7 +30,7 @@ class TelemetryNotifier extends StateNotifier<TelemetryState> {
   final ConnectivityService _connectivityService;
   
   // Stream subscriptions for cleanup
-  StreamSubscription<ConnectivityStatus>? _connectivitySubscription;
+  StreamSubscription<plant_id.ConnectivityStatus>? _connectivitySubscription;
   StreamSubscription<List<TelemetryData>>? _telemetryStreamSubscription;
   StreamSubscription<SyncStatus>? _syncStatusSubscription;
   
@@ -38,8 +39,6 @@ class TelemetryNotifier extends StateNotifier<TelemetryState> {
   
   // Sync configuration
   static const Duration _periodicSyncInterval = Duration(minutes: 5);
-  static const Duration _retryDelay = Duration(seconds: 30);
-  static const int _maxRetries = 3;
   
   TelemetryNotifier(this._repository, this._connectivityService) 
       : super(const TelemetryState()) {
@@ -60,7 +59,7 @@ class TelemetryNotifier extends StateNotifier<TelemetryState> {
       );
       
       // Subscribe to telemetry data stream
-      _telemetryStreamSubscription = _repository.telemetryStream.listen(
+      _telemetryStreamSubscription = _repository.watchTelemetryData(const TelemetryQueryParams()).listen(
         (telemetryData) {
           state = state.copyWith(telemetryData: telemetryData);
         },
@@ -74,10 +73,14 @@ class TelemetryNotifier extends StateNotifier<TelemetryState> {
       // Subscribe to sync status stream
       _syncStatusSubscription = _repository.syncStatusStream.listen(
         (syncStatus) {
+          // Update state based on sync status
+          final isSyncing = syncStatus == SyncStatus.inProgress;
+          final hasFailed = syncStatus == SyncStatus.failed;
+          
           state = state.copyWith(
-            isSyncing: syncStatus.isSyncing,
-            syncError: syncStatus.isError ? syncStatus.message : null,
-            lastSuccessfulSync: syncStatus.isSuccess ? DateTime.now() : state.lastSuccessfulSync,
+            isSyncing: isSyncing,
+            syncError: hasFailed ? 'Some items failed to sync' : null,
+            lastSuccessfulSync: syncStatus == SyncStatus.synced ? DateTime.now() : state.lastSuccessfulSync,
           );
         },
         onError: (error) {
@@ -116,14 +119,62 @@ class TelemetryNotifier extends StateNotifier<TelemetryState> {
     );
     
     try {
-      // Create query params from filter
-      final queryParams = TelemetryQueryParams(
-        plantId: filter?.plantId,
-        startDate: filter?.startDate,
-        endDate: filter?.endDate,
-        limit: filter?.limit ?? 100,
-        offset: filter?.offset ?? 0,
-      );
+      // Create query params based on filter type
+      TelemetryQueryParams queryParams;
+      
+      if (filter != null) {
+        switch (filter) {
+          case TelemetryDataFilter.today:
+            final today = DateTime.now();
+            final startOfDay = DateTime(today.year, today.month, today.day);
+            final endOfDay = startOfDay.add(const Duration(days: 1));
+            queryParams = TelemetryQueryParams(
+              startDate: startOfDay,
+              endDate: endOfDay,
+              limit: 100,
+            );
+            break;
+          case TelemetryDataFilter.thisWeek:
+            final now = DateTime.now();
+            final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+            final startOfWeekDay = DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day);
+            queryParams = TelemetryQueryParams(
+              startDate: startOfWeekDay,
+              limit: 500,
+            );
+            break;
+          case TelemetryDataFilter.thisMonth:
+            final now = DateTime.now();
+            final startOfMonth = DateTime(now.year, now.month, 1);
+            queryParams = TelemetryQueryParams(
+              startDate: startOfMonth,
+              limit: 1000,
+            );
+            break;
+          case TelemetryDataFilter.synced:
+            queryParams = const TelemetryQueryParams(
+              syncStatus: SyncStatus.synced,
+              limit: 100,
+            );
+            break;
+          case TelemetryDataFilter.pending:
+            queryParams = const TelemetryQueryParams(
+              syncStatus: SyncStatus.pending,
+              limit: 100,
+            );
+            break;
+          case TelemetryDataFilter.failed:
+            queryParams = const TelemetryQueryParams(
+              syncStatus: SyncStatus.failed,
+              limit: 100,
+            );
+            break;
+          default:
+            queryParams = const TelemetryQueryParams(limit: 100);
+        }
+      } else {
+        queryParams = const TelemetryQueryParams(limit: 100);
+      }
       
       final telemetryData = await _repository.query(queryParams);
       
@@ -154,7 +205,7 @@ class TelemetryNotifier extends StateNotifier<TelemetryState> {
     );
     
     try {
-      await _repository.addTelemetryData(telemetryData);
+      await _repository.create(telemetryData);
       
       // Update local state immediately for better UX
       final updatedTelemetryData = [telemetryData, ...state.telemetryData];
@@ -179,7 +230,7 @@ class TelemetryNotifier extends StateNotifier<TelemetryState> {
   }
 
   /// Add light reading
-  Future<void> addLightReading(LightReading lightReading) async {
+  Future<void> addLightReading(LightReadingData lightReading) async {
     if (state.isLoadingData) return;
     
     state = state.copyWith(
@@ -188,7 +239,16 @@ class TelemetryNotifier extends StateNotifier<TelemetryState> {
     );
     
     try {
-      await _repository.addLightReading(lightReading);
+      // Create TelemetryData with the light reading
+      final telemetryData = TelemetryData(
+        userId: 'current_user', // TODO: Get from auth service
+        lightReading: lightReading,
+        offlineCreated: true,
+        clientTimestamp: DateTime.now(),
+        createdAt: DateTime.now(),
+      );
+      
+      await _repository.create(telemetryData);
       
       // Update local state immediately
       final updatedLightReadings = [lightReading, ...state.lightReadings];
@@ -213,7 +273,7 @@ class TelemetryNotifier extends StateNotifier<TelemetryState> {
   }
 
   /// Add growth photo
-  Future<void> addGrowthPhoto(GrowthPhoto growthPhoto) async {
+  Future<void> addGrowthPhoto(GrowthPhotoData growthPhoto) async {
     if (state.isLoadingData) return;
     
     state = state.copyWith(
@@ -222,7 +282,20 @@ class TelemetryNotifier extends StateNotifier<TelemetryState> {
     );
     
     try {
-      await _repository.addGrowthPhoto(growthPhoto);
+      // Create TelemetryData with the growth photo
+      final telemetryData = TelemetryData(
+        id: '', // Will be generated by repository
+        userId: '', // Should be set from current user context
+        plantId: growthPhoto.plantId,
+        growthPhoto: growthPhoto,
+        sessionId: growthPhoto.telemetrySessionId,
+        offlineCreated: true,
+        clientTimestamp: DateTime.now(),
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+      
+      await _repository.create(telemetryData);
       
       // Update local state immediately
       final updatedGrowthPhotos = [growthPhoto, ...state.growthPhotos];
@@ -243,6 +316,24 @@ class TelemetryNotifier extends StateNotifier<TelemetryState> {
         isLoadingData: false,
         error: 'Failed to add growth photo: $e',
       );
+    }
+  }
+
+  /// Delete telemetry data by ID
+  Future<void> deleteTelemetryData(String id) async {
+    try {
+      final success = await _repository.delete(id);
+      if (!success) {
+        throw Exception('Failed to delete telemetry data: item not found');
+      }
+      
+      // Refresh data to update UI
+      await loadTelemetryData();
+    } catch (e) {
+      state = state.copyWith(
+        error: 'Failed to delete telemetry data: $e',
+      );
+      rethrow;
     }
   }
 
@@ -327,9 +418,9 @@ class TelemetryNotifier extends StateNotifier<TelemetryState> {
   }
 
   /// Handle connectivity changes
-  void _handleConnectivityChange(ConnectivityStatus connectivityStatus) {
+  void _handleConnectivityChange(plant_id.ConnectivityStatus connectivityStatus) {
     final wasOffline = state.isOfflineMode;
-    final isNowOnline = connectivityStatus.isOnline;
+    final isNowOnline = connectivityStatus != const plant_id.ConnectivityStatus.offline();
     
     state = state.copyWith(isOfflineMode: !isNowOnline);
     
@@ -376,7 +467,7 @@ class TelemetryNotifier extends StateNotifier<TelemetryState> {
   Future<void> refresh() async {
     await loadTelemetryData();
     
-    if (state.isOnline) {
+    if (!state.isOfflineMode) {
       await syncPendingData();
     }
   }
@@ -390,8 +481,28 @@ class TelemetryNotifier extends StateNotifier<TelemetryState> {
       pendingSyncCount: state.pendingSyncCount,
       failedSyncCount: state.failedSyncCount,
       lastSuccessfulSync: state.lastSuccessfulSync,
-      isOnline: state.isOnline,
+      isOnline: !state.isOfflineMode,
     );
+  }
+
+  /// Update an existing growth photo with new data
+  Future<void> updateGrowthPhoto(GrowthPhotoData updatedPhoto) async {
+    try {
+      // Update the photo in the repository
+      await _repository.updateGrowthPhoto(updatedPhoto);
+      
+      // Update the state
+      final updatedPhotos = state.growthPhotos.map((photo) {
+        return photo.id == updatedPhoto.id ? updatedPhoto : photo;
+      }).toList();
+      
+      state = state.copyWith(
+        growthPhotos: updatedPhotos,
+      );
+    } catch (e) {
+      // Handle error - could add error state management here
+      rethrow;
+    }
   }
 
   @override

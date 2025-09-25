@@ -17,6 +17,7 @@ class AuthTextField extends StatelessWidget {
   final int? minLines;
   final FocusNode? focusNode;
   final bool autofocus;
+  final Iterable<String>? autofillHints;
 
   const AuthTextField({
     super.key,
@@ -36,6 +37,7 @@ class AuthTextField extends StatelessWidget {
     this.minLines,
     this.focusNode,
     this.autofocus = false,
+    this.autofillHints,
   });
 
   @override
@@ -66,6 +68,7 @@ class AuthTextField extends StatelessWidget {
           minLines: minLines,
           focusNode: focusNode,
           autofocus: autofocus,
+          autofillHints: autofillHints,
           style: theme.textTheme.bodyLarge?.copyWith(
             color: theme.colorScheme.onSurface,
           ),

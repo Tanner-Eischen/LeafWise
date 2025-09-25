@@ -13,6 +13,7 @@ from sqlalchemy.dialects.postgresql import UUID as PostgresUUID, JSONB, DATERANG
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base
+from app.utils.datetime_utils import utc_now
 
 
 class SeasonalPrediction(Base):
@@ -22,7 +23,7 @@ class SeasonalPrediction(Base):
     
     id = Column(PostgresUUID(as_uuid=True), primary_key=True, default=uuid4)
     plant_id = Column(PostgresUUID(as_uuid=True), ForeignKey("user_plants.id"), nullable=False)
-    prediction_date = Column(DateTime, nullable=False, default=datetime.utcnow)
+    prediction_date = Column(DateTime, nullable=False, default=utc_now)
     prediction_period_start = Column(Date, nullable=False)
     prediction_period_end = Column(Date, nullable=False)
     
@@ -38,8 +39,8 @@ class SeasonalPrediction(Base):
     environmental_factors = Column(JSONB, nullable=True)  # Environmental conditions used
     
     # Timestamps
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now, nullable=False)
+    updated_at = Column(DateTime, default=utc_now, onupdate=utc_now)
     
     # Relationships
     plant = relationship("UserPlant", back_populates="seasonal_predictions")
@@ -65,10 +66,10 @@ class EnvironmentalDataCache(Base):
     # Cache metadata
     expires_at = Column(DateTime, nullable=False)
     hit_count = Column(Integer, default=0)
-    last_accessed = Column(DateTime, default=datetime.utcnow)
+    last_accessed = Column(DateTime, default=utc_now)
     
     # Timestamps
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=utc_now, nullable=False)
     
     def __repr__(self) -> str:
         return f"<EnvironmentalDataCache(id={self.id}, type={self.data_type}, location={self.location_hash})>"
@@ -95,7 +96,7 @@ class SeasonalTransition(Base):
     environmental_indicators = Column(JSONB, nullable=True)
     
     # Timestamps
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=utc_now, nullable=False)
     
     def __repr__(self) -> str:
         return f"<SeasonalTransition(id={self.id}, type={self.transition_type}, date={self.transition_date})>"

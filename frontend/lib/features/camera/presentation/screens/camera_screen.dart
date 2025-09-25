@@ -143,20 +143,9 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
       return;
     }
 
-    // Handle other capture scenarios
+    // Navigate to story creation with the captured image
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Photo captured successfully!'),
-          backgroundColor: Colors.green,
-          action: SnackBarAction(
-            label: 'View',
-            onPressed: () {
-              // TODO: Implement view action
-            },
-          ),
-        ),
-      );
+      context.pushNamed('story-creation', extra: {'imagePath': image.path});
     }
   }
 

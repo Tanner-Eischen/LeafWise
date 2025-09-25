@@ -9,35 +9,41 @@ class User with _$User {
     required String id,
     required String email,
     required String username,
-    String? displayName,
+    @JsonKey(name: 'display_name') String? displayName,
     String? bio,
-    String? profilePictureUrl,
+    @JsonKey(name: 'profile_picture_url') String? profilePictureUrl,
     String? location,
-    DateTime? dateOfBirth,
-    @Default(false) bool isPrivate,
-    @Default(0) int followersCount,
-    @Default(0) int followingCount,
-    @Default(0) int postsCount,
-    @Default(true) bool isActive,
-    @Default(false) bool isVerified,
-    DateTime? lastSeen,
-    required DateTime createdAt,
-    DateTime? updatedAt,
+    @JsonKey(name: 'date_of_birth') DateTime? dateOfBirth,
+    @JsonKey(name: 'is_private') @Default(false) bool isPrivate,
+    @JsonKey(name: 'followers_count') @Default(0) int followersCount,
+    @JsonKey(name: 'following_count') @Default(0) int followingCount,
+    @JsonKey(name: 'posts_count') @Default(0) int postsCount,
+    @JsonKey(name: 'is_active') @Default(true) bool isActive,
+    @JsonKey(name: 'is_verified') @Default(false) bool isVerified,
+    @JsonKey(name: 'last_seen') DateTime? lastSeen,
+    @JsonKey(name: 'created_at') required DateTime createdAt,
+    @JsonKey(name: 'updated_at') DateTime? updatedAt,
     
     // Role-based access control fields
-    @Default(false) bool isAdmin,
-    @Default(false) bool isExpert,
-    @Default(false) bool isModerator,
-    @Default(false) bool isSuperuser,
-    String? adminPermissions, // JSON string of admin permissions
-    String? expertSpecialties, // JSON string of expert specialties
+    @JsonKey(name: 'is_admin') @Default(false) bool isAdmin,
+    @JsonKey(name: 'is_expert') @Default(false) bool isExpert,
+    @JsonKey(name: 'is_moderator') @Default(false) bool isModerator,
+    @JsonKey(name: 'is_superuser') @Default(false) bool isSuperuser,
+    @JsonKey(name: 'has_telemetry_access') @Default(false) bool hasTelemetryAccess,
+    @JsonKey(name: 'admin_permissions') String? adminPermissions, // JSON string of admin permissions
+    @JsonKey(name: 'expert_specialties') String? expertSpecialties, // JSON string of expert specialties
     
     // Plant-specific fields for Phase 2
-    @Default([]) List<String> plantInterests,
-    String? experienceLevel, // 'beginner', 'intermediate', 'expert'
-    @Default([]) List<String> favoriteGenres,
-    String? gardenType, // 'indoor', 'outdoor', 'balcony', 'greenhouse'
+    @JsonKey(name: 'plant_interests') @Default([]) List<String> plantInterests,
+    @JsonKey(name: 'experience_level') String? experienceLevel, // 'beginner', 'intermediate', 'expert'
+    @JsonKey(name: 'favorite_genres') @Default([]) List<String> favoriteGenres,
+    @JsonKey(name: 'garden_type') String? gardenType, // 'indoor', 'outdoor', 'balcony', 'greenhouse'
     String? climate, // 'tropical', 'temperate', 'arid', 'continental'
+    
+    // Additional backend fields that might be missing
+    @JsonKey(name: 'gardening_experience') String? gardeningExperience,
+    @JsonKey(name: 'favorite_plants') String? favoritePlants,
+    @JsonKey(name: 'allow_plant_id_requests') @Default(true) bool allowPlantIdRequests,
   }) = _User;
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);

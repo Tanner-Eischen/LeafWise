@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../stories/data/repositories/stories_repository.dart';
+import '../../../stories/data/models/story_model.dart';
 
 /// Story viewer screen for viewing individual stories
 /// Displays stories with full-screen media and interaction options
@@ -23,6 +25,9 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
   late AnimationController _progressController;
   bool _isPaused = false;
   bool _showUI = true;
+  Story? _story;
+  bool _isLoading = true;
+  String? _error;
 
   @override
   void initState() {
@@ -32,13 +37,49 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
       vsync: this,
     );
     
-    _startStoryProgress();
+    _loadStory();
   }
 
   @override
   void dispose() {
     _progressController.dispose();
     super.dispose();
+  }
+
+  /// Load story data from API
+  Future<void> _loadStory() async {
+    try {
+      final storiesRepository = ref.read(storiesRepositoryProvider);
+      
+      // Mark story as viewed - using correct parameter signature
+      await storiesRepository.viewStory(widget.storyId);
+      
+      // For now, we'll create a mock story since we don't have a get single story endpoint
+      // In a real implementation, you'd fetch the story details here
+      setState(() {
+        _story = Story(
+          id: widget.storyId,
+          userId: widget.userId ?? 'user1',
+          username: 'Alice Green',
+          caption: 'My beautiful succulent garden is thriving! 🌵✨ #PlantLife #SucculentLove',
+          mediaUrl: 'https://example.com/story-image.jpg',
+          mediaType: 'image',
+          createdAt: DateTime.now().subtract(const Duration(hours: 2)),
+          expiresAt: DateTime.now().add(const Duration(hours: 22)),
+          viewCount: 24,
+          isViewed: false,
+          isOwner: widget.userId == 'current_user_id', // This should come from auth
+        );
+        _isLoading = false;
+      });
+      
+      _startStoryProgress();
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+    }
   }
 
   /// Start the story progress animation
@@ -76,21 +117,56 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
   }
 
   /// Mock story data
-  MockStory get _mockStory => MockStory(
-    id: widget.storyId,
-    userId: widget.userId ?? 'user1',
-    userName: 'Alice Green',
-    caption: 'My beautiful succulent garden is thriving! 🌵✨ #PlantLife #SucculentLove',
-    imageUrl: 'https://example.com/story-image.jpg', // Placeholder
-    timestamp: DateTime.now().subtract(const Duration(hours: 2)),
-    viewCount: 24,
-    isLiked: false,
-  );
+  Story? get _currentStory => _story;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final story = _mockStory;
+    
+    if (_isLoading) {
+      return const Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: CircularProgressIndicator(color: Colors.white),
+        ),
+      );
+    }
+    
+    if (_error != null) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.error_outline,
+                color: Colors.white,
+                size: 64,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Failed to load story',
+                style: theme.textTheme.headlineSmall?.copyWith(color: Colors.white),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                _error!,
+                style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white70),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () => context.pop(),
+                child: const Text('Go Back'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+    
+    final story = _currentStory!;
     
     return Scaffold(
       backgroundColor: Colors.black,
@@ -196,16 +272,17 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
     );
   }
 
-  Widget _buildHeader(MockStory story, ThemeData theme) {
+  Widget _buildHeader(Story story, ThemeData theme) {
     return Row(
       children: [
         CircleAvatar(
-          radius: 20,
+          radius: 16,
           backgroundColor: Colors.white,
           child: Text(
-            story.userName.split(' ').map((name) => name[0]).join(),
+            story.username.split(' ').map((name) => name[0]).join(),
             style: TextStyle(
               color: theme.colorScheme.primary,
+              fontSize: 12,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -216,15 +293,15 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                story.userName,
+                story.username,
                 style: const TextStyle(
                   color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
               Text(
-                _formatTimestamp(story.timestamp),
+                _formatTimestamp(story.createdAt),
                 style: const TextStyle(
                   color: Colors.white70,
                   fontSize: 12,
@@ -235,21 +312,18 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
         ),
         IconButton(
           onPressed: () => context.pop(),
-          icon: const Icon(
-            Icons.close,
-            color: Colors.white,
-          ),
+          icon: const Icon(Icons.close, color: Colors.white),
         ),
       ],
     );
   }
 
-  Widget _buildFooter(MockStory story, ThemeData theme) {
+  Widget _buildFooter(Story story, ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Caption
-        if (story.caption.isNotEmpty)
+        if (story.caption != null && story.caption!.isNotEmpty)
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -257,7 +331,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              story.caption,
+              story.caption!,
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 14,
@@ -286,16 +360,16 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
                   color: const Color.fromRGBO(0, 0, 0, 0.5),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: Row(
+                child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
-                      story.isLiked ? Icons.favorite : Icons.favorite_border,
-                      color: story.isLiked ? Colors.red : Colors.white,
+                      Icons.favorite_border,
+                      color: Colors.white,
                       size: 20,
                     ),
-                    const SizedBox(width: 4),
-                    const Text(
+                    SizedBox(width: 4),
+                    Text(
                       'Like',
                       style: TextStyle(
                         color: Colors.white,
@@ -375,7 +449,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
     );
   }
 
-  void _showReplyBottomSheet(BuildContext context, MockStory story) {
+  void _showReplyBottomSheet(BuildContext context, Story story) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -398,7 +472,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
             ),
             const SizedBox(height: 16),
             Text(
-              'Reply to ${story.userName}',
+              'Reply to ${story.username}',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 16),
@@ -443,27 +517,4 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
       return '${difference.inDays}d ago';
     }
   }
-}
-
-/// Mock story model for demonstration
-class MockStory {
-  final String id;
-  final String userId;
-  final String userName;
-  final String caption;
-  final String imageUrl;
-  final DateTime timestamp;
-  final int viewCount;
-  final bool isLiked;
-
-  MockStory({
-    required this.id,
-    required this.userId,
-    required this.userName,
-    required this.caption,
-    required this.imageUrl,
-    required this.timestamp,
-    required this.viewCount,
-    required this.isLiked,
-  });
 }

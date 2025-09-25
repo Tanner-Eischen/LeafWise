@@ -42,7 +42,7 @@ class BreadcrumbNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final defaultActiveColor = activeColor ?? theme.primaryColor;
-    final defaultInactiveColor = inactiveColor ?? theme.textTheme.bodyMedium?.color?.withOpacity(0.6);
+    final defaultInactiveColor = inactiveColor ?? theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.6);
     final defaultSeparator = separator ?? Icon(
       Icons.chevron_right,
       size: 16,
@@ -197,8 +197,8 @@ class BreadcrumbHelper {
           isActive: true,
           icon: Icons.sensors,
         ));
-      } else if (telemetryId != null) {
-        breadcrumbs.add(const BreadcrumbItem(
+      } else if (telemetryId != null && plantId != null) {
+        breadcrumbs.add( BreadcrumbItem(
           label: 'Telemetry',
           route: '/home/plants/$plantId/telemetry',
           icon: Icons.sensors,

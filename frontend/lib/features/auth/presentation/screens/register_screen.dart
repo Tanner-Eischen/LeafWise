@@ -199,6 +199,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   prefixIcon: Icons.email_outlined,
                   validator: _validateEmail,
                   textInputAction: TextInputAction.next,
+                  autofillHints: const [AutofillHints.email],
                 ),
 
                 const SizedBox(height: 16),
@@ -211,6 +212,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   prefixIcon: Icons.person_outlined,
                   validator: _validateUsername,
                   textInputAction: TextInputAction.next,
+                  autofillHints: const [AutofillHints.username],
                 ),
 
                 const SizedBox(height: 16),
@@ -222,6 +224,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   hintText: 'Enter your display name',
                   prefixIcon: Icons.badge_outlined,
                   textInputAction: TextInputAction.next,
+                  autofillHints: const [AutofillHints.name],
                 ),
 
                 const SizedBox(height: 16),
@@ -233,6 +236,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   hintText: 'Create a password',
                   obscureText: _obscurePassword,
                   prefixIcon: Icons.lock_outlined,
+                  autofillHints: const [AutofillHints.newPassword],
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscurePassword
@@ -258,6 +262,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   hintText: 'Confirm your password',
                   obscureText: _obscureConfirmPassword,
                   prefixIcon: Icons.lock_outlined,
+                  autofillHints: const [AutofillHints.newPassword],
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscureConfirmPassword

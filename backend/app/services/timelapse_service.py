@@ -19,7 +19,8 @@ from sqlalchemy import select, and_, desc, func
 from sqlalchemy.orm import selectinload
 
 from app.core.database import get_db
-from app.models.timelapse import TimelapseSession, GrowthPhoto, GrowthMilestone
+from app.models.timelapse import TimelapseSession, GrowthMilestone
+from app.models.growth_photo import GrowthPhoto
 from app.models.user_plant import UserPlant
 from app.schemas.timelapse import (
     TimelapseSessionCreate,

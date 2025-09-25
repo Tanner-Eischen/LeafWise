@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:leafwise/features/plant_identification/presentation/screens/plant_identification_screen.dart';
 import 'package:leafwise/features/plant_care/presentation/screens/plant_care_dashboard_screen.dart';
 import 'package:leafwise/features/plant_community/presentation/screens/plant_community_screen.dart';
@@ -98,7 +99,7 @@ class PlantFeaturesGridScreen extends ConsumerWidget {
                 crossAxisCount: 2,
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
-                childAspectRatio: 1.1,
+                childAspectRatio: 1.0,
                 children: [
                   _buildFeatureCard(
                     context,
@@ -106,7 +107,7 @@ class PlantFeaturesGridScreen extends ConsumerWidget {
                     subtitle: 'Identify any plant with AI',
                     icon: Icons.camera_alt,
                     color: Colors.green,
-                    onTap: () => _navigateToIdentification(context),
+                    onTap: () => context.push('/home/plants/identify'),
                   ),
                   _buildFeatureCard(
                     context,
@@ -114,7 +115,7 @@ class PlantFeaturesGridScreen extends ConsumerWidget {
                     subtitle: 'Track care & reminders',
                     icon: Icons.eco,
                     color: Colors.blue,
-                    onTap: () => _navigateToPlantCare(context),
+                    onTap: () => context.push('/home/plants/care'),
                   ),
                   _buildFeatureCard(
                     context,
@@ -122,7 +123,7 @@ class PlantFeaturesGridScreen extends ConsumerWidget {
                     subtitle: 'Ask plant experts',
                     icon: Icons.help_outline,
                     color: Colors.orange,
-                    onTap: () => _navigateToQuestions(context),
+                    onTap: () => context.push('/home/plants/community/questions'),
                   ),
                   _buildFeatureCard(
                     context,
@@ -130,7 +131,23 @@ class PlantFeaturesGridScreen extends ConsumerWidget {
                     subtitle: 'Buy, sell & trade plants',
                     icon: Icons.swap_horiz,
                     color: Colors.purple,
-                    onTap: () => _navigateToTrades(context),
+                    onTap: () => context.push('/home/plants/community/trades'),
+                  ),
+                  _buildFeatureCard(
+                    context,
+                    title: 'Care Plans',
+                    subtitle: 'AI-generated care guides',
+                    icon: Icons.schedule,
+                    color: Colors.teal,
+                    onTap: () => context.push('/home/plants/care-plans'),
+                  ),
+                  _buildFeatureCard(
+                    context,
+                    title: 'Plant Search',
+                    subtitle: 'Browse plant database',
+                    icon: Icons.search,
+                    color: Colors.indigo,
+                    onTap: () => context.push('/home/plants/identify/search'),
                   ),
                 ],
               ),
@@ -143,7 +160,7 @@ class PlantFeaturesGridScreen extends ConsumerWidget {
               children: [
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: () => _navigateToIdentification(context),
+                    onPressed: () => context.push('/home/plants/identify'),
                     icon: const Icon(Icons.camera_alt),
                     label: const Text('Identify Plant'),
                     style: ElevatedButton.styleFrom(
@@ -154,7 +171,7 @@ class PlantFeaturesGridScreen extends ConsumerWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: OutlinedButton.icon(
-                    onPressed: () => _navigateToPlantCare(context),
+                    onPressed: () => context.push('/home/plants/care/add'),
                     icon: const Icon(Icons.add),
                     label: const Text('Add Plant'),
                     style: OutlinedButton.styleFrom(

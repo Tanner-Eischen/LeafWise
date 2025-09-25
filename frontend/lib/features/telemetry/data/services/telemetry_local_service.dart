@@ -793,56 +793,67 @@ class TelemetryLocalService {
       print('Failed to cleanup old data: $e');
     }
   }
-}
 
-/// Statistics for telemetry local storage
-class TelemetryLocalStats {
-  final int totalItems;
-  final int syncedItems;
-  final int pendingItems;
-  final int failedItems;
-
-  const TelemetryLocalStats({
-    required this.totalItems,
-    required this.syncedItems,
-    required this.pendingItems,
-    required this.failedItems,
-  });
-
-  /// Get sync completion percentage
-  double get syncPercentage {
-    if (totalItems == 0) return 0.0;
-    return (syncedItems / totalItems) * 100;
-  }
-
-  /// Check if all items are synced
-  bool get isFullySynced => totalItems > 0 && syncedItems == totalItems;
-
-  /// Get human-readable summary
-  String get summary {
-    return 'Total: $totalItems, Synced: $syncedItems, Pending: $pendingItems, Failed: $failedItems';
-  }
-}
-
-  /// Decrypt telemetry data from storage
-  Future<TelemetryData> _decryptTelemetryData(String encryptedData) async {
+  /// Get count of pending sync items
+  /// Returns the number of items that need to be synced to the server
+  Future<int> getPendingSyncCount() async {
     try {
-      // Decrypt and parse JSON data
-      final jsonData = jsonDecode(encryptedData) as Map<String, dynamic>;
-      return TelemetryData.fromJson(jsonData);
+      final db = await _database.database;
+      
+      final result = await db.rawQuery('''
+        SELECT COUNT(*) as count FROM ${TelemetryDatabaseConfig.telemetrySyncStatusTable}
+        WHERE sync_status IN ('pending', 'failed', 'retry')
+      ''');
+      
+      return result.first['count'] as int? ?? 0;
     } catch (e) {
-      throw TelemetryLocalException('Failed to decrypt telemetry data: $e');
+      throw TelemetryLocalException('Failed to get pending sync count: $e');
     }
   }
 
-  /// Encrypt telemetry data for storage
-  Future<String> _encryptTelemetryData(TelemetryData data) async {
+  /// Clear all local telemetry data
+  /// Removes all telemetry data and sync status from local storage
+  Future<void> clearLocalData() async {
+    try {
+      final db = await _database.database;
+      
+      await db.transaction((txn) async {
+        // Clear sync status table first (due to foreign key constraint)
+        await txn.delete(TelemetryDatabaseConfig.telemetrySyncStatusTable);
+        
+        // Clear telemetry data table
+        await txn.delete(TelemetryDatabaseConfig.telemetryDataTable);
+      });
+      
+      // Clear sync metadata
+      await _clearSyncMetadata();
+      
+      _logDebug('Cleared all local telemetry data');
+    } catch (e) {
+      _logError('Failed to clear local data', e);
+      throw TelemetryLocalException('Failed to clear local data: $e');
+    }
+  }
+
+  /// Encrypt telemetry data for secure storage
+  String _encryptTelemetryData(TelemetryData data) {
     try {
       // Convert data to JSON and encrypt if needed
       final jsonData = data.toJson();
       return jsonEncode(jsonData);
     } catch (e) {
       throw TelemetryLocalException('Failed to encrypt telemetry data: $e');
+    }
+  }
+
+  /// Decrypt telemetry data from secure storage
+  Future<TelemetryData> _decryptTelemetryData(String encryptedData) async {
+    try {
+      // Decrypt and convert JSON back to TelemetryData
+      final jsonData = jsonDecode(encryptedData) as Map<String, dynamic>;
+      return TelemetryData.fromJson(jsonData);
+    } catch (e) {
+      throw TelemetryLocalException('Failed to decrypt telemetry data: $e');
     }
   }
 
@@ -868,75 +879,60 @@ class TelemetryLocalStats {
   }
 
   /// Get count of pending sync items
-  Future<int> getPendingSyncCount() async {
+  Future<int> _getPendingSyncCount() async {
     try {
       final db = await _database.database;
-      final result = await db.rawQuery('''
-        SELECT COUNT(*) as count FROM ${TelemetryDatabaseConfig.telemetrySyncStatusTable}
-        WHERE sync_status IN ('pending', 'retry')
-      ''');
-      return result.first['count'] as int? ?? 0;
+      final result = await db.rawQuery(
+        'SELECT COUNT(*) as count FROM ${TelemetryDatabaseConfig.telemetrySyncStatusTable} WHERE sync_status = ?',
+        ['pending']
+      );
+      return Sqflite.firstIntValue(result) ?? 0;
     } catch (e) {
       throw TelemetryLocalException('Failed to get pending sync count: $e');
     }
   }
 
-  /// Get count of failed sync items
-  Future<int> getFailedSyncCount() async {
+  /// Get failed sync items count
+  Future<int> _getFailedSyncCount() async {
     try {
       final db = await _database.database;
-      final result = await db.rawQuery('''
-        SELECT COUNT(*) as count FROM ${TelemetryDatabaseConfig.telemetrySyncStatusTable}
-        WHERE sync_status = 'failed'
-      ''');
-      return result.first['count'] as int? ?? 0;
+      final result = await db.rawQuery(
+        'SELECT COUNT(*) as count FROM ${TelemetryDatabaseConfig.telemetrySyncStatusTable} WHERE sync_status = ?',
+        ['failed']
+      );
+      return Sqflite.firstIntValue(result) ?? 0;
     } catch (e) {
       throw TelemetryLocalException('Failed to get failed sync count: $e');
     }
   }
 
-  /// Get last sync time
-  Future<DateTime?> getLastSyncTime() async {
+  /// Get synced items count
+  Future<int> _getSyncedCount() async {
     try {
       final db = await _database.database;
-      final result = await db.rawQuery('''
-        SELECT MAX(last_sync_attempt) as last_sync FROM ${TelemetryDatabaseConfig.telemetrySyncStatusTable}
-        WHERE sync_status = 'synced'
-      ''');
-      final lastSyncMs = result.first['last_sync'] as int?;
-      return lastSyncMs != null ? DateTime.fromMillisecondsSinceEpoch(lastSyncMs) : null;
+      final result = await db.rawQuery(
+        'SELECT COUNT(*) as count FROM ${TelemetryDatabaseConfig.telemetrySyncStatusTable} WHERE sync_status = ?',
+        ['synced']
+      );
+      return Sqflite.firstIntValue(result) ?? 0;
     } catch (e) {
-      throw TelemetryLocalException('Failed to get last sync time: $e');
+      throw TelemetryLocalException('Failed to get synced count: $e');
     }
   }
 
-  /// Clear all local telemetry data
-  /// WARNING: This will permanently delete all local telemetry data
-  Future<void> clearLocalData() async {
+  /// Clear sync metadata
+  Future<void> _clearSyncMetadata() async {
     try {
-      final db = await _database.database;
-      
-      await db.transaction((txn) async {
-        // Delete all sync status entries first (due to foreign key constraint)
-        await txn.delete(TelemetryDatabaseConfig.telemetrySyncStatusTable);
-        
-        // Clear all telemetry data
-        await txn.delete(TelemetryDatabaseConfig.telemetryDataTable);
-      });
-      
-      // Clear sync metadata
       await _storageService.remove(_syncMetadataKey);
       await _storageService.remove(_offlineQueueKey);
-      
     } catch (e) {
-      throw TelemetryLocalException('Failed to clear local data: $e');
+      throw TelemetryLocalException('Failed to clear sync metadata: $e');
     }
   }
 
-  /// Generate unique ID for telemetry data
+  /// Generate unique ID for telemetry items
   String _generateId() {
-    return DateTime.now().millisecondsSinceEpoch.toString() + 
-           (1000 + (DateTime.now().microsecond % 1000)).toString();
+    return DateTime.now().millisecondsSinceEpoch.toString();
   }
 
   /// Log debug information (replace with proper logging in production)
@@ -951,6 +947,38 @@ class TelemetryLocalStats {
     // TODO: Replace with proper logging framework
     // ignore: avoid_print
     print('[TelemetryLocalService] ERROR: $message${error != null ? ' - $error' : ''}');
+  }
+}
+
+/// Statistics for telemetry local storage
+class TelemetryLocalStats {
+  final int totalItems;
+  final int syncedItems;
+  final int pendingItems;
+  final int failedItems;
+
+  const TelemetryLocalStats({
+    required this.totalItems,
+    required this.syncedItems,
+    required this.pendingItems,
+    required this.failedItems,
+  });
+
+  /// Calculate sync completion percentage
+  double get syncPercentage {
+    if (totalItems == 0) return 0.0;
+    return (syncedItems / totalItems) * 100;
+  }
+
+  /// Check if all items are synced
+  bool get isFullySynced => totalItems > 0 && syncedItems == totalItems;
+
+  /// Check if there are any failed items
+  bool get hasFailures => failedItems > 0;
+
+  /// Get human-readable summary
+  String get summary {
+    return 'Total: $totalItems, Synced: $syncedItems, Pending: $pendingItems, Failed: $failedItems';
   }
 }
 

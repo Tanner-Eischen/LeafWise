@@ -4,6 +4,7 @@ import 'package:leafwise/core/theme/app_theme.dart';
 import 'package:leafwise/core/router/app_router.dart';
 import 'package:leafwise/core/constants/app_constants.dart';
 import 'package:leafwise/core/services/connectivity_service.dart';
+import 'package:leafwise/core/services/preferences_service.dart';
 import 'package:leafwise/features/plant_identification/providers/enhanced_plant_identification_provider.dart';
 
 void main() async {
@@ -19,7 +20,11 @@ void main() async {
 /// Initialize offline services and dependencies
 Future<void> _initializeOfflineServices() async {
   try {
-    // Note: Services will be initialized through their providers when first accessed
+    // Initialize preferences service for login suggestions and persistence
+    await PreferencesService.init();
+    print('✅ PreferencesService initialized');
+    
+    // Note: Other services will be initialized through their providers when first accessed
     // This ensures proper dependency injection and lifecycle management
     print('🚀 Offline services will be initialized on first access');
   } catch (e) {

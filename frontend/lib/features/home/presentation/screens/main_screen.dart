@@ -4,6 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:leafwise/core/router/app_router.dart';
 import 'package:leafwise/features/auth/providers/auth_provider.dart';
 import 'package:leafwise/features/home/presentation/screens/home_screen.dart';
+import 'package:leafwise/features/camera/presentation/screens/camera_screen.dart';
+import 'package:leafwise/features/chat/presentation/screens/chat_screen.dart';
+import 'package:leafwise/features/stories/presentation/screens/stories_screen.dart';
+import 'package:leafwise/features/profile/presentation/screens/profile_screen.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
@@ -78,10 +82,14 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         onPageChanged: _onPageChanged,
         children: [
           const HomeScreen(), // Home screen
-          _buildCameraPlaceholder(context, theme),
-          _buildChatPlaceholder(context, theme),
-          _buildStoriesPlaceholder(context, theme),
-          _buildProfilePlaceholder(context, theme, authState.user?.displayName),
+          const CameraScreen(
+            selectedPlantId: null,
+            selectedPlantType: null,
+            userLocation: null,
+          ), // Camera screen
+          const ChatScreen(), // Chat screen
+          const StoriesScreen(), // Stories screen - now using actual implementation
+          const ProfileScreen(), // Profile screen - now using actual implementation
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -119,155 +127,6 @@ class _MainScreenState extends ConsumerState<MainScreen> {
             label: 'Profile',
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildCameraPlaceholder(BuildContext context, ThemeData theme) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Camera'),
-        backgroundColor: theme.colorScheme.surface,
-        elevation: 0,
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.camera_alt_outlined,
-              size: 64,
-              color: theme.colorScheme.primary,
-            ),
-            const SizedBox(height: 16),
-            Text('Camera Feature', style: theme.textTheme.headlineSmall),
-            const SizedBox(height: 8),
-            Text(
-              'Take photos and create stories',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildChatPlaceholder(BuildContext context, ThemeData theme) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Messages'),
-        backgroundColor: theme.colorScheme.surface,
-        elevation: 0,
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.chat_bubble_outline,
-              size: 64,
-              color: theme.colorScheme.primary,
-            ),
-            const SizedBox(height: 16),
-            Text('Messages', style: theme.textTheme.headlineSmall),
-            const SizedBox(height: 8),
-            Text(
-              'Chat with your plant friends',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStoriesPlaceholder(BuildContext context, ThemeData theme) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Stories'),
-        backgroundColor: theme.colorScheme.surface,
-        elevation: 0,
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.auto_stories_outlined,
-              size: 64,
-              color: theme.colorScheme.primary,
-            ),
-            const SizedBox(height: 16),
-            Text('Stories', style: theme.textTheme.headlineSmall),
-            const SizedBox(height: 8),
-            Text(
-              'Share your plant moments',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProfilePlaceholder(
-    BuildContext context,
-    ThemeData theme,
-    String? userName,
-  ) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-        backgroundColor: theme.colorScheme.surface,
-        elevation: 0,
-        actions: [
-          IconButton(
-            onPressed: _handleLogout,
-            icon: const Icon(Icons.logout),
-            tooltip: 'Logout',
-          ),
-        ],
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircleAvatar(
-              radius: 48,
-              backgroundColor: theme.colorScheme.primary,
-              child: Icon(
-                Icons.person,
-                size: 48,
-                color: theme.colorScheme.onPrimary,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(userName ?? 'User', style: theme.textTheme.headlineSmall),
-            const SizedBox(height: 8),
-            Text(
-              'Plant enthusiast',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
-              ),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Opening profile editor...')),
-                );
-              },
-              icon: const Icon(Icons.edit),
-              label: const Text('Edit Profile'),
-            ),
-          ],
-        ),
       ),
     );
   }

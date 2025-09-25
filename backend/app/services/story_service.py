@@ -16,7 +16,8 @@ from app.models.story import Story, StoryView
 from app.schemas.story import StoryType, StoryPrivacyLevel
 from app.models.user import User
 from app.models.friendship import Friendship, FriendshipStatus
-from app.models.timelapse import TimelapseSession, GrowthPhoto
+from app.models.timelapse import TimelapseSession
+from app.models.growth_photo import GrowthPhoto
 from app.models.seasonal_ai import SeasonalPrediction
 from app.schemas.story import (
     StoryCreate, StoryUpdate, StoryRead, StoryFeed,

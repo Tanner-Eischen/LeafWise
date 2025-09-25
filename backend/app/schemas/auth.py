@@ -5,6 +5,7 @@ data validation and serialization.
 """
 
 from typing import Optional, List
+from uuid import UUID
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from datetime import datetime
 
@@ -15,7 +16,7 @@ class UserBase(BaseModel):
     username: str = Field(..., min_length=3, max_length=30, pattern=r"^[a-zA-Z0-9_]+$")
     display_name: str = Field(..., min_length=1, max_length=50)
     bio: Optional[str] = Field(None, max_length=500)
-    avatar_url: Optional[str] = None
+    profile_picture_url: Optional[str] = None
     
     # Plant-specific fields
     gardening_experience: Optional[str] = Field(None, pattern=r"^(beginner|intermediate|advanced|expert)$")
@@ -24,7 +25,6 @@ class UserBase(BaseModel):
     
     # Privacy settings
     is_private: bool = False
-    show_location: bool = True
     allow_plant_id_requests: bool = True
 
 
@@ -32,6 +32,8 @@ class UserCreate(UserBase):
     """Schema for user registration."""
     password: str = Field(..., min_length=8, max_length=100)
     confirm_password: str = Field(..., min_length=8, max_length=100)
+    
+    model_config = {"from_attributes": True}
     
     @field_validator('confirm_password')
     @classmethod
@@ -72,7 +74,7 @@ class UserUpdate(BaseModel):
 
 class UserRead(UserBase):
     """Schema for reading user data."""
-    id: str
+    id: UUID
     is_verified: bool
     is_active: bool
     created_at: datetime
@@ -90,7 +92,7 @@ class UserRead(UserBase):
 
 class UserPublicRead(BaseModel):
     """Schema for public user data (no sensitive fields)."""
-    id: str
+    id: UUID
     username: str
     display_name: str
     bio: Optional[str] = None
@@ -169,7 +171,7 @@ class ChangePassword(BaseModel):
 
 class LoginRequest(BaseModel):
     """Schema for login request."""
-    username_or_email: str = Field(..., min_length=3)
+    username: str = Field(..., min_length=3, description="Email address or username")
     password: str = Field(..., min_length=1)
     remember_me: bool = False
 

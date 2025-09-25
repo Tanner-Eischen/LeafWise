@@ -48,8 +48,13 @@ class UserService:
             display_name=user_data.display_name or user_data.username,
             hashed_password=hashed_password,
             bio=user_data.bio,
+            profile_picture_url=user_data.profile_picture_url,
             location=user_data.location,
-            gardening_experience=user_data.gardening_experience
+            gardening_experience=user_data.gardening_experience,
+            favorite_plants=user_data.favorite_plants,
+            is_private=user_data.is_private,
+            allow_plant_identification=user_data.allow_plant_id_requests,
+            allow_friend_requests=True  # Default value for friend requests
         )
         
         session.add(user)

@@ -17,9 +17,9 @@ from sqlalchemy.orm import selectinload
 from app.models.user_plant import UserPlant
 from app.models.plant_species import PlantSpecies
 from app.models.plant_care_log import PlantCareLog
-from app.models.environmental_data_cache import EnvironmentalDataCache
-from app.models.seasonal_predictions import SeasonalPredictions
-from app.models.growth_photos import GrowthPhotos
+from app.models.seasonal_ai import EnvironmentalDataCache
+from app.models.seasonal_ai import SeasonalPrediction
+from app.models.growth_photo import GrowthPhoto
 from app.services.environmental_data_service import EnvironmentalDataService
 from app.services.seasonal_ai_service import SeasonalAIService
 
@@ -256,9 +256,9 @@ class ContextAggregationService:
         """
         # Get current seasonal predictions
         result = await self.db.execute(
-            select(SeasonalPredictions)
-            .where(SeasonalPredictions.plant_id == plant_id)
-            .order_by(desc(SeasonalPredictions.created_at))
+            select(SeasonalPrediction)
+            .where(SeasonalPrediction.plant_id == plant_id)
+            .order_by(desc(SeasonalPrediction.created_at))
             .limit(1)
         )
         prediction = result.scalar_one_or_none()
@@ -287,14 +287,14 @@ class ContextAggregationService:
         
         # Get recent growth photos
         result = await self.db.execute(
-            select(GrowthPhotos)
+            select(GrowthPhoto)
             .where(
                 and_(
-                    GrowthPhotos.plant_id == plant_id,
-                    GrowthPhotos.captured_at >= cutoff_date
+                    GrowthPhoto.plant_id == plant_id,
+                    GrowthPhoto.captured_at >= cutoff_date
                 )
             )
-            .order_by(desc(GrowthPhotos.captured_at))
+            .order_by(desc(GrowthPhoto.captured_at))
         )
         photos = result.scalars().all()
         
@@ -347,15 +347,15 @@ class ContextAggregationService:
         cutoff_date = datetime.utcnow() - timedelta(days=days_back)
         
         result = await self.db.execute(
-            select(GrowthPhotos)
+            select(GrowthPhoto)
             .where(
                 and_(
-                    GrowthPhotos.plant_id == plant_id,
-                    GrowthPhotos.captured_at >= cutoff_date,
-                    GrowthPhotos.health_score.isnot(None)
+                    GrowthPhoto.plant_id == plant_id,
+                    GrowthPhoto.captured_at >= cutoff_date,
+                    GrowthPhoto.health_score.isnot(None)
                 )
             )
-            .order_by(desc(GrowthPhotos.captured_at))
+            .order_by(desc(GrowthPhoto.captured_at))
         )
         photos = result.scalars().all()
         
@@ -384,7 +384,7 @@ class ContextAggregationService:
         else:
             return "autumn"
     
-    def _analyze_growth_trend(self, photos: List[GrowthPhotos]) -> str:
+    def _analyze_growth_trend(self, photos: List[GrowthPhoto]) -> str:
         """Analyze growth trend from photos.
         
         Args:

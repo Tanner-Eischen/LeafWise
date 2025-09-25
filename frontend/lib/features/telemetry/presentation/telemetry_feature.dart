@@ -17,7 +17,9 @@ class TelemetryFeature extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentRoute = GoRouterState.of(context).uri.toString();
-    final breadcrumbs = BreadcrumbHelper.generateTelemetryBreadcrumbs(currentRoute);
+    final breadcrumbs = BreadcrumbHelper.generateTelemetryBreadcrumbs(
+      currentRoute,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -33,9 +35,7 @@ class TelemetryFeature extends ConsumerWidget {
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
               color: Colors.grey[100],
-              border: Border(
-                bottom: BorderSide(color: Colors.grey[300]!),
-              ),
+              border: Border(bottom: BorderSide(color: Colors.grey[300]!)),
             ),
             child: BreadcrumbNavigation(items: breadcrumbs),
           ),
@@ -56,9 +56,9 @@ class TelemetryFeature extends ConsumerWidget {
                   const SizedBox(height: 8),
                   Text(
                     'Monitor your plants with environmental sensors and growth tracking.',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Colors.grey[600],
-                    ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyLarge?.copyWith(color: Colors.grey[600]),
                   ),
                   const SizedBox(height: 24),
                   Expanded(
@@ -74,7 +74,8 @@ class TelemetryFeature extends ConsumerWidget {
                           icon: Icons.wb_sunny,
                           onTap: () => Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) => const LightMeasurementScreen(),
+                              builder: (context) =>
+                                  const LightMeasurementScreen(),
                             ),
                           ),
                         ),
@@ -85,7 +86,8 @@ class TelemetryFeature extends ConsumerWidget {
                           icon: Icons.photo_camera,
                           onTap: () => Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) => const GrowthPhotoCaptureScreen(),
+                              builder: (context) =>
+                                  const GrowthPhotoCaptureScreen(),
                             ),
                           ),
                         ),
@@ -96,7 +98,10 @@ class TelemetryFeature extends ConsumerWidget {
                           icon: Icons.history,
                           onTap: () => Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) => const TelemetryHistoryScreen(),
+                              builder: (context) =>
+                                  const TelemetryHistoryScreen(
+                                    plantId: 'default_plant_id',
+                                  ),
                             ),
                           ),
                         ),

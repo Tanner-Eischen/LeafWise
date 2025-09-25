@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:camera/camera.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:leafwise/features/plant_identification/providers/plant_identification_provider.dart';
@@ -8,7 +9,6 @@ import 'package:leafwise/features/plant_identification/providers/enhanced_plant_
 import 'package:leafwise/features/plant_identification/presentation/widgets/plant_identification_result.dart';
 import 'package:leafwise/features/plant_identification/presentation/widgets/plant_identification_loading.dart';
 import 'package:leafwise/features/plant_identification/presentation/widgets/offline_identification_result.dart';
-import 'package:leafwise/features/plant_identification/models/offline_plant_identification_models.dart';
 
 class PlantIdentificationScreen extends ConsumerStatefulWidget {
   const PlantIdentificationScreen({super.key});
@@ -207,17 +207,77 @@ class _PlantIdentificationScreenState
             IconButton(
               icon: const Icon(Icons.sync_problem, color: Colors.orange),
               onPressed: () {
-                // Navigate to offline mode screen or show sync options
-                Navigator.of(context).pushNamed('/offline-mode');
+                context.push('/home/plants/identify/offline-mode');
               },
               tooltip: 'Pending sync',
             ),
           IconButton(
             icon: const Icon(Icons.history, color: Colors.white),
             onPressed: () {
-              // Navigate to identification history
-              Navigator.of(context).pushNamed('/plant-identification-history');
+              context.push('/home/plants/identify/history');
             },
+            tooltip: 'Identification History',
+          ),
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert, color: Colors.white),
+            onSelected: (value) {
+              switch (value) {
+                case 'search':
+                  context.push('/home/plants/identify/search');
+                  break;
+                case 'my_plants':
+                  context.push('/home/plants/care');
+                  break;
+                case 'community':
+                  context.push('/home/plants/community');
+                  break;
+                case 'care_plans':
+                  context.push('/home/plants/care-plans');
+                  break;
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'search',
+                child: Row(
+                  children: [
+                    Icon(Icons.search, color: Colors.black),
+                    SizedBox(width: 8),
+                    Text('Plant Search'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'my_plants',
+                child: Row(
+                  children: [
+                    Icon(Icons.eco, color: Colors.black),
+                    SizedBox(width: 8),
+                    Text('My Plants'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'community',
+                child: Row(
+                  children: [
+                    Icon(Icons.groups, color: Colors.black),
+                    SizedBox(width: 8),
+                    Text('Community'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'care_plans',
+                child: Row(
+                  children: [
+                    Icon(Icons.schedule, color: Colors.black),
+                    SizedBox(width: 8),
+                    Text('Care Plans'),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),

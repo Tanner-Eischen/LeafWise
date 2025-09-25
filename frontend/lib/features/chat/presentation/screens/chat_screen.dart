@@ -125,7 +125,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 ),
                 filled: true,
                 fillColor: theme.colorScheme.surfaceContainerHighest
-                    .withOpacity(0.5),
+                    .withValues(alpha: 0.5),
               ),
             ),
           ),
@@ -165,7 +165,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           Icon(
             Icons.chat_bubble_outline,
             size: 64,
-            color: theme.colorScheme.onSurface.withOpacity(0.5),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 16),
           Text(
@@ -173,7 +173,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 ? 'No conversations found'
                 : 'No messages yet',
             style: theme.textTheme.headlineSmall?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.7),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ),
           const SizedBox(height: 8),
@@ -182,7 +182,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 ? 'Try searching with different keywords'
                 : 'Start chatting with your plant friends!',
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.5),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
             ),
           ),
         ],
@@ -243,7 +243,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           Text(
             _formatTimestamp(conversation.timestamp),
             style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.6),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
             ),
           ),
         ],
@@ -256,9 +256,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: conversation.unreadCount > 0
-                    ? theme.colorScheme.onSurface
-                    : theme.colorScheme.onSurface.withOpacity(0.7),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                 fontWeight: conversation.unreadCount > 0
                     ? FontWeight.w500
                     : FontWeight.normal,

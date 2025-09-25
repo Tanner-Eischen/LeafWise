@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leafwise/core/router/app_router.dart';
+import 'package:leafwise/core/services/preferences_service.dart';
 import 'package:leafwise/features/auth/providers/auth_provider.dart';
 import 'package:leafwise/features/auth/presentation/widgets/auth_text_field.dart';
 import 'package:leafwise/features/auth/presentation/widgets/auth_button.dart';
+import 'package:leafwise/features/auth/presentation/widgets/email_suggestions_field.dart';
 import 'package:leafwise/core/exceptions/api_exception.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -22,28 +24,61 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _rememberMe = false;
 
   @override
+  void initState() {
+    super.initState();
+    _initializePreferences();
+  }
+
+  @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
+  /// Initialize preferences and load saved data
+  Future<void> _initializePreferences() async {
+    await PreferencesService.init();
+    
+    // Load remember me state
+    setState(() {
+      _rememberMe = PreferencesService.getRememberMe();
+    });
+    
+    // Load last email if remember me is enabled
+    if (_rememberMe) {
+      final lastEmail = PreferencesService.getLastEmail();
+      if (lastEmail != null) {
+        _emailController.text = lastEmail;
+      }
+    }
+  }
+
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
     try {
+      print('🔐 Login screen: Starting login process...');
+      
+      // Save email suggestion and remember me state
+      final email = _emailController.text.trim();
+      await PreferencesService.saveEmailSuggestion(email);
+      await PreferencesService.setRememberMe(_rememberMe);
+      
       await ref
           .read(authProvider.notifier)
-          .login(_emailController.text.trim(), _passwordController.text);
+          .login(email, _passwordController.text);
 
-      if (mounted) {
-        context.go(AppRoutes.home);
-      }
+      print('✅ Login screen: Login completed successfully');
+      // Let the router handle navigation automatically via redirect logic
+      // The router will redirect to /home when isAuthenticated becomes true
     } on ApiException catch (e) {
+      print('❌ Login screen: API Exception - ${e.message}');
       if (mounted) {
         _showErrorSnackBar(e.message);
       }
     } catch (e) {
+      print('❌ Login screen: General Exception - $e');
       if (mounted) {
         _showErrorSnackBar('An unexpected error occurred. Please try again.');
       }
@@ -137,13 +172,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                 const SizedBox(height: 48),
 
-                // Email Field
-                AuthTextField(
+                // Email Field with Suggestions
+                EmailSuggestionsField(
                   controller: _emailController,
                   label: 'Email',
                   hintText: 'Enter your email',
-                  keyboardType: TextInputType.emailAddress,
-                  prefixIcon: Icons.email_outlined,
                   validator: _validateEmail,
                   textInputAction: TextInputAction.next,
                 ),
@@ -157,6 +190,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   hintText: 'Enter your password',
                   obscureText: _obscurePassword,
                   prefixIcon: Icons.lock_outlined,
+                  autofillHints: const [AutofillHints.password],
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscurePassword
@@ -181,10 +215,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   children: [
                     Checkbox(
                       value: _rememberMe,
-                      onChanged: (value) {
+                      onChanged: (value) async {
                         setState(() {
                           _rememberMe = value ?? false;
                         });
+                        // Save the remember me state immediately
+                        await PreferencesService.setRememberMe(_rememberMe);
                       },
                     ),
                     Text('Remember me', style: theme.textTheme.bodyMedium),
@@ -194,15 +230,33 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     // Forgot Password Link
                     Align(
                       alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () => _showForgotPasswordDialog(context),
-                        child: Text(
-                          'Forgot Password?',
-                          style: TextStyle(
-                            color: theme.primaryColor,
-                            fontWeight: FontWeight.w500,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Clear suggestions button
+                          TextButton(
+                            onPressed: () => _showClearSuggestionsDialog(context),
+                            child: Text(
+                              'Clear History',
+                              style: TextStyle(
+                                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                                fontWeight: FontWeight.w400,
+                                fontSize: 12,
+                              ),
+                            ),
                           ),
-                        ),
+                          const SizedBox(width: 8),
+                          TextButton(
+                            onPressed: () => _showForgotPasswordDialog(context),
+                            child: Text(
+                              'Forgot Password?',
+                              style: TextStyle(
+                                color: theme.primaryColor,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -319,6 +373,45 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  void _showClearSuggestionsDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Clear Login History'),
+        content: const Text(
+          'This will remove all saved email suggestions and login preferences. Are you sure you want to continue?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              await PreferencesService.clearAll();
+              setState(() {
+                _rememberMe = false;
+                _emailController.clear();
+              });
+              Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Login history cleared successfully'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Clear All'),
+          ),
+        ],
       ),
     );
   }

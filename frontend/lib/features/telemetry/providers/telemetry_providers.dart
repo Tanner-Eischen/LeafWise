@@ -27,6 +27,9 @@ import 'telemetry_state.dart';
 // Database provider imports
 import '../data/providers/telemetry_database_provider.dart';
 
+// Growth tracker imports
+import '../growth_tracker.dart';
+
 // =============================================================================
 // SERVICE PROVIDERS
 // =============================================================================
@@ -75,7 +78,7 @@ class TelemetryNotifier extends StateNotifier<TelemetryState> {
   TelemetryNotifier(this._repository) : super(TelemetryState.initial());
 
   /// Load telemetry data for a specific plant
-  Future<void> loadTelemetryData(String plantId) async {
+  Future<void> loadTelemetryData(String plantId, {TelemetryDataFilter? filter}) async {
     state = state.copyWith(isLoadingData: true, error: null);
     
     try {
@@ -277,6 +280,42 @@ class TelemetryNotifier extends StateNotifier<TelemetryState> {
   /// Toggle offline mode
   void toggleOfflineMode() {
     state = state.copyWith(isOfflineMode: !state.isOfflineMode);
+  }
+
+  /// Delete telemetry data by ID
+  Future<void> deleteTelemetryData(String id) async {
+    state = state.copyWith(isLoadingData: true, error: null);
+    
+    try {
+      await _repository.delete(id);
+      
+      // Remove from current state
+      final updatedData = state.telemetryData.where((item) => item.id != id).toList();
+      state = state.copyWith(
+        telemetryData: updatedData,
+        isLoadingData: false,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        isLoadingData: false,
+        error: 'Failed to delete telemetry data: $e',
+      );
+    }
+  }
+
+  /// Sync pending telemetry data with the server
+  Future<void> syncPendingData() async {
+    state = state.copyWith(isSyncing: true, syncError: null);
+    
+    try {
+      await _repository.syncPendingData();
+      state = state.copyWith(isSyncing: false);
+    } catch (e) {
+      state = state.copyWith(
+        isSyncing: false,
+        syncError: 'Failed to sync data: $e',
+      );
+    }
   }
 
   /// Clear errors
@@ -520,6 +559,63 @@ class DateRangeParams {
     required this.endDate,
   });
 }
+
+/// Provider for growth tracking statistics
+/// Returns growth tracking statistics for a specific plant
+final growthTrackingStatsProvider = FutureProvider.family<GrowthTrackingStats, String>((
+  ref,
+  plantId,
+) async {
+  final repository = ref.watch(telemetryRepositoryProvider);
+  
+  // Query growth photos for the plant
+  final params = TelemetryQueryParams(
+    plantId: plantId,
+    limit: 1000,
+    orderBy: 'timestamp',
+    ascending: true,
+  );
+  
+  final telemetryData = await repository.query(params);
+  final growthPhotos = telemetryData.whereType<GrowthPhotoData>().toList();
+  
+  // Calculate statistics
+  final totalPhotos = growthPhotos.length;
+  final processedPhotos = growthPhotos.where((p) => p.isProcessed).length;
+  final photosWithMetrics = growthPhotos.where((p) => p.metrics != null).length;
+  
+  // Calculate average growth rate if we have metrics
+  double? averageGrowthRate;
+  if (photosWithMetrics >= 2) {
+    final photosWithHeight = growthPhotos
+        .where((p) => p.metrics?.heightCm != null)
+        .toList();
+    
+    if (photosWithHeight.length >= 2) {
+      final firstPhoto = photosWithHeight.first;
+      final lastPhoto = photosWithHeight.last;
+      final heightDiff = (lastPhoto.metrics!.heightCm! - firstPhoto.metrics!.heightCm!);
+      final daysDiff = lastPhoto.capturedAt.difference(firstPhoto.capturedAt).inDays;
+      
+      if (daysDiff > 0) {
+        averageGrowthRate = heightDiff / daysDiff;
+      }
+    }
+  }
+  
+  return GrowthTrackingStats(
+    plantId: plantId,
+    totalPhotos: totalPhotos,
+    processedPhotos: processedPhotos,
+    photosWithMetrics: photosWithMetrics,
+    averageGrowthRate: averageGrowthRate,
+    firstPhotoDate: growthPhotos.isNotEmpty ? growthPhotos.first.capturedAt : null,
+    lastPhotoDate: growthPhotos.isNotEmpty ? growthPhotos.last.capturedAt : null,
+    isContinuousTracking: false, // This would need to be tracked separately
+    currentSessionId: null,
+    currentStreak: 0, // Calculate based on consecutive days with photos
+  );
+});
 
 /// Summary class for telemetry data
 class TelemetrySummary {

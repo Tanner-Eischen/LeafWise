@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Screen for viewing and managing plant care logs
 class CareLogsScreen extends ConsumerStatefulWidget {
-  const CareLogsScreen({super.key});
+  final String plantId;
+  
+  const CareLogsScreen({super.key, required this.plantId});
 
   @override
   ConsumerState<CareLogsScreen> createState() => _CareLogsScreenState();

@@ -23,37 +23,69 @@ mixin _$User {
   String get id => throw _privateConstructorUsedError;
   String get email => throw _privateConstructorUsedError;
   String get username => throw _privateConstructorUsedError;
+  @JsonKey(name: 'display_name')
   String? get displayName => throw _privateConstructorUsedError;
   String? get bio => throw _privateConstructorUsedError;
+  @JsonKey(name: 'profile_picture_url')
   String? get profilePictureUrl => throw _privateConstructorUsedError;
   String? get location => throw _privateConstructorUsedError;
+  @JsonKey(name: 'date_of_birth')
   DateTime? get dateOfBirth => throw _privateConstructorUsedError;
+  @JsonKey(name: 'is_private')
   bool get isPrivate => throw _privateConstructorUsedError;
+  @JsonKey(name: 'followers_count')
   int get followersCount => throw _privateConstructorUsedError;
+  @JsonKey(name: 'following_count')
   int get followingCount => throw _privateConstructorUsedError;
+  @JsonKey(name: 'posts_count')
   int get postsCount => throw _privateConstructorUsedError;
+  @JsonKey(name: 'is_active')
   bool get isActive => throw _privateConstructorUsedError;
+  @JsonKey(name: 'is_verified')
   bool get isVerified => throw _privateConstructorUsedError;
+  @JsonKey(name: 'last_seen')
   DateTime? get lastSeen => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'updated_at')
   DateTime? get updatedAt =>
       throw _privateConstructorUsedError; // Role-based access control fields
+  @JsonKey(name: 'is_admin')
   bool get isAdmin => throw _privateConstructorUsedError;
+  @JsonKey(name: 'is_expert')
   bool get isExpert => throw _privateConstructorUsedError;
+  @JsonKey(name: 'is_moderator')
   bool get isModerator => throw _privateConstructorUsedError;
+  @JsonKey(name: 'is_superuser')
   bool get isSuperuser => throw _privateConstructorUsedError;
+  @JsonKey(name: 'has_telemetry_access')
+  bool get hasTelemetryAccess => throw _privateConstructorUsedError;
+  @JsonKey(name: 'admin_permissions')
   String? get adminPermissions =>
       throw _privateConstructorUsedError; // JSON string of admin permissions
+  @JsonKey(name: 'expert_specialties')
   String? get expertSpecialties =>
       throw _privateConstructorUsedError; // JSON string of expert specialties
 // Plant-specific fields for Phase 2
+  @JsonKey(name: 'plant_interests')
   List<String> get plantInterests => throw _privateConstructorUsedError;
+  @JsonKey(name: 'experience_level')
   String? get experienceLevel =>
       throw _privateConstructorUsedError; // 'beginner', 'intermediate', 'expert'
+  @JsonKey(name: 'favorite_genres')
   List<String> get favoriteGenres => throw _privateConstructorUsedError;
+  @JsonKey(name: 'garden_type')
   String? get gardenType =>
       throw _privateConstructorUsedError; // 'indoor', 'outdoor', 'balcony', 'greenhouse'
-  String? get climate => throw _privateConstructorUsedError;
+  String? get climate =>
+      throw _privateConstructorUsedError; // 'tropical', 'temperate', 'arid', 'continental'
+// Additional backend fields that might be missing
+  @JsonKey(name: 'gardening_experience')
+  String? get gardeningExperience => throw _privateConstructorUsedError;
+  @JsonKey(name: 'favorite_plants')
+  String? get favoritePlants => throw _privateConstructorUsedError;
+  @JsonKey(name: 'allow_plant_id_requests')
+  bool get allowPlantIdRequests => throw _privateConstructorUsedError;
 
   /// Serializes this User to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -73,31 +105,35 @@ abstract class $UserCopyWith<$Res> {
       {String id,
       String email,
       String username,
-      String? displayName,
+      @JsonKey(name: 'display_name') String? displayName,
       String? bio,
-      String? profilePictureUrl,
+      @JsonKey(name: 'profile_picture_url') String? profilePictureUrl,
       String? location,
-      DateTime? dateOfBirth,
-      bool isPrivate,
-      int followersCount,
-      int followingCount,
-      int postsCount,
-      bool isActive,
-      bool isVerified,
-      DateTime? lastSeen,
-      DateTime createdAt,
-      DateTime? updatedAt,
-      bool isAdmin,
-      bool isExpert,
-      bool isModerator,
-      bool isSuperuser,
-      String? adminPermissions,
-      String? expertSpecialties,
-      List<String> plantInterests,
-      String? experienceLevel,
-      List<String> favoriteGenres,
-      String? gardenType,
-      String? climate});
+      @JsonKey(name: 'date_of_birth') DateTime? dateOfBirth,
+      @JsonKey(name: 'is_private') bool isPrivate,
+      @JsonKey(name: 'followers_count') int followersCount,
+      @JsonKey(name: 'following_count') int followingCount,
+      @JsonKey(name: 'posts_count') int postsCount,
+      @JsonKey(name: 'is_active') bool isActive,
+      @JsonKey(name: 'is_verified') bool isVerified,
+      @JsonKey(name: 'last_seen') DateTime? lastSeen,
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'updated_at') DateTime? updatedAt,
+      @JsonKey(name: 'is_admin') bool isAdmin,
+      @JsonKey(name: 'is_expert') bool isExpert,
+      @JsonKey(name: 'is_moderator') bool isModerator,
+      @JsonKey(name: 'is_superuser') bool isSuperuser,
+      @JsonKey(name: 'has_telemetry_access') bool hasTelemetryAccess,
+      @JsonKey(name: 'admin_permissions') String? adminPermissions,
+      @JsonKey(name: 'expert_specialties') String? expertSpecialties,
+      @JsonKey(name: 'plant_interests') List<String> plantInterests,
+      @JsonKey(name: 'experience_level') String? experienceLevel,
+      @JsonKey(name: 'favorite_genres') List<String> favoriteGenres,
+      @JsonKey(name: 'garden_type') String? gardenType,
+      String? climate,
+      @JsonKey(name: 'gardening_experience') String? gardeningExperience,
+      @JsonKey(name: 'favorite_plants') String? favoritePlants,
+      @JsonKey(name: 'allow_plant_id_requests') bool allowPlantIdRequests});
 }
 
 /// @nodoc
@@ -136,6 +172,7 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
     Object? isExpert = null,
     Object? isModerator = null,
     Object? isSuperuser = null,
+    Object? hasTelemetryAccess = null,
     Object? adminPermissions = freezed,
     Object? expertSpecialties = freezed,
     Object? plantInterests = null,
@@ -143,6 +180,9 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
     Object? favoriteGenres = null,
     Object? gardenType = freezed,
     Object? climate = freezed,
+    Object? gardeningExperience = freezed,
+    Object? favoritePlants = freezed,
+    Object? allowPlantIdRequests = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -229,6 +269,10 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
           ? _value.isSuperuser
           : isSuperuser // ignore: cast_nullable_to_non_nullable
               as bool,
+      hasTelemetryAccess: null == hasTelemetryAccess
+          ? _value.hasTelemetryAccess
+          : hasTelemetryAccess // ignore: cast_nullable_to_non_nullable
+              as bool,
       adminPermissions: freezed == adminPermissions
           ? _value.adminPermissions
           : adminPermissions // ignore: cast_nullable_to_non_nullable
@@ -257,6 +301,18 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
           ? _value.climate
           : climate // ignore: cast_nullable_to_non_nullable
               as String?,
+      gardeningExperience: freezed == gardeningExperience
+          ? _value.gardeningExperience
+          : gardeningExperience // ignore: cast_nullable_to_non_nullable
+              as String?,
+      favoritePlants: freezed == favoritePlants
+          ? _value.favoritePlants
+          : favoritePlants // ignore: cast_nullable_to_non_nullable
+              as String?,
+      allowPlantIdRequests: null == allowPlantIdRequests
+          ? _value.allowPlantIdRequests
+          : allowPlantIdRequests // ignore: cast_nullable_to_non_nullable
+              as bool,
     ) as $Val);
   }
 }
@@ -272,31 +328,35 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
       {String id,
       String email,
       String username,
-      String? displayName,
+      @JsonKey(name: 'display_name') String? displayName,
       String? bio,
-      String? profilePictureUrl,
+      @JsonKey(name: 'profile_picture_url') String? profilePictureUrl,
       String? location,
-      DateTime? dateOfBirth,
-      bool isPrivate,
-      int followersCount,
-      int followingCount,
-      int postsCount,
-      bool isActive,
-      bool isVerified,
-      DateTime? lastSeen,
-      DateTime createdAt,
-      DateTime? updatedAt,
-      bool isAdmin,
-      bool isExpert,
-      bool isModerator,
-      bool isSuperuser,
-      String? adminPermissions,
-      String? expertSpecialties,
-      List<String> plantInterests,
-      String? experienceLevel,
-      List<String> favoriteGenres,
-      String? gardenType,
-      String? climate});
+      @JsonKey(name: 'date_of_birth') DateTime? dateOfBirth,
+      @JsonKey(name: 'is_private') bool isPrivate,
+      @JsonKey(name: 'followers_count') int followersCount,
+      @JsonKey(name: 'following_count') int followingCount,
+      @JsonKey(name: 'posts_count') int postsCount,
+      @JsonKey(name: 'is_active') bool isActive,
+      @JsonKey(name: 'is_verified') bool isVerified,
+      @JsonKey(name: 'last_seen') DateTime? lastSeen,
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'updated_at') DateTime? updatedAt,
+      @JsonKey(name: 'is_admin') bool isAdmin,
+      @JsonKey(name: 'is_expert') bool isExpert,
+      @JsonKey(name: 'is_moderator') bool isModerator,
+      @JsonKey(name: 'is_superuser') bool isSuperuser,
+      @JsonKey(name: 'has_telemetry_access') bool hasTelemetryAccess,
+      @JsonKey(name: 'admin_permissions') String? adminPermissions,
+      @JsonKey(name: 'expert_specialties') String? expertSpecialties,
+      @JsonKey(name: 'plant_interests') List<String> plantInterests,
+      @JsonKey(name: 'experience_level') String? experienceLevel,
+      @JsonKey(name: 'favorite_genres') List<String> favoriteGenres,
+      @JsonKey(name: 'garden_type') String? gardenType,
+      String? climate,
+      @JsonKey(name: 'gardening_experience') String? gardeningExperience,
+      @JsonKey(name: 'favorite_plants') String? favoritePlants,
+      @JsonKey(name: 'allow_plant_id_requests') bool allowPlantIdRequests});
 }
 
 /// @nodoc
@@ -332,6 +392,7 @@ class __$$UserImplCopyWithImpl<$Res>
     Object? isExpert = null,
     Object? isModerator = null,
     Object? isSuperuser = null,
+    Object? hasTelemetryAccess = null,
     Object? adminPermissions = freezed,
     Object? expertSpecialties = freezed,
     Object? plantInterests = null,
@@ -339,6 +400,9 @@ class __$$UserImplCopyWithImpl<$Res>
     Object? favoriteGenres = null,
     Object? gardenType = freezed,
     Object? climate = freezed,
+    Object? gardeningExperience = freezed,
+    Object? favoritePlants = freezed,
+    Object? allowPlantIdRequests = null,
   }) {
     return _then(_$UserImpl(
       id: null == id
@@ -425,6 +489,10 @@ class __$$UserImplCopyWithImpl<$Res>
           ? _value.isSuperuser
           : isSuperuser // ignore: cast_nullable_to_non_nullable
               as bool,
+      hasTelemetryAccess: null == hasTelemetryAccess
+          ? _value.hasTelemetryAccess
+          : hasTelemetryAccess // ignore: cast_nullable_to_non_nullable
+              as bool,
       adminPermissions: freezed == adminPermissions
           ? _value.adminPermissions
           : adminPermissions // ignore: cast_nullable_to_non_nullable
@@ -453,6 +521,18 @@ class __$$UserImplCopyWithImpl<$Res>
           ? _value.climate
           : climate // ignore: cast_nullable_to_non_nullable
               as String?,
+      gardeningExperience: freezed == gardeningExperience
+          ? _value.gardeningExperience
+          : gardeningExperience // ignore: cast_nullable_to_non_nullable
+              as String?,
+      favoritePlants: freezed == favoritePlants
+          ? _value.favoritePlants
+          : favoritePlants // ignore: cast_nullable_to_non_nullable
+              as String?,
+      allowPlantIdRequests: null == allowPlantIdRequests
+          ? _value.allowPlantIdRequests
+          : allowPlantIdRequests // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -464,31 +544,38 @@ class _$UserImpl implements _User {
       {required this.id,
       required this.email,
       required this.username,
-      this.displayName,
+      @JsonKey(name: 'display_name') this.displayName,
       this.bio,
-      this.profilePictureUrl,
+      @JsonKey(name: 'profile_picture_url') this.profilePictureUrl,
       this.location,
-      this.dateOfBirth,
-      this.isPrivate = false,
-      this.followersCount = 0,
-      this.followingCount = 0,
-      this.postsCount = 0,
-      this.isActive = true,
-      this.isVerified = false,
-      this.lastSeen,
-      required this.createdAt,
-      this.updatedAt,
-      this.isAdmin = false,
-      this.isExpert = false,
-      this.isModerator = false,
-      this.isSuperuser = false,
-      this.adminPermissions,
-      this.expertSpecialties,
+      @JsonKey(name: 'date_of_birth') this.dateOfBirth,
+      @JsonKey(name: 'is_private') this.isPrivate = false,
+      @JsonKey(name: 'followers_count') this.followersCount = 0,
+      @JsonKey(name: 'following_count') this.followingCount = 0,
+      @JsonKey(name: 'posts_count') this.postsCount = 0,
+      @JsonKey(name: 'is_active') this.isActive = true,
+      @JsonKey(name: 'is_verified') this.isVerified = false,
+      @JsonKey(name: 'last_seen') this.lastSeen,
+      @JsonKey(name: 'created_at') required this.createdAt,
+      @JsonKey(name: 'updated_at') this.updatedAt,
+      @JsonKey(name: 'is_admin') this.isAdmin = false,
+      @JsonKey(name: 'is_expert') this.isExpert = false,
+      @JsonKey(name: 'is_moderator') this.isModerator = false,
+      @JsonKey(name: 'is_superuser') this.isSuperuser = false,
+      @JsonKey(name: 'has_telemetry_access') this.hasTelemetryAccess = false,
+      @JsonKey(name: 'admin_permissions') this.adminPermissions,
+      @JsonKey(name: 'expert_specialties') this.expertSpecialties,
+      @JsonKey(name: 'plant_interests')
       final List<String> plantInterests = const [],
-      this.experienceLevel,
+      @JsonKey(name: 'experience_level') this.experienceLevel,
+      @JsonKey(name: 'favorite_genres')
       final List<String> favoriteGenres = const [],
-      this.gardenType,
-      this.climate})
+      @JsonKey(name: 'garden_type') this.gardenType,
+      this.climate,
+      @JsonKey(name: 'gardening_experience') this.gardeningExperience,
+      @JsonKey(name: 'favorite_plants') this.favoritePlants,
+      @JsonKey(name: 'allow_plant_id_requests')
+      this.allowPlantIdRequests = true})
       : _plantInterests = plantInterests,
         _favoriteGenres = favoriteGenres;
 
@@ -502,56 +589,67 @@ class _$UserImpl implements _User {
   @override
   final String username;
   @override
+  @JsonKey(name: 'display_name')
   final String? displayName;
   @override
   final String? bio;
   @override
+  @JsonKey(name: 'profile_picture_url')
   final String? profilePictureUrl;
   @override
   final String? location;
   @override
+  @JsonKey(name: 'date_of_birth')
   final DateTime? dateOfBirth;
   @override
-  @JsonKey()
+  @JsonKey(name: 'is_private')
   final bool isPrivate;
   @override
-  @JsonKey()
+  @JsonKey(name: 'followers_count')
   final int followersCount;
   @override
-  @JsonKey()
+  @JsonKey(name: 'following_count')
   final int followingCount;
   @override
-  @JsonKey()
+  @JsonKey(name: 'posts_count')
   final int postsCount;
   @override
-  @JsonKey()
+  @JsonKey(name: 'is_active')
   final bool isActive;
   @override
-  @JsonKey()
+  @JsonKey(name: 'is_verified')
   final bool isVerified;
   @override
+  @JsonKey(name: 'last_seen')
   final DateTime? lastSeen;
   @override
+  @JsonKey(name: 'created_at')
   final DateTime createdAt;
   @override
+  @JsonKey(name: 'updated_at')
   final DateTime? updatedAt;
 // Role-based access control fields
   @override
-  @JsonKey()
+  @JsonKey(name: 'is_admin')
   final bool isAdmin;
   @override
-  @JsonKey()
+  @JsonKey(name: 'is_expert')
   final bool isExpert;
   @override
-  @JsonKey()
+  @JsonKey(name: 'is_moderator')
   final bool isModerator;
   @override
-  @JsonKey()
+  @JsonKey(name: 'is_superuser')
   final bool isSuperuser;
   @override
+  @JsonKey(name: 'has_telemetry_access')
+  final bool hasTelemetryAccess;
+  @override
+  @JsonKey(name: 'admin_permissions')
   final String? adminPermissions;
 // JSON string of admin permissions
   @override
+  @JsonKey(name: 'expert_specialties')
   final String? expertSpecialties;
 // JSON string of expert specialties
 // Plant-specific fields for Phase 2
@@ -559,7 +657,7 @@ class _$UserImpl implements _User {
 // JSON string of expert specialties
 // Plant-specific fields for Phase 2
   @override
-  @JsonKey()
+  @JsonKey(name: 'plant_interests')
   List<String> get plantInterests {
     if (_plantInterests is EqualUnmodifiableListView) return _plantInterests;
     // ignore: implicit_dynamic_type
@@ -567,12 +665,13 @@ class _$UserImpl implements _User {
   }
 
   @override
+  @JsonKey(name: 'experience_level')
   final String? experienceLevel;
 // 'beginner', 'intermediate', 'expert'
   final List<String> _favoriteGenres;
 // 'beginner', 'intermediate', 'expert'
   @override
-  @JsonKey()
+  @JsonKey(name: 'favorite_genres')
   List<String> get favoriteGenres {
     if (_favoriteGenres is EqualUnmodifiableListView) return _favoriteGenres;
     // ignore: implicit_dynamic_type
@@ -580,14 +679,26 @@ class _$UserImpl implements _User {
   }
 
   @override
+  @JsonKey(name: 'garden_type')
   final String? gardenType;
 // 'indoor', 'outdoor', 'balcony', 'greenhouse'
   @override
   final String? climate;
+// 'tropical', 'temperate', 'arid', 'continental'
+// Additional backend fields that might be missing
+  @override
+  @JsonKey(name: 'gardening_experience')
+  final String? gardeningExperience;
+  @override
+  @JsonKey(name: 'favorite_plants')
+  final String? favoritePlants;
+  @override
+  @JsonKey(name: 'allow_plant_id_requests')
+  final bool allowPlantIdRequests;
 
   @override
   String toString() {
-    return 'User(id: $id, email: $email, username: $username, displayName: $displayName, bio: $bio, profilePictureUrl: $profilePictureUrl, location: $location, dateOfBirth: $dateOfBirth, isPrivate: $isPrivate, followersCount: $followersCount, followingCount: $followingCount, postsCount: $postsCount, isActive: $isActive, isVerified: $isVerified, lastSeen: $lastSeen, createdAt: $createdAt, updatedAt: $updatedAt, isAdmin: $isAdmin, isExpert: $isExpert, isModerator: $isModerator, isSuperuser: $isSuperuser, adminPermissions: $adminPermissions, expertSpecialties: $expertSpecialties, plantInterests: $plantInterests, experienceLevel: $experienceLevel, favoriteGenres: $favoriteGenres, gardenType: $gardenType, climate: $climate)';
+    return 'User(id: $id, email: $email, username: $username, displayName: $displayName, bio: $bio, profilePictureUrl: $profilePictureUrl, location: $location, dateOfBirth: $dateOfBirth, isPrivate: $isPrivate, followersCount: $followersCount, followingCount: $followingCount, postsCount: $postsCount, isActive: $isActive, isVerified: $isVerified, lastSeen: $lastSeen, createdAt: $createdAt, updatedAt: $updatedAt, isAdmin: $isAdmin, isExpert: $isExpert, isModerator: $isModerator, isSuperuser: $isSuperuser, hasTelemetryAccess: $hasTelemetryAccess, adminPermissions: $adminPermissions, expertSpecialties: $expertSpecialties, plantInterests: $plantInterests, experienceLevel: $experienceLevel, favoriteGenres: $favoriteGenres, gardenType: $gardenType, climate: $climate, gardeningExperience: $gardeningExperience, favoritePlants: $favoritePlants, allowPlantIdRequests: $allowPlantIdRequests)';
   }
 
   @override
@@ -633,6 +744,8 @@ class _$UserImpl implements _User {
                 other.isModerator == isModerator) &&
             (identical(other.isSuperuser, isSuperuser) ||
                 other.isSuperuser == isSuperuser) &&
+            (identical(other.hasTelemetryAccess, hasTelemetryAccess) ||
+                other.hasTelemetryAccess == hasTelemetryAccess) &&
             (identical(other.adminPermissions, adminPermissions) ||
                 other.adminPermissions == adminPermissions) &&
             (identical(other.expertSpecialties, expertSpecialties) ||
@@ -645,7 +758,13 @@ class _$UserImpl implements _User {
                 .equals(other._favoriteGenres, _favoriteGenres) &&
             (identical(other.gardenType, gardenType) ||
                 other.gardenType == gardenType) &&
-            (identical(other.climate, climate) || other.climate == climate));
+            (identical(other.climate, climate) || other.climate == climate) &&
+            (identical(other.gardeningExperience, gardeningExperience) ||
+                other.gardeningExperience == gardeningExperience) &&
+            (identical(other.favoritePlants, favoritePlants) ||
+                other.favoritePlants == favoritePlants) &&
+            (identical(other.allowPlantIdRequests, allowPlantIdRequests) ||
+                other.allowPlantIdRequests == allowPlantIdRequests));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -673,13 +792,17 @@ class _$UserImpl implements _User {
         isExpert,
         isModerator,
         isSuperuser,
+        hasTelemetryAccess,
         adminPermissions,
         expertSpecialties,
         const DeepCollectionEquality().hash(_plantInterests),
         experienceLevel,
         const DeepCollectionEquality().hash(_favoriteGenres),
         gardenType,
-        climate
+        climate,
+        gardeningExperience,
+        favoritePlants,
+        allowPlantIdRequests
       ]);
 
   /// Create a copy of User
@@ -703,31 +826,36 @@ abstract class _User implements User {
       {required final String id,
       required final String email,
       required final String username,
-      final String? displayName,
+      @JsonKey(name: 'display_name') final String? displayName,
       final String? bio,
-      final String? profilePictureUrl,
+      @JsonKey(name: 'profile_picture_url') final String? profilePictureUrl,
       final String? location,
-      final DateTime? dateOfBirth,
-      final bool isPrivate,
-      final int followersCount,
-      final int followingCount,
-      final int postsCount,
-      final bool isActive,
-      final bool isVerified,
-      final DateTime? lastSeen,
-      required final DateTime createdAt,
-      final DateTime? updatedAt,
-      final bool isAdmin,
-      final bool isExpert,
-      final bool isModerator,
-      final bool isSuperuser,
-      final String? adminPermissions,
-      final String? expertSpecialties,
-      final List<String> plantInterests,
-      final String? experienceLevel,
-      final List<String> favoriteGenres,
-      final String? gardenType,
-      final String? climate}) = _$UserImpl;
+      @JsonKey(name: 'date_of_birth') final DateTime? dateOfBirth,
+      @JsonKey(name: 'is_private') final bool isPrivate,
+      @JsonKey(name: 'followers_count') final int followersCount,
+      @JsonKey(name: 'following_count') final int followingCount,
+      @JsonKey(name: 'posts_count') final int postsCount,
+      @JsonKey(name: 'is_active') final bool isActive,
+      @JsonKey(name: 'is_verified') final bool isVerified,
+      @JsonKey(name: 'last_seen') final DateTime? lastSeen,
+      @JsonKey(name: 'created_at') required final DateTime createdAt,
+      @JsonKey(name: 'updated_at') final DateTime? updatedAt,
+      @JsonKey(name: 'is_admin') final bool isAdmin,
+      @JsonKey(name: 'is_expert') final bool isExpert,
+      @JsonKey(name: 'is_moderator') final bool isModerator,
+      @JsonKey(name: 'is_superuser') final bool isSuperuser,
+      @JsonKey(name: 'has_telemetry_access') final bool hasTelemetryAccess,
+      @JsonKey(name: 'admin_permissions') final String? adminPermissions,
+      @JsonKey(name: 'expert_specialties') final String? expertSpecialties,
+      @JsonKey(name: 'plant_interests') final List<String> plantInterests,
+      @JsonKey(name: 'experience_level') final String? experienceLevel,
+      @JsonKey(name: 'favorite_genres') final List<String> favoriteGenres,
+      @JsonKey(name: 'garden_type') final String? gardenType,
+      final String? climate,
+      @JsonKey(name: 'gardening_experience') final String? gardeningExperience,
+      @JsonKey(name: 'favorite_plants') final String? favoritePlants,
+      @JsonKey(name: 'allow_plant_id_requests')
+      final bool allowPlantIdRequests}) = _$UserImpl;
 
   factory _User.fromJson(Map<String, dynamic> json) = _$UserImpl.fromJson;
 
@@ -738,56 +866,91 @@ abstract class _User implements User {
   @override
   String get username;
   @override
+  @JsonKey(name: 'display_name')
   String? get displayName;
   @override
   String? get bio;
   @override
+  @JsonKey(name: 'profile_picture_url')
   String? get profilePictureUrl;
   @override
   String? get location;
   @override
+  @JsonKey(name: 'date_of_birth')
   DateTime? get dateOfBirth;
   @override
+  @JsonKey(name: 'is_private')
   bool get isPrivate;
   @override
+  @JsonKey(name: 'followers_count')
   int get followersCount;
   @override
+  @JsonKey(name: 'following_count')
   int get followingCount;
   @override
+  @JsonKey(name: 'posts_count')
   int get postsCount;
   @override
+  @JsonKey(name: 'is_active')
   bool get isActive;
   @override
+  @JsonKey(name: 'is_verified')
   bool get isVerified;
   @override
+  @JsonKey(name: 'last_seen')
   DateTime? get lastSeen;
   @override
+  @JsonKey(name: 'created_at')
   DateTime get createdAt;
   @override
+  @JsonKey(name: 'updated_at')
   DateTime? get updatedAt; // Role-based access control fields
   @override
+  @JsonKey(name: 'is_admin')
   bool get isAdmin;
   @override
+  @JsonKey(name: 'is_expert')
   bool get isExpert;
   @override
+  @JsonKey(name: 'is_moderator')
   bool get isModerator;
   @override
+  @JsonKey(name: 'is_superuser')
   bool get isSuperuser;
   @override
+  @JsonKey(name: 'has_telemetry_access')
+  bool get hasTelemetryAccess;
+  @override
+  @JsonKey(name: 'admin_permissions')
   String? get adminPermissions; // JSON string of admin permissions
   @override
+  @JsonKey(name: 'expert_specialties')
   String? get expertSpecialties; // JSON string of expert specialties
 // Plant-specific fields for Phase 2
   @override
+  @JsonKey(name: 'plant_interests')
   List<String> get plantInterests;
   @override
+  @JsonKey(name: 'experience_level')
   String? get experienceLevel; // 'beginner', 'intermediate', 'expert'
   @override
+  @JsonKey(name: 'favorite_genres')
   List<String> get favoriteGenres;
   @override
+  @JsonKey(name: 'garden_type')
   String? get gardenType; // 'indoor', 'outdoor', 'balcony', 'greenhouse'
   @override
-  String? get climate;
+  String? get climate; // 'tropical', 'temperate', 'arid', 'continental'
+// Additional backend fields that might be missing
+  @override
+  @JsonKey(name: 'gardening_experience')
+  String? get gardeningExperience;
+  @override
+  @JsonKey(name: 'favorite_plants')
+  String? get favoritePlants;
+  @override
+  @JsonKey(name: 'allow_plant_id_requests')
+  bool get allowPlantIdRequests;
 
   /// Create a copy of User
   /// with the given fields replaced by the non-null parameter values.

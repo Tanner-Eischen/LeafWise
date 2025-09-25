@@ -8,18 +8,18 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/models/plant_models.dart';
-import '../../../core/providers/plant_provider.dart';
-import '../../../core/widgets/loading_indicator.dart';
-import '../../../core/widgets/error_display.dart';
-import '../../../core/utils/date_formatter.dart';
-import '../../../core/utils/color_utils.dart';
+import '../../../../core/models/plant_models.dart';
+import '../../../../core/providers/plant_provider.dart';
+import '../../../../core/widgets/loading_indicator.dart';
+import '../../../../core/widgets/error_display.dart';
+import '../../../../core/utils/date_formatter.dart';
+import '../../../../core/utils/color_utils.dart';
 
 // Telemetry imports
 import '../../../telemetry/providers/telemetry_providers.dart';
 import '../../../telemetry/models/telemetry_data_models.dart';
 
-import 'package:leafwise/features/plant_care/models/plant_care_models.dart';
+import 'package:leafwise/features/plant_care/models/plant_care_models.dart' as plant_care;
 import 'package:leafwise/features/plant_care/providers/plant_care_provider.dart';
 import 'package:leafwise/features/plant_care/presentation/widgets/care_reminder_card.dart';
 
@@ -35,7 +35,7 @@ class PlantDetailScreen extends ConsumerStatefulWidget {
 class _PlantDetailScreenState extends ConsumerState<PlantDetailScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  UserPlant? _plant;
+  plant_care.UserPlant? _plant;
   bool _isLoading = true;
 
   @override
@@ -431,7 +431,7 @@ class _PlantDetailScreenState extends ConsumerState<PlantDetailScreen>
       );
     }
 
-    final sortedLogs = List<PlantCareLog>.from(_plant!.careLogs!)
+    final sortedLogs = List<plant_care.PlantCareLog>.from(_plant!.careLogs!)
       ..sort((a, b) => b.careDate.compareTo(a.careDate));
 
     return ListView.builder(
@@ -444,7 +444,7 @@ class _PlantDetailScreenState extends ConsumerState<PlantDetailScreen>
     );
   }
 
-  Widget _buildCareLogCard(PlantCareLog log) {
+  Widget _buildCareLogCard(plant_care.PlantCareLog log) {
     final theme = Theme.of(context);
 
     return Card(
@@ -674,15 +674,15 @@ class _PlantDetailScreenState extends ConsumerState<PlantDetailScreen>
     // TODO: Navigate to add reminder screen
   }
 
-  void _editReminder(PlantCareReminder reminder) {
+  void _editReminder(plant_care.PlantCareReminder reminder) {
     // TODO: Navigate to edit reminder screen
   }
 
-  void _completeReminder(PlantCareReminder reminder) {
+  void _completeReminder(plant_care.PlantCareReminder reminder) {
     // TODO: Mark reminder as completed and log care activity
   }
 
-  void _snoozeReminder(PlantCareReminder reminder) {
+  void _snoozeReminder(plant_care.PlantCareReminder reminder) {
     // TODO: Snooze reminder for a specified duration
   }
 

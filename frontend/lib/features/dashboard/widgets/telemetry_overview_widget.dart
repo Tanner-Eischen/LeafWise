@@ -11,18 +11,25 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 // Feature imports
 import '../../telemetry/providers/telemetry_providers.dart';
 import '../../telemetry/providers/telemetry_state.dart';
-import '../../telemetry/models/telemetry_data_models.dart';
 import '../../telemetry/growth_tracker.dart';
 
 /// Widget that displays telemetry overview with key metrics and insights
 class TelemetryOverviewWidget extends ConsumerWidget {
-  const TelemetryOverviewWidget({super.key});
+  final String? plantId;
+  
+  const TelemetryOverviewWidget({
+    super.key,
+    this.plantId,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final telemetryState = ref.watch(telemetryNotifierProvider);
-    final growthStats = ref.watch(growthTrackingStatsProvider);
+    
+    // Use a default plant ID if none provided
+    final effectivePlantId = plantId ?? 'default_plant_id';
+    final growthStatsAsync = ref.watch(growthTrackingStatsProvider(effectivePlantId));
 
     return Card(
       elevation: 4,
@@ -72,7 +79,7 @@ class TelemetryOverviewWidget extends ConsumerWidget {
 
             // Data state
             if (!telemetryState.isLoadingData && telemetryState.error == null)
-              _buildDataOverview(context, theme, telemetryState, growthStats),
+              _buildDataOverview(context, theme, telemetryState, growthStatsAsync),
           ],
         ),
       ),
@@ -299,7 +306,9 @@ class TelemetryOverviewWidget extends ConsumerWidget {
                 context,
                 theme,
                 'Avg Growth',
-                '${stats.averageGrowthRate.toStringAsFixed(1)}%',
+                stats.averageGrowthRate != null 
+                  ? '${stats.averageGrowthRate!.toStringAsFixed(1)} cm/day'
+                  : 'N/A',
               ),
               _buildStatItem(
                 context,
@@ -433,15 +442,15 @@ class TelemetryOverviewWidget extends ConsumerWidget {
     // Light reading insights
     if (telemetryState.lightReadings.isNotEmpty) {
       final recentReadings = telemetryState.lightReadings
-          .where((reading) => DateTime.now()
-              .difference(reading.createdAt)
+          .where((reading) => reading.createdAt != null && DateTime.now()
+              .difference(reading.createdAt!)
               .inDays < 7)
           .toList();
 
       if (recentReadings.isNotEmpty) {
         final avgLight = recentReadings
             .map((r) => r.ppfdValue)
-            .reduce((a, b) => a + b) / recentReadings.length;
+            .reduce((a, b) => a! + b!)! / recentReadings.length;
 
         if (avgLight < 200) {
           insights.add('Your plants may need more light. Consider moving them closer to a window.');
@@ -454,8 +463,8 @@ class TelemetryOverviewWidget extends ConsumerWidget {
     // Growth photo insights
     if (telemetryState.growthPhotos.isNotEmpty) {
       final recentPhotos = telemetryState.growthPhotos
-          .where((photo) => DateTime.now()
-              .difference(photo.createdAt)
+          .where((photo) => photo.createdAt != null && DateTime.now()
+              .difference(photo.createdAt!)
               .inDays < 7)
           .toList();
 
